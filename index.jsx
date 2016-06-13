@@ -9,9 +9,23 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import {LoginPage} from './components/login.jsx';
 
+export class Top extends React.Component {
+	render() {
+		return (
+			<div>
+				top
+				{this.props.children}
+			</div>
+		);
+	}
+};
+
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={getMuiTheme()}>
-		<LoginPage />
+		<Router history={hashHistory}>
+			<Route path="/" component={Top} />
+			<Route path="/login" component={LoginPage} />
+		</Router>
 	</MuiThemeProvider>
 	,document.getElementById("content")
 );

@@ -1,6 +1,6 @@
 import React from 'react';
-import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Router, Route, hashHistory} from 'react-router';
+import {Card} from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -53,19 +53,24 @@ export class LoginIcon extends React.Component {
 };
 
 export class LoginForm extends React.Component {
-	constructor(props) {
-		super(props);
-		this.handleSubmit = this.handleSubmit.bind(this);
+	constructor(props, context) {
+		super(props, context);
 		this.state = {message: ''};
 	}
 
-	handleSubmit() {
-		console.log('LoginForm.handleSubmit()');
+	handleSubmit(e) {
+		e.preventDefault();
+		alert('LoginForm.handleSubmit()');
+	}
+
+	handleClickRegister(e) {
+		e.preventDefault();
+		this.context.router.push('/');
 	}
 
 	render() {
 		return (
-			<section style={styles.form}><form>
+			<section style={styles.form}><form onSubmit={(event) => this.handleSubmit(event)}>
 				<Card
 					style={styles.card}
 				>
@@ -81,12 +86,16 @@ export class LoginForm extends React.Component {
 						underlineShow={false}
 					/>
 				</Card>
-				<RaisedButton label="ログイン" primary={true} style={styles.login}/>
-				<RaisedButton label="新規登録" primary={true} style={styles.register}/>
+				<RaisedButton label="ログイン" primary={true} style={styles.login} type="submit" />
+				<RaisedButton label="新規登録" primary={true} style={styles.register} onClick={(event) => this.handleClickRegister(event)} />
 			</form></section>
 		);
 	}
 };
+
+LoginForm.contextTypes = {
+  router: React.PropTypes.object.isRequired
+}
 
 export class LoginPage extends React.Component {
 	render() {
@@ -94,6 +103,7 @@ export class LoginPage extends React.Component {
 			<article>
 				<LoginIcon />
 				<LoginForm />
+				{this.props.children}
 			</article>
 		);
 	}
