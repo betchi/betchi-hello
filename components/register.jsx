@@ -1,21 +1,13 @@
 import React from 'react';
-import {Router, Route, hashHistory, Link} from 'react-router';
+import {Router, Route, hashHistory} from 'react-router';
 import {Card} from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
 
+import {LoginIcon} from './login.jsx';
+
 const styles = {
-	iconBox: {
-		display: 'display:table-cell',
-		width: '42px',
-		height: '200px',
-		margin: 'auto',
-	},
-	icon: {
-		width: '100%',
-		marginTop: '75px',
-	},
 	formBox: {
 		width: '100%',
 		maxWidth: '30rem',
@@ -33,7 +25,7 @@ const styles = {
 		marginRight: '1rem',
 		lineHeight: '1.5rem',
 	},
-	login: {
+	register: {
 		width: '100%',
 		maxWidth: '30rem',
 		marginTop: '0.5rem',
@@ -45,31 +37,16 @@ const styles = {
 	},
 };
 
-export class LoginIcon extends React.Component {
-	render() {
-		return (
-			<section style={styles.iconBox}>
-				<Link to={'/'}><img src="/assets/img/icon.png" style={styles.icon} /></Link>
-			</section>
-		);
-	}
-};
-
-export class LoginForm extends React.Component {
+export class RegisterForm extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {message: ''};
 		this.onSubmit = this.onSubmit.bind(this);
-		this.onTapRegister = this.onTapRegister.bind(this);
 	}
 
 	onSubmit(e) {
 		e.preventDefault();
-		alert('LoginForm.onSubmit()');
-	}
-
-	onTapRegister(e) {
-		this.context.router.push('/register');
+		alert('RegisterForm.onSubmit()');
 	}
 
 	render() {
@@ -89,25 +66,29 @@ export class LoginForm extends React.Component {
 						hintText='パスワード'
 						underlineShow={false}
 					/>
+					<Divider />
+					<TextField
+						style={styles.text}
+						hintText='パスワード（確認）'
+						underlineShow={false}
+					/>
 				</Card>
-				<RaisedButton label="ログイン" primary={true} style={styles.login} type="submit" />
-				<RaisedButton label="新規登録" primary={true} style={styles.register} onTouchTap={this.onTapRegister} />
+				<RaisedButton label="登録" primary={true} style={styles.register} type="submit" />
 			</form></section>
 		);
 	}
 };
 
-LoginForm.contextTypes = {
+RegisterForm.contextTypes = {
   router: React.PropTypes.object.isRequired
 }
 
-export class LoginPage extends React.Component {
+export class RegisterPage extends React.Component {
 	render() {
 		return (
 			<section>
 				<LoginIcon />
-				<LoginForm />
-				{this.props.children}
+				<RegisterForm />
 			</section>
 		);
 	}
