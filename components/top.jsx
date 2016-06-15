@@ -2,12 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
+import {Tabs, Tab} from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 
 import ActionHome from 'material-ui/svg-icons/action/home';
+
+import SwipeableViews from 'react-swipeable-views';
 
 export class DrawerMenu extends React.Component {
 	constructor(props, context) {
@@ -62,6 +65,103 @@ DrawerMenu.contextTypes = {
   router: React.PropTypes.object.isRequired
 }
 
+export class TopTab extends React.Component {
+	constructor(props, context) {
+		super(props, context);
+		this.state = {
+			tab: 0,
+			categories: [
+				{label: 'ビジネス', value: 'business'},
+				{label: 'デザイン', value: 'design'},
+				{label: 'プログラム', value: 'programming'},
+				{label: '言語', value: 'language'},
+				{label: 'スポーツ', value: 'sports'},
+				{label: 'ライフ', value: 'life'},
+				{label: '教育', value: 'education'},
+				{label: '大学', value: 'university'},
+				{label: '音楽', value: 'music'},
+			],
+		};
+		this.onChangeTab = this.onChangeTab.bind(this);
+	}
+
+	onChangeTab(tab) {
+		this.setState({
+			tab: tab,
+		});
+
+		if (tab > 0) {
+			let tabs = 9;
+			let box = document.getElementById("tab-box");
+			let pos = (box.scrollWidth / tabs) * (tab - 1);
+			box.scrollLeft = pos;
+		}
+	}
+
+	render() {
+		const styles = {
+			root: {
+				overflow: 'hidden',
+			},
+			tabsBox: {
+				overflowX: 'scroll',
+				webkitOverflowScrolling: 'touch',
+				webkitTransform: 'translateZ(0px)',
+			},
+			tabs: {
+				width: '175%',
+			},
+		};
+		return (
+			<div style={styles.root}><div style={styles.tabsBox} id="tab-box">
+			<Tabs
+				value={this.state.tab}
+				onChange={this.onChangeTab}
+				style={styles.tabs}
+			>
+				{this.state.categories.map(function(row, index) {
+					return (
+						<Tab label={row.label} value={index} />
+					);
+				})}
+			</Tabs>
+			</div>
+				<SwipeableViews
+					index={this.state.tab}
+					onChangeIndex={this.onChangeTab}
+				>
+				{this.state.categories.map(function(row, index) {
+					return (
+					<div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+						<div>hogehogehogehogehogehogehogehogehogehoge</div>
+					</div>
+					);
+				})}
+
+				</SwipeableViews>
+			</div>
+		);
+	}
+}
+TopTab.contextTypes = {
+  router: React.PropTypes.object.isRequired
+}
+
 export class TopPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -82,7 +182,7 @@ export class TopPage extends React.Component {
 					title='応援し合う世界へ'
 					onLeftIconButtonTouchTap={this.onDrawerToggle}
 				/>
-				TOP
+				<TopTab />
 				{this.props.children}
 			</section>
 		);
@@ -91,5 +191,4 @@ export class TopPage extends React.Component {
 TopPage.contextTypes = {
   router: React.PropTypes.object.isRequired
 }
-
 
