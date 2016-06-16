@@ -90,11 +90,43 @@ export class TopTab extends React.Component {
 			tab: tab,
 		});
 
-		if (tab > 0) {
-			let tabs = 9;
-			let box = document.getElementById("tab-box");
-			let pos = (box.scrollWidth / tabs) * (tab - 1);
-			box.scrollLeft = pos;
+		let box = document.getElementById("tab-box");
+		let tabs = 9;
+		let scrollLeftMax = box.scrollWidth - box.clientWidth;
+		if (tab > 2) {
+			let pos = (box.scrollWidth / tabs) * (tab - 2);
+			if (pos > scrollLeftMax) {
+				pos = scrollLeftMax;
+			}
+			this.scrollTab(box.scrollLeft, pos);
+		} else {
+			this.scrollTab(box.scrollLeft, 0);
+		}
+	}
+
+	scrollTab(cur, pos) {
+		if (cur == pos) {
+			return;
+		}
+
+		let box = document.getElementById("tab-box");
+		const step = Math.abs((Math.abs(pos) - Math.abs(cur))) / 10;
+		if (pos > cur) {
+			const interval = setInterval(() => {
+				if (box.scrollLeft < pos) {
+					box.scrollLeft += step;
+				} else {
+					clearInterval(interval);
+				}
+			}, 15);
+		} else {
+			const interval = setInterval(() => {
+				if (box.scrollLeft > pos) {
+					box.scrollLeft -= step;
+				} else {
+					clearInterval(interval);
+				}
+			}, 15);
 		}
 	}
 
