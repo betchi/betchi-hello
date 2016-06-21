@@ -84,6 +84,14 @@ RegisterForm.contextTypes = {
 }
 
 export class RegisterPage extends React.Component {
+	componentWillMount() {
+		document.bgColor = '#303F9F';
+	}
+
+	componentWillUnmount() {
+		document.bgColor = '#E8EAF6';
+	}
+
 	render() {
 		return (
 			<section>

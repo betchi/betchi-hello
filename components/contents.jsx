@@ -30,7 +30,7 @@ export class MentoringCover extends React.Component {
 			title: {
 				position: 'absolute',
 				left: '5%',
-				top: '30%',
+				top: '20%',
 				color: 'white',
 				fontSize: '2rem',
 				fontWeight: 'bolder',
@@ -96,6 +96,7 @@ export class MentoringDigest extends React.Component {
 			digest: {
 				width: '100%',
 				fontSize: '0.9rem',
+				fontWeight: 'bold',
 			},
 			starBox: {
 				display: 'inline-block',
@@ -127,13 +128,14 @@ export class MentoringDigest extends React.Component {
 			<div style={styles.digestBox}>
 				<div style={styles.digest}>{this.props.digest}</div>
 				<div style={styles.starBox}>
-				{stars.map((star) => {
+				{stars.map((star, index) => {
+					const key = "star" + index;
 					if (0 == star) {
-						return <StarBorder style={styles.star} />
+						return <StarBorder key={key} style={styles.star} />
 					} else if (1 == star) {
-						return <Star style={styles.star} />
+						return <Star key={key} style={styles.star} />
 					}
-					return <StarHalf style={styles.star} />
+					return <StarHalf key={key} style={styles.star} />
 				})}
 				</div>
 				<div style={styles.goodBox}>
@@ -170,6 +172,9 @@ export class MentoringCard extends React.Component {
 		const styles = {
 			card: {
 				width: '100%',
+				boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.24), 0 -1px 2px rgba(0,0,0,0.12), 0 -1px 1px rgba(0,0,0,0.24)',
+				transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
+				marginTop: '16px',
 				backgroundColor: 'white',
 			},
 		};
@@ -212,15 +217,14 @@ export class MentoringList extends React.Component {
 
 	render() {
 		const styles = {
-			card: {
-				width: '100%',
-				backgroundColor: 'white',
+			list: {
 			},
 		};
 		return (
-			<section>
-				{this.props.mentorings.map((mentoring) => {
-					return <MentoringCard mentoring={mentoring} />
+			<section style={styles.list}>
+				{this.props.mentorings.map((mentoring, index) => {
+					const key = "mentoring" + index;
+					return <MentoringCard key={key} mentoring={mentoring} />
 				})}
 			</section>
 		);

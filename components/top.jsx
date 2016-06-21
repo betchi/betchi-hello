@@ -8,9 +8,11 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import ActionHome from 'material-ui/svg-icons/action/home';
+import Snackbar from 'material-ui/Snackbar';
 
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import SwipeableViews from 'react-swipeable-views';
+import HeadRoom from 'react-headroom';
 
 import {MentoringList} from './contents.jsx';
 
@@ -91,6 +93,8 @@ export class TopTab extends React.Component {
 		this.setState({
 			tab: tab,
 		});
+		let category = this.state.categories[tab];
+		this.props.loadContents(category.value);
 
 		// scroll tab
 		let box = document.getElementById("tab-box");
@@ -170,44 +174,102 @@ TopTab.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 
+TopTab.propTypes = {
+	loadContents: React.PropTypes.func.isRequired
+}
+
 export class TopPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.state = {
+			mentorings: [],
+			snack: {
+				open: false,
+				message: '',
+			}
+		};
 		this.onDrawerToggle = this.onDrawerToggle.bind(this);
+		this.onSnackClose = this.onSnackClose.bind(this);
+		this.loadContents = this.loadContents.bind(this);
+	}
+
+	componentDidMount() {
+		this.loadContents('business');
+	}
+
+	loadContents(category) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/' + category + '.json');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					}
+				});
+				return;
+			}
+			let mentorings = JSON.parse(xhr.responseText);
+			this.setState({
+				mentorings: mentorings,
+			});
+			if (mentorings.length == 0) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '検索ヒット0件です。',
+					}
+				});
+				return;
+			}
+			window.scrollTo(0,0);
+		}
+		xhr.send();
 	}
 
 	onDrawerToggle(e) {
 		this.refs.drawerMenu.onToggle();
 	}
 
+	onSnackClose(e) {
+		this.setState({
+			snack: {
+				open: false,
+				message: '',
+			}
+		})
+	}
+
 	render() {
-		let mentorings = [];
-		for (var ii = 0; ii < 10; ii++) {
-			mentorings.push({
-				cover: '/cover.jpg',
-				avatar: '/avatar.jpg',
-				title: '海人の生き方教えます。',
-				duration: '1時間',
-				price: 'いいね値段',
-				digest: '海人の杉江です。海人の生き方教えます。',
-				star: 3,
-				countGood: 10,
-				countMentors: 5,
-				countFollowers: 10,
-			})
+		const styles = {
+			headroom: {
+				WebkitTransition: 'all .3s ease-in-out',
+				MozTransition: 'all .3s ease-in-out',
+				OTransition: 'all .3s ease-in-out',
+				transition: 'all .3s ease-in-out',
+			},
 		}
 		return (
 			<section>
 				<DrawerMenu 
 					ref='drawerMenu'
 				/>
-				<AppBar
-					title='応援し合う世界へ'
-					onLeftIconButtonTouchTap={this.onDrawerToggle}
-				/>
-				<TopTab />
+				<HeadRoom style={styles.headroom}>
+					<AppBar
+						title='応援し合う世界へ'
+						onLeftIconButtonTouchTap={this.onDrawerToggle}
+					/>
+					<TopTab loadContents={this.loadContents} />
+				</HeadRoom>
 				<MentoringList
-					mentorings={mentorings}
+					mentorings={this.state.mentorings}
+				/>
+				<Snackbar
+					open={this.state.snack.open}
+					message={this.state.snack.message}
+					autoHideDuration={4000}
+					onRequestClose={this.onSnackClose}
 				/>
 			</section>
 		);
