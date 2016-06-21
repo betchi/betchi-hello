@@ -7,10 +7,12 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-
 import ActionHome from 'material-ui/svg-icons/action/home';
 
+import RefreshIndicator from 'material-ui/RefreshIndicator';
 import SwipeableViews from 'react-swipeable-views';
+
+import {MentoringList} from './contents.jsx';
 
 export class DrawerMenu extends React.Component {
 	constructor(props, context) {
@@ -62,7 +64,7 @@ export class DrawerMenu extends React.Component {
 	}
 }
 DrawerMenu.contextTypes = {
-  router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired
 }
 
 export class TopTab extends React.Component {
@@ -90,6 +92,7 @@ export class TopTab extends React.Component {
 			tab: tab,
 		});
 
+		// scroll tab
 		let box = document.getElementById("tab-box");
 		let tabs = 9;
 		let scrollLeftMax = box.scrollWidth - box.clientWidth;
@@ -137,61 +140,34 @@ export class TopTab extends React.Component {
 			},
 			tabsBox: {
 				overflowX: 'scroll',
-				webkitOverflowScrolling: 'touch',
-				webkitTransform: 'translateZ(0px)',
+				WebkitOverflowScrolling: 'touch',
+				WebkitTransform: 'translateZ(0px)',
 			},
 			tabs: {
 				width: '175%',
 			},
 		};
 		return (
-			<div style={styles.root}><div style={styles.tabsBox} id="tab-box">
-			<Tabs
-				value={this.state.tab}
-				onChange={this.onChangeTab}
-				style={styles.tabs}
-			>
-				{this.state.categories.map(function(row, index) {
-					return (
-						<Tab label={row.label} value={index} />
-					);
-				})}
-			</Tabs>
-			</div>
-				<SwipeableViews
-					index={this.state.tab}
-					onChangeIndex={this.onChangeTab}
-				>
-				{this.state.categories.map(function(row, index) {
-					return (
-					<div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-						<div>hogehogehogehogehogehogehogehogehogehoge</div>
-					</div>
-					);
-				})}
-
-				</SwipeableViews>
+			<div style={styles.root}>
+				<div style={styles.tabsBox} id="tab-box">
+					<Tabs
+						value={this.state.tab}
+						onChange={this.onChangeTab}
+						style={styles.tabs}
+					>
+						{this.state.categories.map(function(row, index) {
+							return (
+								<Tab key={row.value} label={row.label} value={index} />
+							);
+						})}
+					</Tabs>
+				</div>
 			</div>
 		);
 	}
 }
 TopTab.contextTypes = {
-  router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired
 }
 
 export class TopPage extends React.Component {
@@ -205,6 +181,21 @@ export class TopPage extends React.Component {
 	}
 
 	render() {
+		let mentorings = [];
+		for (var ii = 0; ii < 10; ii++) {
+			mentorings.push({
+				cover: '/cover.jpg',
+				avatar: '/avatar.jpg',
+				title: '海人の生き方教えます。',
+				duration: '1時間',
+				price: 'いいね値段',
+				digest: '海人の杉江です。海人の生き方教えます。',
+				star: 3,
+				countGood: 10,
+				countMentors: 5,
+				countFollowers: 10,
+			})
+		}
 		return (
 			<section>
 				<DrawerMenu 
@@ -215,12 +206,14 @@ export class TopPage extends React.Component {
 					onLeftIconButtonTouchTap={this.onDrawerToggle}
 				/>
 				<TopTab />
-				{this.props.children}
+				<MentoringList
+					mentorings={mentorings}
+				/>
 			</section>
 		);
 	}
 }
 TopPage.contextTypes = {
-  router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired
 }
 

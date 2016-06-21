@@ -5,48 +5,20 @@ import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
 
-const styles = {
-	iconBox: {
-		display: 'display:table-cell',
-		width: '42px',
-		height: '200px',
-		margin: 'auto',
-	},
-	icon: {
-		width: '100%',
-		marginTop: '75px',
-	},
-	formBox: {
-		width: '100%',
-		maxWidth: '30rem',
-		margin: 'auto',
-	},
-	form: {
-		margin: '8px',
-	},
-	card: {
-	},
-	text: {
-		fontSize: '0.8rem',
-		width: '90%',
-		marginLeft: '1rem',
-		marginRight: '1rem',
-		lineHeight: '1.5rem',
-	},
-	login: {
-		width: '100%',
-		maxWidth: '30rem',
-		marginTop: '0.5rem',
-	},
-	register: {
-		width: '100%',
-		maxWidth: '30rem',
-		marginTop: '0.5rem',
-	},
-};
-
 export class LoginIcon extends React.Component {
 	render() {
+		const styles = {
+			iconBox: {
+				display: 'display:table-cell',
+				width: '42px',
+				height: '200px',
+				margin: 'auto',
+			},
+			icon: {
+				width: '100%',
+				marginTop: '75px',
+			},
+		}
 		return (
 			<section style={styles.iconBox}>
 				<Link to={'/'}><img src="/assets/img/icon.png" style={styles.icon} /></Link>
@@ -73,6 +45,36 @@ export class LoginForm extends React.Component {
 	}
 
 	render() {
+		const styles = {
+			formBox: {
+				width: '100%',
+				maxWidth: '30rem',
+				margin: 'auto',
+			},
+			form: {
+				margin: '8px',
+			},
+			card: {
+			},
+			text: {
+				fontSize: '0.8rem',
+				width: '90%',
+				marginLeft: '1rem',
+				marginRight: '1rem',
+				lineHeight: '1.5rem',
+			},
+			login: {
+				width: '100%',
+				maxWidth: '30rem',
+				marginTop: '0.5rem',
+			},
+			register: {
+				width: '100%',
+				maxWidth: '30rem',
+				marginTop: '0.5rem',
+			},
+		};
+
 		return (
 			<section style={styles.formBox}><form style={styles.form} onSubmit={this.onSubmit}>
 				<Card
