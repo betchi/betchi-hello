@@ -9,8 +9,10 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import ActionHome from 'material-ui/svg-icons/action/home';
+import ActionSearch from 'material-ui/svg-icons/action/search';
 import Snackbar from 'material-ui/Snackbar';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
+import IconButton from 'material-ui/IconButton';
 
 import SwipeableViews from 'react-swipeable-views';
 import HeadRoom from 'react-headroom';
@@ -290,6 +292,12 @@ export class TopPage extends React.Component {
 
 	render() {
 		const styles = {
+			searchBox: {
+				position: 'fixed',
+				top: 0,
+				width: '100%',
+				height: '64px',
+			},
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
 				MozTransition: 'all .3s ease-in-out',
@@ -311,6 +319,8 @@ export class TopPage extends React.Component {
 				<DrawerMenu 
 					ref='drawerMenu'
 				/>
+				<div style={styles.searchBox}>
+				</div>
 				<HeadRoom
 					style={styles.headroom}
 					upTolerance={60}
@@ -318,6 +328,12 @@ export class TopPage extends React.Component {
 					<AppBar
 						title='応援し合う世界へ'
 						onLeftIconButtonTouchTap={this.onDrawerToggle}
+						iconElementRight={
+							<IconButton>
+								<ActionSearch
+								/>
+							</IconButton>
+						}
 					/>
 					<TopTab loadContents={this.loadContents} />
 				</HeadRoom>
