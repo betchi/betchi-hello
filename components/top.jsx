@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
+import {Card} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
@@ -9,8 +10,8 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import ActionHome from 'material-ui/svg-icons/action/home';
 import Snackbar from 'material-ui/Snackbar';
-
 import RefreshIndicator from 'material-ui/RefreshIndicator';
+
 import SwipeableViews from 'react-swipeable-views';
 import HeadRoom from 'react-headroom';
 
@@ -141,6 +142,7 @@ export class TopTab extends React.Component {
 		const styles = {
 			root: {
 				overflow: 'hidden',
+				backgroundColor: baseTheme.palette.primary1Color,
 			},
 			tabsBox: {
 				overflowX: 'scroll',
@@ -149,6 +151,9 @@ export class TopTab extends React.Component {
 			},
 			tabs: {
 				width: '175%',
+			},
+			tab: {
+				fontWeight: 'bold',
 			},
 		};
 		return (
@@ -161,7 +166,7 @@ export class TopTab extends React.Component {
 					>
 						{this.state.categories.map(function(row, index) {
 							return (
-								<Tab key={row.value} label={row.label} value={index} />
+								<Tab style={styles.tab} key={row.value} label={row.label} value={index} />
 							);
 						})}
 					</Tabs>
@@ -186,20 +191,29 @@ export class TopPage extends React.Component {
 			snack: {
 				open: false,
 				message: '',
-			}
+			},
+			refreshStyle: {
+				position: 'relative',
+				display: 'inline-block',
+			},
 		};
 		this.onDrawerToggle = this.onDrawerToggle.bind(this);
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.loadContents = this.loadContents.bind(this);
+		this.onScroll = this.onScroll.bind(this);
 	}
 
 	componentDidMount() {
-		this.loadContents('business');
+		this.loadContents();
 	}
 
-	loadContents(category) {
+	componentWillUnmount() {
+		window.removeEventListener('scroll', this.onScroll);
+	}
+
+	loadContents(category = 'business', page = 1) {
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/' + category + '.json');
+		xhr.open('GET', '/' + category + '.json?p=' + page);
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
 				this.setState({
@@ -210,22 +224,55 @@ export class TopPage extends React.Component {
 				});
 				return;
 			}
-			let mentorings = JSON.parse(xhr.responseText);
+			let mentorings = [];
+			let data = JSON.parse(xhr.responseText);
+			if (page === 1) {
+				mentorings = data;
+			} else {
+				mentorings = this.state.mentorings.slice();
+				for (var ii in data) {
+					mentorings.push(data[ii]);
+				}
+			}
 			this.setState({
 				mentorings: mentorings,
+				refreshStyle: {
+					position: 'relative',
+					display: 'inline-block',
+				},
 			});
+			this.state.category = category;
+			this.state.page = page;
+
 			if (mentorings.length == 0) {
 				this.setState({
 					snack: {
 						open: true,
 						message: '検索ヒット0件です。',
-					}
+					},
+					refreshStyle: {
+						display: 'none',
+					},
 				});
 				return;
 			}
-			window.scrollTo(0,0);
+			if (page === 1) {
+				window.scrollTo(0,0);
+			}
+			window.addEventListener('scroll', this.onScroll);
 		}
 		xhr.send();
+	}
+
+	onScroll(e) {
+		let body = window.document.body;
+		let html = window.document.documentElement;
+		let scrollTop = body.scrollTop || html.scrollTop;
+		let bottom = html.scrollHeight - html.clientHeight - scrollTop;
+		if (bottom <= 60) {
+			window.removeEventListener('scroll', this.onScroll);
+			this.loadContents(this.state.category, this.state.page + 1);
+		}
 	}
 
 	onDrawerToggle(e) {
@@ -249,13 +296,25 @@ export class TopPage extends React.Component {
 				OTransition: 'all .3s ease-in-out',
 				transition: 'all .3s ease-in-out',
 			},
+			refreshBox: {
+				position: 'relative',
+				margin: '16px 0',
+				width: '100%',
+			},
+			refreshMargin: {
+					width: '40px',
+					margin: 'auto',
+			},
 		}
 		return (
 			<section>
 				<DrawerMenu 
 					ref='drawerMenu'
 				/>
-				<HeadRoom style={styles.headroom}>
+				<HeadRoom
+					style={styles.headroom}
+					upTolerance={60}
+				>
 					<AppBar
 						title='応援し合う世界へ'
 						onLeftIconButtonTouchTap={this.onDrawerToggle}
@@ -265,6 +324,17 @@ export class TopPage extends React.Component {
 				<MentoringList
 					mentorings={this.state.mentorings}
 				/>
+				<div style={styles.refreshBox}>
+					<div style={styles.refreshMargin}>
+						<RefreshIndicator
+							size={40}
+							left={0}
+							top={0}
+							status="loading"
+							style={this.state.refreshStyle}
+						/>
+					</div>
+				</div>
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}

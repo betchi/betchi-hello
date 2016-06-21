@@ -105,12 +105,10 @@ LoginForm.contextTypes = {
 
 export class LoginPage extends React.Component {
 	componentWillMount() {
-		console.log('componentWillMount');
 		document.bgColor = '#303F9F';
 	}
 
 	componentWillUnmount() {
-		console.log('componentWillUnmount');
 		document.bgColor = '#E8EAF6';
 	}
 
