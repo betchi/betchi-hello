@@ -13,6 +13,7 @@ import ActionSearch from 'material-ui/svg-icons/action/search';
 import Snackbar from 'material-ui/Snackbar';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import IconButton from 'material-ui/IconButton';
+import TextField from 'material-ui/TextField';
 
 import SwipeableViews from 'react-swipeable-views';
 import HeadRoom from 'react-headroom';
@@ -198,11 +199,22 @@ export class TopPage extends React.Component {
 				position: 'relative',
 				display: 'inline-block',
 			},
+			searchBoxStyle: {
+				position: 'fixed',
+				top: 0,
+				width: '100%',
+				height: '64px',
+				zIndex: 0,
+			},
+			category: 'business',
+			page: 1,
+			q: '',
 		};
 		this.onDrawerToggle = this.onDrawerToggle.bind(this);
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.loadContents = this.loadContents.bind(this);
 		this.onScroll = this.onScroll.bind(this);
+		this.onSearchOpen = this.onSearchOpen.bind(this);
 	}
 
 	componentDidMount() {
@@ -222,7 +234,10 @@ export class TopPage extends React.Component {
 					snack: {
 						open: true,
 						message: '通信に失敗しました。',
-					}
+					},
+					refreshStyle: {
+						display: 'none',
+					},
 				});
 				return;
 			}
@@ -238,10 +253,6 @@ export class TopPage extends React.Component {
 			}
 			this.setState({
 				mentorings: mentorings,
-				refreshStyle: {
-					position: 'relative',
-					display: 'inline-block',
-				},
 			});
 			this.state.category = category;
 			this.state.page = page;
@@ -263,6 +274,12 @@ export class TopPage extends React.Component {
 			}
 			window.addEventListener('scroll', this.onScroll);
 		}
+		this.setState({
+			refreshStyle: {
+				position: 'relative',
+				display: 'inline-block',
+			},
+		});
 		xhr.send();
 	}
 
@@ -281,6 +298,10 @@ export class TopPage extends React.Component {
 		this.refs.drawerMenu.onToggle();
 	}
 
+	onSearchOpen(e) {
+		this.context.router.push('/search');
+	}
+
 	onSnackClose(e) {
 		this.setState({
 			snack: {
@@ -292,12 +313,6 @@ export class TopPage extends React.Component {
 
 	render() {
 		const styles = {
-			searchBox: {
-				position: 'fixed',
-				top: 0,
-				width: '100%',
-				height: '64px',
-			},
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
 				MozTransition: 'all .3s ease-in-out',
@@ -310,8 +325,8 @@ export class TopPage extends React.Component {
 				width: '100%',
 			},
 			refreshMargin: {
-					width: '40px',
-					margin: 'auto',
+				width: '40px',
+				margin: 'auto',
 			},
 		}
 		return (
@@ -319,8 +334,6 @@ export class TopPage extends React.Component {
 				<DrawerMenu 
 					ref='drawerMenu'
 				/>
-				<div style={styles.searchBox}>
-				</div>
 				<HeadRoom
 					style={styles.headroom}
 					upTolerance={60}
@@ -329,9 +342,8 @@ export class TopPage extends React.Component {
 						title='応援し合う世界へ'
 						onLeftIconButtonTouchTap={this.onDrawerToggle}
 						iconElementRight={
-							<IconButton>
-								<ActionSearch
-								/>
+							<IconButton onTouchTap={this.onSearchOpen}>
+								<ActionSearch />
 							</IconButton>
 						}
 					/>

@@ -10,6 +10,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {LoginPage} from './components/login.jsx';
 import {RegisterPage} from './components/register.jsx';
 import {TopPage} from './components/top.jsx';
+import {SearchPage} from './components/search.jsx';
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -17,6 +18,7 @@ ReactDOM.render(
 			<Route path="/" component={TopPage} />
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
+			<Route path="/search" component={SearchPage} />
 		</Router>
 	</MuiThemeProvider>
 	,document.getElementById("content")
