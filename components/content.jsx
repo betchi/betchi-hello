@@ -400,7 +400,9 @@ export class MentoringList extends React.Component {
 		return (
 			<section style={styles.list}>
 				{this.props.mentorings.map((mentoring, index) => {
-					const key = "mentoring_" + mentoring.id;
+					// Todo: change key
+					//const key = "mentoring_" + mentoring.id;
+					const key = "mentoring_" + index;
 					return <MentoringCard key={key} mentoring={mentoring} />
 				})}
 			</section>

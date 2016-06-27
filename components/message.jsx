@@ -66,6 +66,7 @@ export class ThxMessageList extends React.Component {
 		return (
 			<section style={styles.root}>
 				{this.props.messages.map((message, index) => {
+					// Todo: change key
 					//const key = "thx-message_" + message.id;
 					const key = "thx-message_" + index;
 					return <div key={key}><Divider /><ThxMessage avatar={message.avatar} message={message.message} /></div>
