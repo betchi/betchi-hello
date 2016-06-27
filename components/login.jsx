@@ -1,5 +1,5 @@
 import React from 'react';
-import {Router, Route, hashHistory, Link} from 'react-router';
+import {Router, Route, IndexRoute, History, hashHistory, Link} from 'react-router';
 import {Card} from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
@@ -93,7 +93,7 @@ export class LoginForm extends React.Component {
 					/>
 				</Card>
 				<RaisedButton label="ログイン" primary={true} style={styles.login} type="submit" />
-				<RaisedButton label="新規登録" primary={true} style={styles.register} onTouchTap={this.onTapRegister} />
+				<RaisedButton label="新規登録" primary={true} style={styles.register} onTouchEnd={this.onTapRegister} />
 			</form></section>
 		);
 	}

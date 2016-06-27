@@ -18,7 +18,7 @@ import TextField from 'material-ui/TextField';
 import SwipeableViews from 'react-swipeable-views';
 import HeadRoom from 'react-headroom';
 
-import {MentoringList} from './contents.jsx';
+import {MentoringList} from './content.jsx';
 
 export class SearchPage extends React.Component {
 	constructor(props, context) {

@@ -11,6 +11,7 @@ import {LoginPage} from './components/login.jsx';
 import {RegisterPage} from './components/register.jsx';
 import {TopPage} from './components/top.jsx';
 import {SearchPage} from './components/search.jsx';
+import {MentoringPage} from './components/mentoring.jsx';
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -19,6 +20,7 @@ ReactDOM.render(
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
 			<Route path="/search" component={SearchPage} />
+			<Route path="/mentoring/:id" component={MentoringPage} />
 		</Router>
 	</MuiThemeProvider>
 	,document.getElementById("content")

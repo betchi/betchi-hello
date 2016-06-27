@@ -1,5 +1,5 @@
 import React from 'react';
-import {Router, Route, hashHistory} from 'react-router';
+import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import {Card} from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
