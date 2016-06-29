@@ -163,6 +163,82 @@ MentoringCoverSwipe.propTypes = {
 	covers: React.PropTypes.array.isRequired,
 }
 
+export class RatingStar extends React.Component {
+	constructor(props, context) {
+		super(props, context);
+	}
+
+	render() {
+		let stars = [];
+		for (var ii = 0; ii < 5; ii++) {
+			if (1 <= this.props.star - ii) {
+				stars.push(1);
+			} else if (0 >= this.props.star - ii) {
+				stars.push(0);
+			} else {
+				stars.push(0.5);
+			}
+		}
+		return (
+			<div style={this.props.rootStyle}>
+				{stars.map((star, index) => {
+					const key = "star" + index;
+					if (0 == star) {
+						return <StarBorder key={key} style={this.props.starStyle} />
+					} else if (1 == star) {
+						return <Star key={key} style={this.props.starStyle} />
+					}
+					return <StarHalf key={key} style={this.props.starStyle} />
+				})}
+			</div>
+		);
+	}
+};
+RatingStar.contextTypes = {
+	router: React.PropTypes.object.isRequired
+}
+RatingStar.propTypes = {
+	star: React.PropTypes.number.isRequired,
+}
+RatingStar.defaultProps = {
+	rootStyle: {
+	},
+	starStyle: {
+		width: '16px',
+	},
+}
+
+export class ThxSummury extends React.Component {
+	constructor(props, context) {
+		super(props, context);
+	}
+
+	render() {
+		return (
+			<div style={this.props.rootStyle}>
+				お礼{this.props.countThx}件&nbsp;
+				メンター{this.props.countMentors}人&nbsp;
+				フォロー{this.props.countFollowers}人&nbsp;
+			</div>
+		);
+	}
+};
+ThxSummury.contextTypes = {
+	router: React.PropTypes.object.isRequired
+}
+ThxSummury.propTypes = {
+	rootStyle: React.PropTypes.object,
+	countThx: React.PropTypes.number.isRequired,
+	countMentors: React.PropTypes.number.isRequired,
+	countFollowers: React.PropTypes.number.isRequired,
+}
+ThxSummury.defaultProps = {
+	rootStyle: {
+	},
+	countThx: 0,
+	countMentors: 0,
+	countFollowers: 0,
+}
 
 export class MentoringDigest extends React.Component {
 	constructor(props, context) {
@@ -171,7 +247,7 @@ export class MentoringDigest extends React.Component {
 
 	render() {
 		const styles = {
-			digestBox: {
+			root: {
 				width: '98%',
 				padding: '0 1%',
 			},
@@ -180,15 +256,14 @@ export class MentoringDigest extends React.Component {
 				fontSize: '0.9rem',
 				fontWeight: 'bold',
 			},
-			starBox: {
+			starRoot: {
 				display: 'inline-block',
+				boxSizing: 'border-box',
 				width: '30%',
 			},
-			star: {
-				width: '16px',
-			},
-			thxBox: {
+			thxRoot: {
 				display: 'inline-block',
+				boxSizing: 'border-box',
 				width: '70%',
 				fontSize: '0.75rem',
 				lineHeight: '1.5rem',
@@ -196,35 +271,20 @@ export class MentoringDigest extends React.Component {
 				verticalAlign: 'top',
 			},
 		};
-		let stars = [];
-		for (var ii = 0; ii < 5; ii++) {
-			if (1 <= this.props.star - ii) {
-				stars.push(1);
-			} else if (0 > this.props.star - ii) {
-				stars.push(0);
-			} else {
-				stars.push(0.5);
-			}
-		}
+
 		return (
-			<div style={styles.digestBox}>
+			<div style={styles.root}>
 				<div style={styles.digest}>{this.props.digest}</div>
-				<div style={styles.starBox}>
-				{stars.map((star, index) => {
-					const key = "star" + index;
-					if (0 == star) {
-						return <StarBorder key={key} style={styles.star} />
-					} else if (1 == star) {
-						return <Star key={key} style={styles.star} />
-					}
-					return <StarHalf key={key} style={styles.star} />
-				})}
-				</div>
-				<div style={styles.thxBox}>
-					お礼{this.props.countThx}件&nbsp;
-					メンター{this.props.countMentors}人&nbsp;
-					フォロー{this.props.countFollowers}人&nbsp;
-				</div>
+				<RatingStar
+					rootStyle={styles.starRoot}
+					star={this.props.star}
+				/>
+				<ThxSummury
+					rootStyle={styles.thxRoot}
+					countThx={this.props.countThx}
+					countMentors={this.props.countMentors}
+					countFollowers={this.props.countFollowers}
+				/>
 			</div>
 		);
 	}
@@ -247,7 +307,7 @@ export class MentoringDigestWithAvatar extends React.Component {
 
 	render() {
 		const styles = {
-			box: {
+			root: {
 				width: '100%',
 				verticalAlign: 'middle',
 			},
@@ -262,12 +322,6 @@ export class MentoringDigestWithAvatar extends React.Component {
 			avatar: {
 				width:  '100%',
 			},
-			starBox: {
-				width: '100%',
-			},
-			star: {
-				width: '16px',
-			},
 			digestBox: {
 				display: 'inline-block',
 				boxSizing: 'border-box',
@@ -281,7 +335,7 @@ export class MentoringDigestWithAvatar extends React.Component {
 				fontWeight: 'bold',
 				verticalAlign: 'middle',
 			},
-			thxBox: {
+			thxRoot: {
 				display: 'inline-block',
 				width: '100%',
 				fontSize: '0.75rem',
@@ -291,39 +345,21 @@ export class MentoringDigestWithAvatar extends React.Component {
 				verticalAlign: 'bottom',
 			},
 		};
-		let stars = [];
-		for (var ii = 0; ii < 5; ii++) {
-			if (1 <= this.props.star - ii) {
-				stars.push(1);
-			} else if (0 > this.props.star - ii) {
-				stars.push(0);
-			} else {
-				stars.push(0.5);
-			}
-		}
+
 		return (
-			<div style={styles.box}>
+			<div style={styles.root}>
 				<div style={styles.avatarBox}>
 					<img src={this.props.avatar} style={styles.avatar} />
-					<div style={styles.starBox}>
-					{stars.map((star, index) => {
-						const key = "star" + index;
-						if (0 == star) {
-							return <StarBorder key={key} style={styles.star} />
-						} else if (1 == star) {
-							return <Star key={key} style={styles.star} />
-						}
-						return <StarHalf key={key} style={styles.star} />
-					})}
-					</div>
+					<RatingStar star={this.props.star} />
 				</div>
 				<div style={styles.digestBox}>
 					<div style={styles.digest}>{this.props.digest}</div>
-					<div style={styles.thxBox}>
-						お礼{this.props.countThx}件&nbsp;
-						メンター{this.props.countMentors}人&nbsp;
-						フォロー{this.props.countFollowers}人&nbsp;
-					</div>
+					<ThxSummury
+						rootStyle={styles.thxRoot}
+						countThx={this.props.countThx}
+						countMentors={this.props.countMentors}
+						countFollowers={this.props.countFollowers}
+					/>
 				</div>
 			</div>
 		);

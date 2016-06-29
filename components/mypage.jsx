@@ -12,13 +12,138 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
+import PeopleOutline from 'material-ui/svg-icons/social/people-outline';
+import LiveTv from 'material-ui/svg-icons/notification/live-tv';
 
 import HeadRoom from 'react-headroom';
 
-import {MentoringCoverSwipe, MentoringDigestWithAvatar} from './content.jsx';
 import {ThxMessageList} from './message.jsx';
+import {RatingStar} from './content.jsx';
 
-export class MentoringPage extends React.Component {
+export class Profile extends React.Component {
+	constructor(props, context) {
+		super(props, context);
+	}
+
+	render() {
+		const styles = {
+			root: {
+				width: '100%',
+			},
+			coverRoot: {
+				position: 'relative',
+				width: '100%',
+			},
+			cover: {
+				width: '100%',
+			},
+			avatar: {
+				position: 'absolute',
+				left: 0,
+				right: 0,
+				top: 0,
+				bottom: 0,
+				margin: 'auto',
+				borderRadius: '50%',
+				width: '120px',
+			},
+			offer: {
+				position: 'absolute',
+				bottom: '16px',
+				left: 0,
+				right: 0,
+				margin: 'auto',
+				width: '14rem',
+				color: 'white',
+				fontSize: '1rem',
+				fontWeight: 'bolder',
+				textShadow: '1px 1px 1px rgba(0,0,0,1)',
+			},
+			starRoot: {
+				display: 'inline-block',
+				boxSizing: 'border-box',
+				width: '50%',
+				lineHeight: '2rem',
+				verticalAlign: 'middle',
+			},
+			summuryRoot: {
+				display: 'inline-block',
+				boxSizing: 'border-box',
+				width: '50%',
+				fontSize: '0.8rem',
+				lineHeight: '1.5rem',
+				verticalAlign: 'top',
+			},
+			actionsRoot: {
+				width: '100%',
+			},
+			action: {
+				display: 'inline-block',
+				boxSizing: 'border-box',
+				width: '50%',
+			},
+			actionLabel: {
+				letterSpacing: '-2px',
+				fontSize: '0.8rem',
+				fontWeight: 'bold',
+			},
+		};
+
+		return (
+			<div style={styles.root}>
+				<div style={styles.coverRoot}>
+					<img style={styles.cover} src={this.props.cover} />
+					<img style={styles.avatar} src={this.props.avatar} />
+					<div style={styles.offer}>メッセージ・オファー&nbsp;{this.props.countOffer}件</div>
+				</div>
+				<RatingStar
+					rootStyle={styles.starRoot}
+					star={this.props.star}
+				/>
+				<div style={styles.summuryRoot}>
+					メンター{this.props.countMentors}人&nbsp;
+					フォロー{this.props.countFollowers}人&nbsp;
+				</div>
+				<div style={styles.actionRoot}>
+					<div style={styles.action}>
+						<FlatButton
+							label={'メンタリングをする'}
+							labelStyle={styles.actionLabel}
+							icon={<PeopleOutline />}
+						/>
+					</div>
+					<div style={styles.action}>
+						<FlatButton
+							label={'メンターライブをする'}
+							labelStyle={styles.actionLabel}
+							icon={<LiveTv />}
+						/>
+					</div>
+					<div style={styles.action}>
+						<FlatButton
+							label={'メンターグループをする'}
+							labelStyle={styles.actionLabel}
+							icon={<PeopleOutline />}
+						/>
+					</div>
+				</div>
+			</div>
+		);
+	}
+};
+Profile.contextTypes = {
+	router: React.PropTypes.object.isRequired
+}
+Profile.propTypes = {
+	cover: React.PropTypes.string.isRequired,
+	avatar: React.PropTypes.string.isRequired,
+	countOffer: React.PropTypes.number.isRequired,
+	star: React.PropTypes.number.isRequired,
+	countMentors: React.PropTypes.number.isRequired,
+	countFollowers: React.PropTypes.number.isRequired,
+}
+
+export class MyPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
@@ -57,12 +182,12 @@ export class MentoringPage extends React.Component {
 	}
 
 	componentDidMount() {
-		this.loadContents(this.props.params.id);
-		this.loadMessages(this.props.params.id);
+		//this.loadContents(this.props.params.id);
+		//this.loadMessages(this.props.params.id);
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener('scroll', this.onScroll);
+		//window.removeEventListener('scroll', this.onScroll);
 	}
 
 	onBack(e) {
@@ -203,17 +328,6 @@ export class MentoringPage extends React.Component {
 				width: '40px',
 				margin: 'auto',
 			},
-			buttons: {
-				position: 'fixed',
-				width: '96%',
-				margin: '0 2%',
-				bottom: '3px',
-				left: 0,
-				textAlign: 'center',
-			},
-			offer: {
-				width: '100%',
-			},
 		}
 
 		return (
@@ -232,29 +346,15 @@ export class MentoringPage extends React.Component {
 								<NavigationArrowBack />
 							</IconButton>
 						}
-						iconElementRight={
-							<FlatButton
-								label="フォロー"
-								icon={<PersonAdd />}
-								primary={true}
-								onTouchEnd={this.onFollow}
-							/>
-						}
 					/>
 				</HeadRoom>
-				<MentoringCoverSwipe
-					covers={this.state.mentoring.covers}
-					title={this.state.mentoring.title}
-					duration={this.state.mentoring.duration}
-					price={this.state.mentoring.price}
-				/>
-				<MentoringDigestWithAvatar
-					avatar={this.state.mentoring.avatar}
-					star={this.state.mentoring.star}
-					digest={this.state.mentoring.digest}
-					countThx={this.state.mentoring.countThx}
-					countMentors={this.state.mentoring.countMentors}
-					countFollowers={this.state.mentoring.countFollowers}
+				<Profile
+					cover={'/cover.jpg'}
+					avatar={'/avatar.jpg'}
+					countOffer={3}
+					star={3.5}
+					countMentors={11}
+					countFollowers={40}
 				/>
 				<ThxMessageList
 					key={'mengorings_' + this.props.params.id}
@@ -278,17 +378,14 @@ export class MentoringPage extends React.Component {
 					autoHideDuration={4000}
 					onRequestClose={this.onSnackClose}
 				/>
-				<div style={styles.buttons}>
-					<RaisedButton label="オファーする・メッセージを送る" primary={true} style={styles.offer} onTouchEnd={this.onOffer} />
-				</div>
 			</section>
 		);
 	}
 }
-MentoringPage.contextTypes = {
+MyPage.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
-MentoringPage.propTypes = {
+MyPage.propTypes = {
 	params: React.PropTypes.object.isRequired
 }
 
