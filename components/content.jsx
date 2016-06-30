@@ -12,16 +12,11 @@ import {Pagination,PaginationDot} from './pagination.jsx';
 export class MentoringCover extends React.Component {
 	constructor(props, context) {
 		super(props, context);
-		this.onTap = this.onTap.bind(this);
-	}
-
-	onTap(e) {
-		this.context.router.push('/register');
 	}
 
 	render() {
 		const styles = {
-			coverBox: {
+			root: {
 				position: 'relative',
 				width: '100%',
 			},
@@ -58,7 +53,7 @@ export class MentoringCover extends React.Component {
 		};
 
 		return (
-			<div style={styles.coverBox}>
+			<div style={styles.root}>
 				<img style={styles.cover} src={this.props.cover} />
 				<img style={styles.avatar} src={this.props.avatar} />
 				<div style={styles.title}>{this.props.title}</div>
@@ -256,35 +251,40 @@ export class MentoringDigest extends React.Component {
 				fontSize: '0.9rem',
 				fontWeight: 'bold',
 			},
+			starBox: {
+				display: 'flex',
+				flexFlow: 'row wrap',
+				justifyContent: 'space-between',
+				alignItems: 'flex-start',
+			},
 			starRoot: {
-				display: 'inline-block',
+				flexGlow: 1,
 				boxSizing: 'border-box',
-				width: '30%',
 			},
 			thxRoot: {
-				display: 'inline-block',
+				flexGrow: 2,
 				boxSizing: 'border-box',
-				width: '70%',
 				fontSize: '0.75rem',
 				lineHeight: '1.5rem',
 				textAlign: 'right',
-				verticalAlign: 'top',
 			},
 		};
 
 		return (
 			<div style={styles.root}>
 				<div style={styles.digest}>{this.props.digest}</div>
-				<RatingStar
-					rootStyle={styles.starRoot}
-					star={this.props.star}
-				/>
-				<ThxSummury
-					rootStyle={styles.thxRoot}
-					countThx={this.props.countThx}
-					countMentors={this.props.countMentors}
-					countFollowers={this.props.countFollowers}
-				/>
+				<div style={styles.starBox}>
+					<RatingStar
+						rootStyle={styles.starRoot}
+						star={this.props.star}
+					/>
+					<ThxSummury
+						rootStyle={styles.thxRoot}
+						countThx={this.props.countThx}
+						countMentors={this.props.countMentors}
+						countFollowers={this.props.countFollowers}
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -303,18 +303,31 @@ MentoringDigest.propTypes = {
 export class MentoringDigestWithAvatar extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.onAvatarTap = this.onAvatarTap.bind(this);
+	}
+
+	onAvatarTap(e) {
+		this.context.router.push('/mypage/' + this.props.uid);
 	}
 
 	render() {
 		const styles = {
 			root: {
+				display: 'flex',
+				flexFlow: 'row wrap',
+				justifyContent: 'space-between',
+				alignItems: 'center',
 				width: '100%',
-				verticalAlign: 'middle',
 			},
 			avatarBox: {
-				display: 'inline-block',
+				flexBasis: '80px',
+				flexGrow: 1,
+
+				display: 'flex',
+				flexFlow: 'column wrap',
+				alignItems: 'center',
+
 				boxSizing: 'border-box',
-				width: '22%',
 				marginLeft: '3%',
 				verticalAlign: 'middle',
 				borderRadius: '50%',
@@ -323,9 +336,9 @@ export class MentoringDigestWithAvatar extends React.Component {
 				width:  '100%',
 			},
 			digestBox: {
-				display: 'inline-block',
+				flexBasis: '240px',
+				flexGrow: 3,
 				boxSizing: 'border-box',
-				width: '73%',
 				padding: '0 1%',
 				verticalAlign: 'middle',
 			},
@@ -336,7 +349,6 @@ export class MentoringDigestWithAvatar extends React.Component {
 				verticalAlign: 'middle',
 			},
 			thxRoot: {
-				display: 'inline-block',
 				width: '100%',
 				fontSize: '0.75rem',
 				lineHeight: '1.5rem',
@@ -348,7 +360,7 @@ export class MentoringDigestWithAvatar extends React.Component {
 
 		return (
 			<div style={styles.root}>
-				<div style={styles.avatarBox}>
+				<div style={styles.avatarBox} onTouchTap={this.onAvatarTap}>
 					<img src={this.props.avatar} style={styles.avatar} />
 					<RatingStar star={this.props.star} />
 				</div>
@@ -369,6 +381,7 @@ MentoringDigestWithAvatar.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 MentoringDigestWithAvatar.propTypes = {
+	uid: React.PropTypes.number.isRequired,
 	avatar: React.PropTypes.string.isRequired,
 	star: React.PropTypes.number.isRequired,
 	digest: React.PropTypes.string.isRequired,
@@ -380,6 +393,9 @@ MentoringDigestWithAvatar.propTypes = {
 export class MentoringCard extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.state = {
+			shadow: 1,
+		};
 		this.onTap = this.onTap.bind(this);
 	}
 
@@ -390,14 +406,19 @@ export class MentoringCard extends React.Component {
 	render() {
 		const styles = {
 			card: {
-				width: '100%',
+				position: 'relative',
+				flexBasis: '320px',
+				flexGrow: 1,
 				boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.24), 0 -1px 2px rgba(0,0,0,0.12), 0 -1px 1px rgba(0,0,0,0.24)',
 				transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
 				marginTop: '16px',
 			},
 		};
 		return (
-			<Card style={styles.card} onTouchTap={this.onTap}>
+			<Card
+				style={styles.card}
+				onTouchTap={this.onTap}
+			>
 				<MentoringCover
 					cover={this.props.mentoring.cover}
 					avatar={this.props.mentoring.avatar}
@@ -430,11 +451,15 @@ export class MentoringList extends React.Component {
 
 	render() {
 		const styles = {
-			list: {
+			root: {
+				display: 'flex',
+				flexFlow: 'row wrap',
+				justifyContent: 'space-between',
+				alignItems: 'flex-start',
 			},
 		};
 		return (
-			<section style={styles.list}>
+			<section style={styles.root}>
 				{this.props.mentorings.map((mentoring, index) => {
 					// Todo: change key
 					//const key = "mentoring_" + mentoring.id;

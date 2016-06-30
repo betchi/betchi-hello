@@ -25,6 +25,7 @@ export class MentoringPage extends React.Component {
 			messages: [],
 			mentoring: {
 				id: this.props.params.id,
+				uid: 0,
 				cover: '',
 				covers: [],
 				avatar: '',
@@ -59,6 +60,12 @@ export class MentoringPage extends React.Component {
 	componentDidMount() {
 		this.loadContents(this.props.params.id);
 		this.loadMessages(this.props.params.id);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		window.removeEventListener('scroll', this.onScroll);
+		this.loadContents(nextProps.params.id);
+		this.loadMessages(nextProps.params.id);
 	}
 
 	componentWillUnmount() {
@@ -227,17 +234,17 @@ export class MentoringPage extends React.Component {
 						iconElementLeft={
 							<IconButton
 								style={styles.backIcon}
-								onTouchEnd={this.onBack}
+								onTouchTap={this.onBack}
 							>
 								<NavigationArrowBack />
 							</IconButton>
 						}
 						iconElementRight={
 							<FlatButton
+								primary={true}
 								label="フォロー"
 								icon={<PersonAdd />}
-								primary={true}
-								onTouchEnd={this.onFollow}
+								onTouchTap={this.onFollow}
 							/>
 						}
 					/>
@@ -249,6 +256,7 @@ export class MentoringPage extends React.Component {
 					price={this.state.mentoring.price}
 				/>
 				<MentoringDigestWithAvatar
+					uid={this.state.mentoring.uid}
 					avatar={this.state.mentoring.avatar}
 					star={this.state.mentoring.star}
 					digest={this.state.mentoring.digest}
@@ -257,7 +265,7 @@ export class MentoringPage extends React.Component {
 					countFollowers={this.state.mentoring.countFollowers}
 				/>
 				<ThxMessageList
-					key={'mengorings_' + this.props.params.id}
+					key={'thx-message_' + this.props.params.id}
 					messages={this.state.messages}
 				/>
 				<Divider />
@@ -279,7 +287,12 @@ export class MentoringPage extends React.Component {
 					onRequestClose={this.onSnackClose}
 				/>
 				<div style={styles.buttons}>
-					<RaisedButton label="オファーする・メッセージを送る" primary={true} style={styles.offer} onTouchEnd={this.onOffer} />
+					<RaisedButton
+						style={styles.offer}
+						primary={true}
+						label="オファーする・メッセージを送る"
+						onTouchTap={this.onOffer}
+					/>
 				</div>
 			</section>
 		);

@@ -93,7 +93,7 @@ export class LoginForm extends React.Component {
 					/>
 				</Card>
 				<RaisedButton label="ログイン" primary={true} style={styles.login} type="submit" />
-				<RaisedButton label="新規登録" primary={true} style={styles.register} onTouchEnd={this.onTapRegister} />
+				<RaisedButton label="新規登録" primary={true} style={styles.register} onTouchTap={this.onTapRegister} />
 			</form></section>
 		);
 	}

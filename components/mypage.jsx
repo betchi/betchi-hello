@@ -19,6 +19,7 @@ import HeadRoom from 'react-headroom';
 
 import {ThxMessageList} from './message.jsx';
 import {RatingStar} from './content.jsx';
+import {AvatarGrid} from './avatar.jsx';
 
 export class Profile extends React.Component {
 	constructor(props, context) {
@@ -59,28 +60,33 @@ export class Profile extends React.Component {
 				fontWeight: 'bolder',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
 			},
+			starBox: {
+				display: 'flex',
+				flexFlow: 'row wrap',
+				justifyContent: 'space-between',
+				alignItems: 'flex-start',
+			},
 			starRoot: {
-				display: 'inline-block',
+				flexGlow: 1,
 				boxSizing: 'border-box',
-				width: '50%',
-				lineHeight: '2rem',
-				verticalAlign: 'middle',
+				margin: '0 0 0 8px',
 			},
 			summuryRoot: {
-				display: 'inline-block',
+				flexGrow: 2,
 				boxSizing: 'border-box',
-				width: '50%',
 				fontSize: '0.8rem',
-				lineHeight: '1.5rem',
-				verticalAlign: 'top',
+				lineHeight: '1.6rem',
+				textAlign: 'right',
 			},
-			actionsRoot: {
+			actionRoot: {
+				display: 'flex',
+				flexFlow: 'row wrap',
 				width: '100%',
+				padding: '8px 0',
 			},
 			action: {
-				display: 'inline-block',
 				boxSizing: 'border-box',
-				width: '50%',
+				flexGrow: 1,
 			},
 			actionLabel: {
 				letterSpacing: '-2px',
@@ -96,13 +102,15 @@ export class Profile extends React.Component {
 					<img style={styles.avatar} src={this.props.avatar} />
 					<div style={styles.offer}>メッセージ・オファー&nbsp;{this.props.countOffer}件</div>
 				</div>
-				<RatingStar
-					rootStyle={styles.starRoot}
-					star={this.props.star}
-				/>
-				<div style={styles.summuryRoot}>
-					メンター{this.props.countMentors}人&nbsp;
-					フォロー{this.props.countFollowers}人&nbsp;
+				<div style={styles.starBox}>
+					<RatingStar
+						rootStyle={styles.starRoot}
+						star={this.props.star}
+					/>
+					<div style={styles.summuryRoot}>
+						メンター{this.props.countMentors}人&nbsp;
+						フォロー{this.props.countFollowers}人&nbsp;
+					</div>
 				</div>
 				<div style={styles.actionRoot}>
 					<div style={styles.action}>
@@ -148,6 +156,19 @@ export class MyPage extends React.Component {
 		super(props, context);
 		this.state = {
 			messages: [],
+			avatars: [
+				{id: 1, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 2, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 3, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 4, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 5, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 6, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 7, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 8, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 9, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 10, avatar: '/avatar.jpg', name: '杉江 規行'},
+				{id: 11, avatar: '/avatar.jpg', name: '杉江 規行'},
+			],
 			mentoring: {
 				id: this.props.params.id,
 				cover: '',
@@ -183,11 +204,16 @@ export class MyPage extends React.Component {
 
 	componentDidMount() {
 		//this.loadContents(this.props.params.id);
-		//this.loadMessages(this.props.params.id);
+		this.loadMessages(this.props.params.id);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		window.removeEventListener('scroll', this.onScroll);
+		this.loadMessages(nextProps.params.id);
 	}
 
 	componentWillUnmount() {
-		//window.removeEventListener('scroll', this.onScroll);
+		window.removeEventListener('scroll', this.onScroll);
 	}
 
 	onBack(e) {
@@ -341,7 +367,7 @@ export class MyPage extends React.Component {
 						iconElementLeft={
 							<IconButton
 								style={styles.backIcon}
-								onTouchEnd={this.onBack}
+								onTouchTap={this.onBack}
 							>
 								<NavigationArrowBack />
 							</IconButton>
@@ -356,8 +382,14 @@ export class MyPage extends React.Component {
 					countMentors={11}
 					countFollowers={40}
 				/>
+				<Divider />
+				<AvatarGrid
+					avatars={this.state.avatars}
+					countAvatar={12}
+				/>
+				<Divider />
 				<ThxMessageList
-					key={'mengorings_' + this.props.params.id}
+					key={'thx-message_' + this.props.params.id}
 					messages={this.state.messages}
 				/>
 				<Divider />

@@ -287,7 +287,9 @@ export class TopPage extends React.Component {
 						titleStyle={styles.title}
 						onLeftIconButtonTouchTap={this.onDrawerToggle}
 						iconElementRight={
-							<IconButton onTouchTap={this.onSearchOpen}>
+							<IconButton
+								onTouchTap={this.onSearchOpen}
+							>
 								<ActionSearch />
 							</IconButton>
 						}

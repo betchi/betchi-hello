@@ -45,7 +45,10 @@ export class PaginationDot extends React.Component {
 		}
 
 		return (
-			<div style={styles.root} onTouchTap={this.onTap}>
+			<div
+				style={styles.root}
+				onTouchTap={this.onTap}
+			>
 				<div style={styleDot} />
 			</div>
 		);

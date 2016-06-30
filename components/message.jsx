@@ -8,18 +8,18 @@ import SwipeableViews from 'react-swipeable-views';
 export class ThxMessage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.onAvatarTap = this.onAvatarTap.bind(this);
+	}
+
+	onAvatarTap(e) {
+		this.context.router.push('/mypage/' + this.props.uid);
 	}
 
 	render() {
 		const styles = {
 			root: {
-				width: '100%',
 				verticalAlign: 'top',
 				padding: '0.5rem 0',
-			},
-			message: {
-				width:  '100%',
-				fontSize: '0.9rem',
 			},
 			avatarBox: {
 				float: 'right',
@@ -30,13 +30,16 @@ export class ThxMessage extends React.Component {
 			avatar: {
 				width: '100%',
 			},
+			message: {
+				fontSize: '0.9rem',
+			},
 			clear: {
 				clear: 'both',
 			},
 		};
 		return (
 			<div style={styles.root}>
-				<div style={styles.avatarBox}>
+				<div style={styles.avatarBox} onTouchTap={this.onAvatarTap}>
 					<img src={this.props.avatar} style={styles.avatar} />
 				</div>
 				<div style={styles.message}>{this.props.message}</div>
@@ -51,6 +54,7 @@ ThxMessage.contextTypes = {
 ThxMessage.propTypes = {
 	message: React.PropTypes.string.isRequired,
 	avatar: React.PropTypes.string.isRequired,
+	uid: React.PropTypes.number.isRequired,
 }
 
 export class ThxMessageList extends React.Component {
@@ -61,6 +65,14 @@ export class ThxMessageList extends React.Component {
 	render() {
 		const styles = {
 			root: {
+				display: 'flex',
+				flexFlow: 'row wrap',
+				justifyContent: 'space-between',
+				alignItems: 'flex-start',
+			},
+			messages: {
+				flexBasis: '320px',
+				flexGrow: 1,
 			},
 		};
 		return (
@@ -69,7 +81,16 @@ export class ThxMessageList extends React.Component {
 					// Todo: change key
 					//const key = "thx-message_" + message.id;
 					const key = "thx-message_" + index;
-					return <div key={key}><Divider /><ThxMessage avatar={message.avatar} message={message.message} /></div>
+					return (
+						<div style={styles.messages} key={key}>
+							<Divider />
+							<ThxMessage
+								uid={message.uid}
+								avatar={message.avatar}
+								message={message.message}
+							/>
+						</div>
+					);
 				})}
 			</section>
 		);

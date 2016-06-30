@@ -163,7 +163,7 @@ export class SearchPage extends React.Component {
 					position: 'absolute',
 					width: '48px',
 					top: 8,
-					right: 4,
+					right: '2%',
 					display: 'inline-block',
 				},
 			});
@@ -204,7 +204,7 @@ export class SearchPage extends React.Component {
 				position: 'absolute',
 				width: '48px',
 				top: 8,
-				left: 4,
+				left: '2%',
 			},
 			searchText: {
 				boxSizing: 'border-box',
