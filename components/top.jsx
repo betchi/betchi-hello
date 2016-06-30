@@ -162,6 +162,11 @@ export class TopPage extends React.Component {
 		this.loadContents();
 	}
 
+	componentWillReceiveProps(nextProps) {
+		window.removeEventListener('scroll', this.onScroll);
+		this.loadContents();
+	}
+
 	componentWillUnmount() {
 		window.removeEventListener('scroll', this.onScroll);
 	}

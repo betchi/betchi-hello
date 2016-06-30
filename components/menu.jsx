@@ -25,14 +25,17 @@ export class DrawerMenu extends React.Component {
 	}
 
 	moveTop(e) {
+		this.onToggle(e);
 		this.context.router.push('/');
 	}
 
 	moveSearch(e) {
+		this.onToggle(e);
 		this.context.router.push('/search');
 	}
 
 	moveLogin(e) {
+		this.onToggle(e);
 		this.context.router.push('/login');
 	}
 
