@@ -16,6 +16,7 @@ export class DrawerMenu extends React.Component {
 		this.state = {open: false};
 		this.onToggle = this.onToggle.bind(this);
 		this.moveTop = this.moveTop.bind(this);
+		this.moveChat = this.moveChat.bind(this);
 		this.moveSearch = this.moveSearch.bind(this);
 		this.moveLogin = this.moveLogin.bind(this);
 	}
@@ -32,6 +33,10 @@ export class DrawerMenu extends React.Component {
 	moveSearch(e) {
 		this.onToggle(e);
 		this.context.router.push('/search');
+	}
+
+	moveChat(e) {
+		this.context.router.push('/chat');
 	}
 
 	moveLogin(e) {
@@ -62,6 +67,7 @@ export class DrawerMenu extends React.Component {
 					/>
 					<MenuItem onTouchTap={this.moveTop} primaryText='Top' leftIcon={<ActionHome />} />
 					<MenuItem onTouchTap={this.moveSearch} primaryText='Search' leftIcon={<ActionSearch />} />
+					<MenuItem onTouchTap={this.moveChat} primaryText='Chat' />
 					<MenuItem onTouchTap={this.moveLogin} primaryText='Login' />
 				</Drawer>
 			</div>

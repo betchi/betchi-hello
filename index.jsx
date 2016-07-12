@@ -10,9 +10,11 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {LoginPage} from './components/login.jsx';
 import {RegisterPage} from './components/register.jsx';
 import {TopPage} from './components/top.jsx';
+import {ChatPage} from './components/chat.jsx';
 import {SearchPage} from './components/search.jsx';
 import {MentoringPage} from './components/mentoring.jsx';
 import {MyPage} from './components/mypage.jsx';
+//import {MessageList} from './components/messageList.js';
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -21,6 +23,7 @@ ReactDOM.render(
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
 			<Route path="/search" component={SearchPage} />
+			<Route path="/chat" component={ChatPage} />
 			<Route path="/mentoring/:id" component={MentoringPage} />
 			<Route path="/mypage/:id" component={MyPage} />
 		</Router>
