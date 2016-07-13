@@ -31,3 +31,13 @@ ReactDOM.render(
 	,document.getElementById("content")
 );
 
+Object.defineProperty(String.prototype, 'isValidEmail', {
+	writable: false,
+	configurable: false,
+	enumerable: false,
+	value: function() {
+		let re = /\S+@\S+\.\S+/;
+		return re.test(this);
+	}
+});
+

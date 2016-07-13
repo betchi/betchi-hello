@@ -39,7 +39,6 @@ export class SearchPage extends React.Component {
 				right: 4,
 				display: 'none',
 			},
-			category: 'business',
 			page: 1,
 			q: '',
 		};
