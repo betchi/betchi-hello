@@ -59,8 +59,8 @@ export class LoginForm extends React.Component {
 		})
 
 		var error = false
-		let email = this.state.email
-		let password = this.state.password
+		const email = this.state.email
+		const password = this.state.password
 
 		if (!email.isValidEmail()) {
 			this.setState({
@@ -80,8 +80,8 @@ export class LoginForm extends React.Component {
 			return
 		}
 
-		let xhr = new XMLHttpRequest();
-		xhr.open('POST', '/api/login');
+		const xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/login', false);
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
