@@ -9,7 +9,6 @@ import ActionHome from 'material-ui/svg-icons/action/home';
 import ActionSearch from 'material-ui/svg-icons/action/search';
 import IconButton from 'material-ui/IconButton';
 
-
 export class DrawerMenu extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -18,6 +17,7 @@ export class DrawerMenu extends React.Component {
 		this.moveTop = this.moveTop.bind(this);
 		this.moveSearch = this.moveSearch.bind(this);
 		this.moveLogin = this.moveLogin.bind(this);
+		this.moveLogout = this.moveLogout.bind(this);
 	}
 
 	onToggle(e) {
@@ -36,6 +36,23 @@ export class DrawerMenu extends React.Component {
 
 	moveLogin(e) {
 		this.onToggle(e);
+		this.context.router.push('/login');
+	}
+
+	moveLogout(e) {
+		this.onToggle(e);
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/logout', false); // synchronous
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				return;
+			}
+			const data = JSON.parse(xhr.responseText);
+			if (!data.ok) {
+			}
+		};
+		xhr.send();
+
 		this.context.router.push('/login');
 	}
 
@@ -62,7 +79,12 @@ export class DrawerMenu extends React.Component {
 					/>
 					<MenuItem onTouchTap={this.moveTop} primaryText='Top' leftIcon={<ActionHome />} />
 					<MenuItem onTouchTap={this.moveSearch} primaryText='Search' leftIcon={<ActionSearch />} />
-					<MenuItem onTouchTap={this.moveLogin} primaryText='Login' />
+					{(() => {
+						return this.props.loggedIn ? '' : <MenuItem onTouchTap={this.moveLogin} primaryText='Login' />
+					})()}
+					{(() => {
+						return this.props.loggedIn ? <MenuItem onTouchTap={this.moveLogout} primaryText='Logout' /> : ''
+					})()}
 				</Drawer>
 			</div>
 		);
@@ -70,5 +92,8 @@ export class DrawerMenu extends React.Component {
 }
 DrawerMenu.contextTypes = {
 	router: React.PropTypes.object.isRequired
+}
+DrawerMenu.propTypes = {
+	loggedIn: React.PropTypes.bool.isRequired,
 }
 

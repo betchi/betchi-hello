@@ -14,20 +14,6 @@ import {SearchPage} from './components/search.jsx';
 import {MentoringPage} from './components/mentoring.jsx';
 import {MyPage} from './components/mypage.jsx';
 
-ReactDOM.render(
-	<MuiThemeProvider muiTheme={getMuiTheme()}>
-		<Router history={hashHistory}>
-			<Route path="/" component={TopPage} />
-			<Route path="/login" component={LoginPage} />
-			<Route path="/register" component={RegisterPage} />
-			<Route path="/search" component={SearchPage} />
-			<Route path="/mentoring/:id" component={MentoringPage} />
-			<Route path="/mypage/:id" component={MyPage} />
-		</Router>
-	</MuiThemeProvider>
-	,document.getElementById("content")
-);
-
 Object.defineProperty(String.prototype, 'isValidEmail', {
 	writable: false,
 	configurable: false,
@@ -37,4 +23,55 @@ Object.defineProperty(String.prototype, 'isValidEmail', {
 		return re.test(this);
 	}
 });
+
+Object.defineProperty(Storage.prototype, 'loggedIn', {
+	configurable: true,
+	enumerable: false,
+	set: function(loggedIn) {
+		this.setItem('loggedIn', loggedIn);
+	},
+	get: function() {
+		return (this.getItem('loggedIn') === 'true');
+	}
+});
+
+function requireAuth(next, replace) {
+	const goLogin = () => {
+		sessionStorage.loggedIn = false;
+		replace({
+			pathname: '/login',
+			state: {
+				nextPathname: next.location.pathname
+			}
+		});
+	}
+	const xhr = new XMLHttpRequest();
+	xhr.open('GET', '/api/user', false); // synchronous
+	xhr.onload = () => {
+		if (xhr.status !== 200) {
+			return;
+		}
+		const data = JSON.parse(xhr.responseText);
+		if (!data.ok) {
+			goLogin();
+			return
+		}
+		sessionStorage.loggedIn = true;
+	};
+	xhr.send();
+}
+
+ReactDOM.render(
+	<MuiThemeProvider muiTheme={getMuiTheme()}>
+		<Router history={hashHistory}>
+			<Route path="/" component={TopPage} onEnter={requireAuth} />
+			<Route path="/login" component={LoginPage} />
+			<Route path="/register" component={RegisterPage} />
+			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
+			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
+			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
+		</Router>
+	</MuiThemeProvider>
+	,document.getElementById("content")
+);
 

@@ -283,6 +283,7 @@ export class TopPage extends React.Component {
 			<section>
 				<DrawerMenu 
 					ref='drawerMenu'
+					loggedIn={sessionStorage.loggedIn}
 				/>
 				<HeadRoom
 					style={styles.headroom}
