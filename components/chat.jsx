@@ -2,11 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
-import {Card} from 'material-ui/Card';
-import {Tabs, Tab} from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
-import ActionSearch from 'material-ui/svg-icons/action/search';
 import Snackbar from 'material-ui/Snackbar';
+import ActionSearch from 'material-ui/svg-icons/action/search';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -15,8 +13,6 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Avatar from 'material-ui/Avatar';
 import Subheader from 'material-ui/Subheader';
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
-import {List, ListItem} from 'material-ui/List';
-import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
@@ -24,7 +20,6 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import HeadRoom from 'react-headroom';
 
 import {DrawerMenu} from './menu.jsx';
-import {MentoringList} from './content.jsx';
 
 const iconButtonElement = (
   <IconButton
@@ -44,108 +39,6 @@ const rightIconMenu = (
   </IconMenu>
 );
 
-/*
-const baloon = {
-  balloon: {
-    position: 'relative',
-    background: '#ffffff',
-    border: '1px solid #cccccc',
-  }
-  balloon::after, balloon::before {
-    right: '100%';
-    top: '50%';
-    border: 'solid transparent';
-    content: '" "';
-    height: '0';
-    width: '0';
-    position: 'absolute';
-    pointer-events: 'none';
-  }
-
-  balloon::after {
-    border-color: 'rgba(255, 255, 255, 0)';
-    border-right-color: '#ffffff';
-    border-width: '30px';
-    margin-top: '-30px';
-  }
-  balloon::before {
-    border-color: 'rgba(204, 204, 204, 0)';
-    border-right-color: '#cccccc';
-    border-width: '31px';
-    margin-top: '-31px';
-  }
-};
-*/
-
-const ListExampleMessages = () => (
-  <div>
-      <List>
-        <Subheader>Today</Subheader>
-        <ListItem
-          leftAvatar={<Avatar src="avatar.jpg" />}
-          primaryText="Brunch this weekend?"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Brendan Lim</span> --
-              I&apos;ll be in your neighborhood doing errands this weekend. Do you want to grab brunch?
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="avatar.jpg" />}
-          primaryText={
-            <p>Summer BBQ&nbsp;&nbsp;<span style={{color: lightBlack}}>4</span></p>
-          }
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>to me, Scott, Jennifer</span> --
-              Wish I could come, but I&apos;m out of town this weekend.
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="images/uxceo-128.jpg" />}
-          primaryText="Oui oui"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Grace Ng</span> --
-              Do you have Paris recommendations? Have you ever been?
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="images/kerem-128.jpg" />}
-          primaryText="Birdthday gift"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Kerem Suer</span> --
-              Do you have any ideas what we can get Heidi for her birthday? How about a pony?
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="images/raquelromanp-128.jpg" />}
-          primaryText="Recipe to try"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Raquel Parrado</span> --
-              We should eat this: grated squash. Corn and tomatillo tacos.
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-      </List>
-  </div>
-);
-
 export class ChatPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -157,6 +50,71 @@ export class ChatPage extends React.Component {
 	componentWillReceiveProps(nextProps) {
 	}
 
+  componentWillMount() {
+// 発行したクッキーの取得（読み込み）
+if (document.cookie) {
+	var cookies = document.cookie.split("; ");
+	console.log(cookies);
+/*
+	for (var i = 0; i < cookies.length; i++) {
+		var str = cookies[i].split("=");
+		if (str[0] == name) {
+			var cookie_value = unescape(str[1]);
+			if (!isNaN(value)) value = ++cookie_value;
+			break;
+		}
+	}
+*/
+}
+
+
+
+
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/messages.json');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let mentorings = [];
+			let data = JSON.parse(xhr.responseText);
+      console.log(data);
+			this.setState({
+				messages: data.message_list,
+			});
+
+			if (data.message_list.length == 0) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '検索ヒット0件です。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			window.addEventListener('scroll', this.onScroll);
+		}
+		this.setState({
+			refreshStyle: {
+				position: 'relative',
+				display: 'inline-block',
+			},
+		});
+		xhr.send();
+  }
+
 	componentWillUnmount() {
 	}
 
@@ -166,11 +124,12 @@ export class ChatPage extends React.Component {
 	onDrawerToggle(e) {
 	}
 
-	onSearchOpen(e) {
-	}
-
-	onSnackClose(e) {
-	}
+  sendMessage(e) {
+    console.log("sendMessage");
+		this.setState({
+			aaa: " "
+		});
+  }
 
 	render() {
 		const styles = {
@@ -188,13 +147,7 @@ export class ChatPage extends React.Component {
 				fontWeight: 'bold',
 			},
       avatar: {
-        //position: 'relative',
-        //top: '50px',
         marginLeft: '10px',
-      },
-      leftLi: {
-        //position: 'relative',
-        //top: '-40px',
       },
       leftBalloon: {
         width: 'auto',
@@ -261,20 +214,27 @@ export class ChatPage extends React.Component {
 					/>
 				</HeadRoom>
         <ul style={styles.ul}>
-            <li><p style={styles.rightBalloon}>right message<br />message</p><p style={styles.clearBalloon}></p></li>
-            <li style={styles.leftLi}><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>left message</p><p style={styles.clearBalloon}></p></li>
-            <li><p style={styles.rightBalloon}>right message<br />message</p><p style={styles.clearBalloon}></p></li>
-            <li style={styles.leftLi}><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>left message left message</p><p style={styles.clearBalloon}></p></li>
-            <li style={styles.leftLi}><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>left message</p><p style={styles.clearBalloon}></p></li>
-            <li><p style={styles.rightBalloon}>right message<br />message</p><p style={styles.clearBalloon}></p></li>
-            <li><p style={styles.rightBalloon}>right message right message<br />message</p><p style={styles.clearBalloon}></p></li>
+          {(() => {
+            if (Array.isArray(this.state.messages)) {
+              let indents = [];
+              let messages = this.state.messages;
+              for (var i = 0; i < messages.length; i++) {
+                if (messages[i].user_id == 1) { // 自分のメッセージ
+                  indents.push(<li><p style={styles.rightBalloon}>{messages[i].message}</p><p style={styles.clearBalloon}></p></li>);
+                } else {
+                  indents.push(<li><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>{messages[i].message}</p><p style={styles.clearBalloon}></p></li>);
+                }
+              }
+              return indents;
+            }
+          })()}
         </ul>
         <TextField
           style={styles.textField}
           multiLine={true}
           rows={1}
         />
-        <FloatingActionButton style={styles.sendButton}>
+        <FloatingActionButton style={styles.sendButton} onClick={this.sendMessage}>
           <ContentAdd />
         </FloatingActionButton>
 			</section>

@@ -84,6 +84,7 @@ export class DrawerMenu extends React.Component {
 					/>
 					<MenuItem onTouchTap={this.moveTop} primaryText='Top' leftIcon={<ActionHome />} />
 					<MenuItem onTouchTap={this.moveSearch} primaryText='Search' leftIcon={<ActionSearch />} />
+					<MenuItem onTouchTap={this.moveChat} primaryText='Chat' leftIcon={<ActionSearch />} />
 					{(() => {
 						return this.props.loggedIn ? '' : <MenuItem onTouchTap={this.moveLogin} primaryText='Login' />
 					})()}
