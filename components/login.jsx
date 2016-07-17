@@ -51,14 +51,16 @@ export class LoginForm extends React.Component {
 
 	onSubmit(e) {
 		e.preventDefault();
+		this.refs.emailTextField.blur();
+		this.refs.passwordTextField.blur();
 		this.setState({
 			errorEmail: '',
 			errorPassword: ''
 		})
 
 		var error = false
-		let email = this.state.email
-		let password = this.state.password
+		const email = this.state.email
+		const password = this.state.password
 
 		if (!email.isValidEmail()) {
 			this.setState({
@@ -78,8 +80,8 @@ export class LoginForm extends React.Component {
 			return
 		}
 
-		let xhr = new XMLHttpRequest();
-		xhr.open('POST', '/api/login');
+		const xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/login', false);
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
@@ -92,7 +94,6 @@ export class LoginForm extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
-			console.log(data)
 			if (data.ok == false) {
 				this.setState({
 					snack: {
@@ -178,6 +179,7 @@ export class LoginForm extends React.Component {
 							value={this.state.email}
 							type="email"
 							onChange={this.onInputEmail}
+							ref='emailTextField'
 						/>
 						<Divider />
 						<TextField
@@ -188,6 +190,7 @@ export class LoginForm extends React.Component {
 							type="password"
 							value={this.state.password}
 							onChange={this.onInputPassword}
+							ref='passwordTextField'
 						/>
 					</Card>
 					<RaisedButton label="ログイン" primary={true} style={styles.login} type="submit" />
