@@ -44,108 +44,6 @@ const rightIconMenu = (
   </IconMenu>
 );
 
-/*
-const baloon = {
-  balloon: {
-    position: 'relative',
-    background: '#ffffff',
-    border: '1px solid #cccccc',
-  }
-  balloon::after, balloon::before {
-    right: '100%';
-    top: '50%';
-    border: 'solid transparent';
-    content: '" "';
-    height: '0';
-    width: '0';
-    position: 'absolute';
-    pointer-events: 'none';
-  }
-
-  balloon::after {
-    border-color: 'rgba(255, 255, 255, 0)';
-    border-right-color: '#ffffff';
-    border-width: '30px';
-    margin-top: '-30px';
-  }
-  balloon::before {
-    border-color: 'rgba(204, 204, 204, 0)';
-    border-right-color: '#cccccc';
-    border-width: '31px';
-    margin-top: '-31px';
-  }
-};
-*/
-
-const ListExampleMessages = () => (
-  <div>
-      <List>
-        <Subheader>Today</Subheader>
-        <ListItem
-          leftAvatar={<Avatar src="avatar.jpg" />}
-          primaryText="Brunch this weekend?"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Brendan Lim</span> --
-              I&apos;ll be in your neighborhood doing errands this weekend. Do you want to grab brunch?
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="avatar.jpg" />}
-          primaryText={
-            <p>Summer BBQ&nbsp;&nbsp;<span style={{color: lightBlack}}>4</span></p>
-          }
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>to me, Scott, Jennifer</span> --
-              Wish I could come, but I&apos;m out of town this weekend.
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="images/uxceo-128.jpg" />}
-          primaryText="Oui oui"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Grace Ng</span> --
-              Do you have Paris recommendations? Have you ever been?
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="images/kerem-128.jpg" />}
-          primaryText="Birdthday gift"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Kerem Suer</span> --
-              Do you have any ideas what we can get Heidi for her birthday? How about a pony?
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-        <Divider inset={true} />
-        <ListItem
-          leftAvatar={<Avatar src="images/raquelromanp-128.jpg" />}
-          primaryText="Recipe to try"
-          secondaryText={
-            <p>
-              <span style={{color: darkBlack}}>Raquel Parrado</span> --
-              We should eat this: grated squash. Corn and tomatillo tacos.
-            </p>
-          }
-          secondaryTextLines={2}
-        />
-      </List>
-  </div>
-);
-
 export class ChatPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -156,6 +54,52 @@ export class ChatPage extends React.Component {
 
 	componentWillReceiveProps(nextProps) {
 	}
+
+  componentWillMount() {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/messages.json');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let mentorings = [];
+			let data = JSON.parse(xhr.responseText);
+      console.log(data);
+			this.setState({
+				messages: data.message_list,
+			});
+
+			if (data.message_list.length == 0) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '検索ヒット0件です。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			window.addEventListener('scroll', this.onScroll);
+		}
+		this.setState({
+			refreshStyle: {
+				position: 'relative',
+				display: 'inline-block',
+			},
+		});
+		xhr.send();
+  }
 
 	componentWillUnmount() {
 	}
@@ -188,13 +132,7 @@ export class ChatPage extends React.Component {
 				fontWeight: 'bold',
 			},
       avatar: {
-        //position: 'relative',
-        //top: '50px',
         marginLeft: '10px',
-      },
-      leftLi: {
-        //position: 'relative',
-        //top: '-40px',
       },
       leftBalloon: {
         width: 'auto',
@@ -242,7 +180,8 @@ export class ChatPage extends React.Component {
         right: '0',
         marginRight: '10px',
       },
-		}
+		};
+    var indents = [];
 		return (
 			<section>
 				<HeadRoom
@@ -261,13 +200,19 @@ export class ChatPage extends React.Component {
 					/>
 				</HeadRoom>
         <ul style={styles.ul}>
-            <li><p style={styles.rightBalloon}>right message<br />message</p><p style={styles.clearBalloon}></p></li>
-            <li style={styles.leftLi}><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>left message</p><p style={styles.clearBalloon}></p></li>
-            <li><p style={styles.rightBalloon}>right message<br />message</p><p style={styles.clearBalloon}></p></li>
-            <li style={styles.leftLi}><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>left message left message</p><p style={styles.clearBalloon}></p></li>
-            <li style={styles.leftLi}><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>left message</p><p style={styles.clearBalloon}></p></li>
-            <li><p style={styles.rightBalloon}>right message<br />message</p><p style={styles.clearBalloon}></p></li>
-            <li><p style={styles.rightBalloon}>right message right message<br />message</p><p style={styles.clearBalloon}></p></li>
+          {(() => {
+            if (Array.isArray(this.state.messages)) {
+              let messages = this.state.messages;
+              for (var i = 0; i < messages.length; i++) {
+                if (messages[i].user_id == 1) { // 自分のメッセージ
+                  indents.push(<li><p style={styles.rightBalloon}>{messages[i].message}</p><p style={styles.clearBalloon}></p></li>);
+                } else {
+                  indents.push(<li><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>{messages[i].message}</p><p style={styles.clearBalloon}></p></li>);
+                }
+              }
+              return indents;
+            }
+          })()}
         </ul>
         <TextField
           style={styles.textField}
