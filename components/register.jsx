@@ -4,6 +4,7 @@ import {Card} from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 
 import {LoginIcon} from './login.jsx';
 
@@ -40,41 +41,167 @@ const styles = {
 export class RegisterForm extends React.Component {
 	constructor(props, context) {
 		super(props, context);
-		this.state = {message: ''};
+		this.state = {
+			message: '',
+			email: '',
+			password: '',
+			passwordConfirm: '',
+			errorEmail: '',
+			errorPassword: '',
+			errorPasswordConfirm: '',
+			snack: {
+				open: false,
+				message: '',
+			},
+		};
+		this.onSnackClose = this.onSnackClose.bind(this);
+		this.onInputEmail = this.onInputEmail.bind(this);
+		this.onInputPassword = this.onInputPassword.bind(this);
+		this.onInputPasswordConfirm = this.onInputPasswordConfirm.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 	}
 
 	onSubmit(e) {
 		e.preventDefault();
-		alert('RegisterForm.onSubmit()');
+		this.refs.emailTextField.blur();
+		this.refs.passwordTextField.blur();
+		this.setState({
+			errorEmail: '',
+			errorPassword: '',
+			errorPasswordConfirm: '',
+		})
+
+		var error = false
+		const email = this.state.email
+		const password = this.state.password
+		const passwordConfirm = this.state.passwordConfirm
+
+		if (!email.isValidEmail()) {
+			this.setState({
+				errorEmail: 'メールアドレスを正しく入力してください',
+			});
+			error = true
+		}
+
+		if (4 > password.length) {
+			this.setState({
+				errorPassword: 'パスワードを4文字以上で入力してください',
+			});
+			error = true
+		}
+
+		if (password !== passwordConfirm) {
+			this.setState({
+				errorPasswordConfirm: '上記と同じパスワードをもう一度入力してください',
+			});
+			error = true
+		}
+
+		const xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/register', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			if (data.ok == false) {
+				this.setState({
+					snack: {
+						open: true,
+						message: data.message,
+					},
+				});
+				return;
+			}
+			this.context.router.push('/');
+		}
+		xhr.send(JSON.stringify({email:this.state.email, password:this.state.password}));
+		return
+	}
+
+	onInputEmail(e) {
+		this.setState({
+			email: e.target.value.trim()
+		})
+	}
+
+	onInputPassword(e) {
+		this.setState({
+			password: e.target.value.trim()
+		})
+	}
+
+	onInputPasswordConfirm(e) {
+		this.setState({
+			passwordConfirm: e.target.value.trim()
+		})
+	}
+
+	onSnackClose(e) {
+		this.setState({
+			snack: {
+				open: false,
+				message: '',
+			}
+		})
 	}
 
 	render() {
 		return (
-			<section style={styles.formBox}><form style={styles.form} onSubmit={this.onSubmit}>
-				<Card
-					style={styles.card}
-				>
-					<TextField
-						style={styles.text}
-						hintText='メールアドレス'
-						underlineShow={false}
+			<section style={styles.formBox}>
+				<form style={styles.form} onSubmit={this.onSubmit}>
+					<Card
+						style={styles.card}
+					>
+						<TextField
+							style={styles.text}
+							hintText='メールアドレス'
+							errorText={this.state.errorEmail}
+							underlineShow={false}
+							value={this.state.email}
+							type="email"
+							onChange={this.onInputEmail}
+							ref='emailTextField'
+						/>
+						<Divider />
+						<TextField
+							style={styles.text}
+							hintText='パスワード'
+							errorText={this.state.errorPassword}
+							underlineShow={false}
+							type="password"
+							value={this.state.password}
+							onChange={this.onInputPassword}
+							ref='passwordTextField'
+						/>
+						<Divider />
+						<TextField
+							style={styles.text}
+							hintText='パスワード（確認）'
+							errorText={this.state.errorPasswordConfirm}
+							underlineShow={false}
+							type="password"
+							value={this.state.passwordConfirm}
+							onChange={this.onInputPasswordConfirm}
+							ref='passwordConfirmTextField'
+						/>
+					</Card>
+					<RaisedButton label="登録" primary={true} style={styles.register} type="submit" />
+				</form>
+					<Snackbar
+						open={this.state.snack.open}
+						message={this.state.snack.message}
+						autoHideDuration={4000}
+						onRequestClose={this.onSnackClose}
 					/>
-					<Divider />
-					<TextField
-						style={styles.text}
-						hintText='パスワード'
-						underlineShow={false}
-					/>
-					<Divider />
-					<TextField
-						style={styles.text}
-						hintText='パスワード（確認）'
-						underlineShow={false}
-					/>
-				</Card>
-				<RaisedButton label="登録" primary={true} style={styles.register} type="submit" />
-			</form></section>
+			</section>
 		);
 	}
 };
