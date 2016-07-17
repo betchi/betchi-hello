@@ -2,11 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
-import {Card} from 'material-ui/Card';
-import {Tabs, Tab} from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
-import ActionSearch from 'material-ui/svg-icons/action/search';
 import Snackbar from 'material-ui/Snackbar';
+import ActionSearch from 'material-ui/svg-icons/action/search';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -15,8 +13,6 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Avatar from 'material-ui/Avatar';
 import Subheader from 'material-ui/Subheader';
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
-import {List, ListItem} from 'material-ui/List';
-import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
@@ -24,7 +20,6 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import HeadRoom from 'react-headroom';
 
 import {DrawerMenu} from './menu.jsx';
-import {MentoringList} from './content.jsx';
 
 const iconButtonElement = (
   <IconButton
@@ -47,6 +42,8 @@ const rightIconMenu = (
 export class ChatPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.sendMessage = this.sendMessage.bind(this);
+		this.changeText = this.changeText.bind(this);
 	}
 
 	componentDidMount() {
@@ -56,6 +53,25 @@ export class ChatPage extends React.Component {
 	}
 
   componentWillMount() {
+// 発行したクッキーの取得（読み込み）
+if (document.cookie) {
+	var cookies = document.cookie.split("; ");
+	console.log(cookies);
+/*
+	for (var i = 0; i < cookies.length; i++) {
+		var str = cookies[i].split("=");
+		if (str[0] == name) {
+			var cookie_value = unescape(str[1]);
+			if (!isNaN(value)) value = ++cookie_value;
+			break;
+		}
+	}
+*/
+}
+
+
+
+
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/messages.json');
 		xhr.onload = () => {
@@ -110,11 +126,22 @@ export class ChatPage extends React.Component {
 	onDrawerToggle(e) {
 	}
 
-	onSearchOpen(e) {
-	}
+  changeText(e) {
+    console.log(e.target.value);
+		this.setState({
+			textValue: e.target.value
+		});
+  }
 
-	onSnackClose(e) {
-	}
+  sendMessage(e) {
+    console.log("sendMessage");
+    var newMessages = this.state.messages.slice();    
+    newMessages.push({user_id: 1, message: this.state.textValue});
+		this.setState({
+			messages: newMessages,
+      textValue: ""
+		});
+  }
 
 	render() {
 		const styles = {
@@ -202,6 +229,7 @@ export class ChatPage extends React.Component {
         <ul style={styles.ul}>
           {(() => {
             if (Array.isArray(this.state.messages)) {
+              let indents = [];
               let messages = this.state.messages;
               for (var i = 0; i < messages.length; i++) {
                 if (messages[i].user_id == 1) { // 自分のメッセージ
@@ -218,8 +246,10 @@ export class ChatPage extends React.Component {
           style={styles.textField}
           multiLine={true}
           rows={1}
+          value={this.state.textValue}
+          onChange={this.changeText}
         />
-        <FloatingActionButton style={styles.sendButton}>
+        <FloatingActionButton style={styles.sendButton} onClick={this.sendMessage}>
           <ContentAdd />
         </FloatingActionButton>
 			</section>
