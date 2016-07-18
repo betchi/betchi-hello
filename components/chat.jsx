@@ -43,14 +43,24 @@ const rightIconMenu = (
   </IconMenu>
 );
 
-var ws = null;
+var ws;
+var self;
 
 export class ChatPage extends React.Component {
 
 	constructor(props, context) {
 		super(props, context);
+		this.state = {
+			messages: [],
+			snack: {
+				open: false,
+				message: '',
+			},
+		};
+		this.onSnackClose = this.onSnackClose.bind(this);
 		this.sendMessage = this.sendMessage.bind(this);
 		this.changeText = this.changeText.bind(this);
+    self = this;
 	}
 
 	componentDidMount() {
@@ -61,13 +71,37 @@ export class ChatPage extends React.Component {
 
   componentWillMount() {
     ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+
+    ws.onopen = function(e) {
+      console.log("onopen");
+      console.log(e);
+      console.log(ws);
+    };
+
+    ws.onerror = function(e) {
+      console.log("onerror");
+      console.log(e);
+      console.log(ws);
+    };
+
+    ws.onclose = function(e) {
+      console.log("onclose");
+      console.log(e);
+      console.log(ws);
+    };
+
     ws.onmessage = function(e) {
       var model = eval("("+e.data+")")
-      console.log(e.data);
       console.log(model);
+      var newMessages = self.state.messages.slice();    
+      newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
+      self.setState({
+        messages: newMessages,
+        textValue: ""
+      });
     };
-    console.log("websocket");
 
+    /*
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/messages.json');
 		xhr.onload = () => {
@@ -111,6 +145,7 @@ export class ChatPage extends React.Component {
 			},
 		});
 		xhr.send();
+    */
   }
 
 	componentWillUnmount() {
@@ -130,16 +165,38 @@ export class ChatPage extends React.Component {
 
   sendMessage(e) {
     console.log("sendMessage");
+    /*  まずはReactでwriteする
     var newMessages = this.state.messages.slice();    
     newMessages.push({user_id: 1, message: this.state.textValue});
 		this.setState({
 			messages: newMessages,
       textValue: ""
 		});
-    Scroll.animateScroll.scrollToBottom();
-    var wsSendMessage = "{\"author\":\"Anonymous mentor\",\"body\":\""+this.state.textValue+"\"}";
-    ws.send(wsSendMessage);
+    */
+    if (ws.readyState == 1) {
+      let wsSendMessage = "{\"user_id\":1,\"name\":\"みのべ\",\"message\":\""+this.state.textValue+"\"}";
+      ws.send(wsSendMessage);
+    } else {
+			this.setState({
+				snack: {
+					open: true,
+					message: '送信に失敗しました。',
+				},
+				refreshStyle: {
+					display: 'none',
+				},
+			});
+    }
   }
+
+	onSnackClose(e) {
+		this.setState({
+			snack: {
+				open: false,
+				message: '',
+			}
+		})
+	}
 
 	render() {
 		const styles = {
@@ -224,6 +281,9 @@ export class ChatPage extends React.Component {
         float: 'left',
         marginTop: '10px',
       },
+      textFieldWrap: {
+        margin: '10px',
+      },
 		};
     var indents = [];
 		return (
@@ -255,7 +315,7 @@ export class ChatPage extends React.Component {
                   indents.push(<li><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
                 }
               }
-              Scroll.animateScroll.scrollToBottom({duration: 0,});
+              Scroll.animateScroll.scrollToBottom({duration: 0});
               return indents;
             }
           })()}
@@ -270,8 +330,14 @@ export class ChatPage extends React.Component {
         <RaisedButton
           icon={<i class="material-icons">send</i>}
           style={styles.sendButton}
-          onClick={this.sendMessage}
+          onTouchTap={this.sendMessage}
         />
+				<Snackbar
+					open={this.state.snack.open}
+					message={this.state.snack.message}
+					autoHideDuration={4000}
+					onRequestClose={this.onSnackClose}
+				/>
 			</section>
 		);
 	}
