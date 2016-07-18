@@ -16,6 +16,10 @@ import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import Time from 'react-time';
+import Scroll from 'react-scroll';
+import FontIcon from 'material-ui/FontIcon';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import HeadRoom from 'react-headroom';
 
@@ -39,7 +43,10 @@ const rightIconMenu = (
   </IconMenu>
 );
 
+var ws = null;
+
 export class ChatPage extends React.Component {
+
 	constructor(props, context) {
 		super(props, context);
 		this.sendMessage = this.sendMessage.bind(this);
@@ -53,24 +60,13 @@ export class ChatPage extends React.Component {
 	}
 
   componentWillMount() {
-// 発行したクッキーの取得（読み込み）
-if (document.cookie) {
-	var cookies = document.cookie.split("; ");
-	console.log(cookies);
-/*
-	for (var i = 0; i < cookies.length; i++) {
-		var str = cookies[i].split("=");
-		if (str[0] == name) {
-			var cookie_value = unescape(str[1]);
-			if (!isNaN(value)) value = ++cookie_value;
-			break;
-		}
-	}
-*/
-}
-
-
-
+    ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+    ws.onmessage = function(e) {
+      var model = eval("("+e.data+")")
+      console.log(e.data);
+      console.log(model);
+    };
+    console.log("websocket");
 
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/messages.json');
@@ -127,7 +123,6 @@ if (document.cookie) {
 	}
 
   changeText(e) {
-    console.log(e.target.value);
 		this.setState({
 			textValue: e.target.value
 		});
@@ -141,12 +136,16 @@ if (document.cookie) {
 			messages: newMessages,
       textValue: ""
 		});
+    Scroll.animateScroll.scrollToBottom();
+    var wsSendMessage = "{\"author\":\"Anonymous mentor\",\"body\":\""+this.state.textValue+"\"}";
+    ws.send(wsSendMessage);
   }
 
 	render() {
 		const styles = {
       ul: {
         paddingLeft: 0,
+        marginBottom: '70px',
       },
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
@@ -163,6 +162,8 @@ if (document.cookie) {
       },
       leftBalloon: {
         width: 'auto',
+        maxWidth: '60%',
+        wordBreak: 'break-all',
         background: '#f1f0f0',
         border: '0px solid #777',
         padding: '5px 10px',
@@ -173,6 +174,8 @@ if (document.cookie) {
       },
       rightBalloon: {
         width: 'auto',
+        maxWidth: '70%',
+        wordBreak: 'break-all',
         color: '#fff',
         position: 'relative',
         background: '#0084ff',
@@ -199,6 +202,7 @@ if (document.cookie) {
         borderTop: '1px solid #eeeeee',
         backgroundColor: '#eeeeee',
         width: '100%',
+        clear: 'both',
       },
       sendButton: {
         marginRight: '20',
@@ -206,6 +210,19 @@ if (document.cookie) {
         bottom: '10px',
         right: '0',
         marginRight: '10px',
+        backgroundColor: '#3f51b5',
+      },
+      timeRight: {
+        fontSize: '0.6em',
+        color: '#666',
+        float: 'right',
+        marginTop: '10px',
+      },
+      timeLeft: {
+        fontSize: '0.6em',
+        color: '#666',
+        float: 'left',
+        marginTop: '10px',
       },
 		};
     var indents = [];
@@ -233,11 +250,12 @@ if (document.cookie) {
               let messages = this.state.messages;
               for (var i = 0; i < messages.length; i++) {
                 if (messages[i].user_id == 1) { // 自分のメッセージ
-                  indents.push(<li><p style={styles.rightBalloon}>{messages[i].message}</p><p style={styles.clearBalloon}></p></li>);
+                  indents.push(<li><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
                 } else {
-                  indents.push(<li><Avatar style={styles.avatar} src="avatar.jpg" /><p style={styles.senderName}>leftname</p><p style={styles.leftBalloon}>{messages[i].message}</p><p style={styles.clearBalloon}></p></li>);
+                  indents.push(<li><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
                 }
               }
+              Scroll.animateScroll.scrollToBottom({duration: 0,});
               return indents;
             }
           })()}
@@ -249,9 +267,11 @@ if (document.cookie) {
           value={this.state.textValue}
           onChange={this.changeText}
         />
-        <FloatingActionButton style={styles.sendButton} onClick={this.sendMessage}>
-          <ContentAdd />
-        </FloatingActionButton>
+        <RaisedButton
+          icon={<i class="material-icons">send</i>}
+          style={styles.sendButton}
+          onClick={this.sendMessage}
+        />
 			</section>
 		);
 	}
