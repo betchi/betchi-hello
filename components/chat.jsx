@@ -4,47 +4,25 @@ import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import AppBar from 'material-ui/AppBar';
 import Snackbar from 'material-ui/Snackbar';
-import ActionSearch from 'material-ui/svg-icons/action/search';
-import RefreshIndicator from 'material-ui/RefreshIndicator';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Avatar from 'material-ui/Avatar';
 import Subheader from 'material-ui/Subheader';
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
 import TextField from 'material-ui/TextField';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Time from 'react-time';
 import Scroll from 'react-scroll';
 import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
-
 import HeadRoom from 'react-headroom';
-
 import {DrawerMenu} from './menu.jsx';
-
-const iconButtonElement = (
-  <IconButton
-    touch={true}
-    tooltip="more"
-    tooltipPosition="bottom-left"
-  >
-    <MoreVertIcon color={grey400} />
-  </IconButton>
-);
-
-const rightIconMenu = (
-  <IconMenu iconButtonElement={iconButtonElement}>
-    <MenuItem>Reply</MenuItem>
-    <MenuItem>Forward</MenuItem>
-    <MenuItem>Delete</MenuItem>
-  </IconMenu>
-);
 
 var ws;
 var self;
+var userId;
+var roomId;
+var name;
 
 export class ChatPage extends React.Component {
 
@@ -63,13 +41,11 @@ export class ChatPage extends React.Component {
     self = this;
 	}
 
-	componentDidMount() {
-	}
-
-	componentWillReceiveProps(nextProps) {
-	}
-
   componentWillMount() {
+    userId = this.props.location.query.userId;
+    roomId = this.props.location.query.roomId;
+    name = this.props.location.query.name;
+
     ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 
     ws.onopen = function(e) {
@@ -92,7 +68,7 @@ export class ChatPage extends React.Component {
 
     ws.onmessage = function(e) {
       var model = eval("("+e.data+")")
-      console.log(model);
+      //console.log(model);
       var newMessages = self.state.messages.slice();    
       newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
       self.setState({
@@ -148,13 +124,8 @@ export class ChatPage extends React.Component {
     */
   }
 
-	componentWillUnmount() {
-	}
-
-	onScroll(e) {
-	}
-
 	onDrawerToggle(e) {
+		this.refs.drawerMenu.onToggle();
 	}
 
   changeText(e) {
@@ -174,9 +145,11 @@ export class ChatPage extends React.Component {
 		});
     */
     if (ws.readyState == 1) {
-      let wsSendMessage = "{\"user_id\":1,\"name\":\"みのべ\",\"message\":\""+this.state.textValue+"\"}";
+      let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+this.state.textValue+"\"}";
+      console.log(wsSendMessage);
       ws.send(wsSendMessage);
     } else {
+      ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 			this.setState({
 				snack: {
 					open: true,
@@ -224,7 +197,7 @@ export class ChatPage extends React.Component {
         background: '#f1f0f0',
         border: '0px solid #777',
         padding: '5px 10px',
-        margin: '5px 50px 5px 60px',
+        margin: '5px 10px 5px 60px',
         borderRadius: '15px',
         clear: 'both',
         float: 'left',
@@ -288,19 +261,16 @@ export class ChatPage extends React.Component {
     var indents = [];
 		return (
 			<section>
+				<DrawerMenu 
+					ref='drawerMenu'
+					loggedIn={sessionStorage.loggedIn}
+				/>
 				<HeadRoom
 					style={styles.headroom}
 				>
 					<AppBar
 						title='チャット'
 						titleStyle={styles.title}
-						iconElementRight={
-							<IconButton
-								onTouchTap={this.onSearchOpen}
-							>
-								<ActionSearch />
-							</IconButton>
-						}
 					/>
 				</HeadRoom>
         <ul style={styles.ul}>
@@ -309,10 +279,10 @@ export class ChatPage extends React.Component {
               let indents = [];
               let messages = this.state.messages;
               for (var i = 0; i < messages.length; i++) {
-                if (messages[i].user_id == 1) { // 自分のメッセージ
-                  indents.push(<li><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
+                if (messages[i].user_id == userId) {
+                  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
                 } else {
-                  indents.push(<li><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
+                  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
                 }
               }
               Scroll.animateScroll.scrollToBottom({duration: 0});
@@ -321,17 +291,14 @@ export class ChatPage extends React.Component {
           })()}
         </ul>
         <TextField
+          id='textField'
           style={styles.textField}
           multiLine={true}
           rows={1}
           value={this.state.textValue}
           onChange={this.changeText}
         />
-        <RaisedButton
-          icon={<i class="material-icons">send</i>}
-          style={styles.sendButton}
-          onTouchTap={this.sendMessage}
-        />
+        <RaisedButton label="送信" primary={true} style={styles.sendButton} onTouchTap={this.sendMessage} />
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}

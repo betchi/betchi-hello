@@ -15,7 +15,9 @@ export class DrawerMenu extends React.Component {
 		this.state = {open: false};
 		this.onToggle = this.onToggle.bind(this);
 		this.moveTop = this.moveTop.bind(this);
-		this.moveChat = this.moveChat.bind(this);
+		this.moveChat1 = this.moveChat1.bind(this);
+		this.moveChat2 = this.moveChat2.bind(this);
+		this.moveChat3 = this.moveChat3.bind(this);
 		this.moveSearch = this.moveSearch.bind(this);
 		this.moveLogin = this.moveLogin.bind(this);
 		this.moveLogout = this.moveLogout.bind(this);
@@ -35,8 +37,16 @@ export class DrawerMenu extends React.Component {
 		this.context.router.push('/search');
 	}
 
-	moveChat(e) {
-		this.context.router.push('/chat');
+	moveChat1(e) {
+    this.context.router.push({ pathname: '/chat', query: {userId: 1, roomId: 1, name: "すぎえ"}});
+	}
+
+	moveChat2(e) {
+    this.context.router.push({ pathname: '/chat', query: {userId: 2, roomId: 1, name: "みのべ"}});
+	}
+
+	moveChat3(e) {
+    this.context.router.push({ pathname: '/chat', query: {userId: 3, roomId: 1, name: "やまだ"}});
 	}
 
 	moveLogin(e) {
@@ -84,7 +94,9 @@ export class DrawerMenu extends React.Component {
 					/>
 					<MenuItem onTouchTap={this.moveTop} primaryText='Top' leftIcon={<ActionHome />} />
 					<MenuItem onTouchTap={this.moveSearch} primaryText='Search' leftIcon={<ActionSearch />} />
-					<MenuItem onTouchTap={this.moveChat} primaryText='Chat' leftIcon={<ActionSearch />} />
+					<MenuItem onTouchTap={this.moveChat1} primaryText='Chat(sugie)' leftIcon={<ActionSearch />} />
+					<MenuItem onTouchTap={this.moveChat2} primaryText='Chat(minobe)' leftIcon={<ActionSearch />} />
+					<MenuItem onTouchTap={this.moveChat3} primaryText='Chat(yamada)' leftIcon={<ActionSearch />} />
 					{(() => {
 						return this.props.loggedIn ? '' : <MenuItem onTouchTap={this.moveLogin} primaryText='Login' />
 					})()}
