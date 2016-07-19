@@ -128,6 +128,10 @@ export class ChatPage extends React.Component {
 		*/
 	}
 
+	componentWillUnmount() {
+		ws.close();
+	}
+
 	onDrawerToggle(e) {
 		this.refs.drawerMenu.onToggle();
 	}
