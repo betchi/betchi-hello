@@ -17,11 +17,13 @@ import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import HeadRoom from 'react-headroom';
 import {DrawerMenu} from './menu.jsx';
+import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 
 var ws;
 var self;
 var userId;
 var roomId;
+var roomName;
 var name;
 
 export class ChatPage extends React.Component {
@@ -38,12 +40,14 @@ export class ChatPage extends React.Component {
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.sendMessage = this.sendMessage.bind(this);
 		this.changeText = this.changeText.bind(this);
-	self = this;
+		this.onBack = this.onBack.bind(this);
+		self = this;
 	}
 
 	componentWillMount() {
 		userId = sessionStorage.user.id;
 		roomId = this.props.location.query.roomId;
+		roomName = this.props.location.query.roomName;
 		name = sessionStorage.user.username;
 
 		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
@@ -171,6 +175,10 @@ export class ChatPage extends React.Component {
 		})
 	}
 
+	onBack(e) {
+		this.context.router.goBack();
+	}
+
 	render() {
 		const styles = {
 		ul: {
@@ -268,10 +276,18 @@ export class ChatPage extends React.Component {
 				<HeadRoom
 					style={styles.headroom}
 				>
-				<AppBar
-					title='チャット'
-					titleStyle={styles.title}
-				/>
+					<AppBar
+						title={roomName}
+						titleStyle={styles.title}
+						iconElementLeft={
+							<IconButton
+								style={styles.backIcon}
+								onTouchTap={this.onBack}
+							>
+								<NavigationArrowBack />
+							</IconButton>
+						}
+					/>
 				</HeadRoom>
 				<ul style={styles.ul}>
 					{(() => {

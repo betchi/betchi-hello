@@ -83,7 +83,7 @@ export class MentoringPage extends React.Component {
 	}
 
 	onOffer(e) {
-		alert('offer');
+		this.context.router.push({ pathname: '/chat', query: {roomId: 1, roomName: this.state.mentoring.title}});
 	}
 
 	onSnackClose(e) {
@@ -370,10 +370,6 @@ export class EditMentoringPage extends React.Component {
 
 	onFollow(e) {
 		alert('follow');
-	}
-
-	onOffer(e) {
-		alert('offer');
 	}
 
 	onSnackClose(e) {
