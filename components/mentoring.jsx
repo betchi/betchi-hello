@@ -262,8 +262,8 @@ export class MentoringPage extends React.Component {
 					star={this.state.mentoring.star}
 					digest={this.state.mentoring.digest}
 					countThx={this.state.mentoring.count_thx}
-					countMentor={this.state.user.count_mentor}
-					countFollower={this.state.user.count_follower}
+					countMentor={this.state.user.mentors.length}
+					countFollower={this.state.user.followers.length}
 				/>s
 				<ThxMessageList
 					key={'thx-message_' + this.props.params.id}

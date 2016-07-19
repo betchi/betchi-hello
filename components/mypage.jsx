@@ -173,8 +173,8 @@ export class MyPage extends React.Component {
 				cover: '',
 				avatar: '',
 				star: 0,
-				count_mentor: 0,
-				count_follower: 0,
+				mentors: [],
+				followers: [],
 			},
 			avatars: [],
 			snack: {
@@ -371,8 +371,8 @@ export class MyPage extends React.Component {
 					avatar={this.state.pageUser.avatar}
 					countOffer={3}
 					star={this.state.pageUser.star}
-					countMentor={this.state.pageUser.count_mentor}
-					countFollower={this.state.pageUser.count_follower}
+					countMentor={this.state.pageUser.mentors.length}
+					countFollower={this.state.pageUser.followers.length}
 				/>
 				<Divider />
 				<AvatarGrid
