@@ -41,43 +41,43 @@ export class ChatPage extends React.Component {
 	self = this;
 	}
 
-  componentWillMount() {
-	userId = sessionStorage.user.id;
-	roomId = this.props.location.query.roomId;
-	name = sessionStorage.user.username;
+	componentWillMount() {
+		userId = sessionStorage.user.id;
+		roomId = this.props.location.query.roomId;
+		name = sessionStorage.user.username;
 
-	ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 
-	ws.onopen = function(e) {
-		console.log("onopen");
-		console.log(e);
-		console.log(ws);
-	};
+		ws.onopen = function(e) {
+			console.log("onopen");
+			console.log(e);
+			console.log(ws);
+		};
 
-	ws.onerror = function(e) {
-		console.log("onerror");
-		console.log(e);
-		console.log(ws);
-	};
+		ws.onerror = function(e) {
+			console.log("onerror");
+			console.log(e);
+			console.log(ws);
+		};
 
-	ws.onclose = function(e) {
-		console.log("onclose");
-		console.log(e);
-		console.log(ws);
-	};
+		ws.onclose = function(e) {
+			console.log("onclose");
+			console.log(e);
+			console.log(ws);
+		};
 
-	ws.onmessage = function(e) {
-		var model = eval("("+e.data+")")
-		//console.log(model);
-		var newMessages = self.state.messages.slice();	
-		newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
-		self.setState({
-		messages: newMessages,
-		textValue: ""
-	  });
-	};
+		ws.onmessage = function(e) {
+			var model = eval("("+e.data+")")
+			//console.log(model);
+			var newMessages = self.state.messages.slice();	
+			newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
+			self.setState({
+			messages: newMessages,
+			textValue: ""
+		  });
+		};
 
-	/*
+		/*
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/messages.json');
 		xhr.onload = () => {
@@ -121,35 +121,35 @@ export class ChatPage extends React.Component {
 			},
 		});
 		xhr.send();
-	*/
-  }
+		*/
+	}
 
 	onDrawerToggle(e) {
 		this.refs.drawerMenu.onToggle();
 	}
 
-  changeText(e) {
+	changeText(e) {
 		this.setState({
 			textValue: e.target.value
 		});
-  }
+	}
 
-  sendMessage(e) {
-	console.log("sendMessage");
-	/*  まずはReactでwriteする
-	var newMessages = this.state.messages.slice();	
-	newMessages.push({user_id: 1, message: this.state.textValue});
-		this.setState({
-			messages: newMessages,
-	  textValue: ""
-		});
-	*/
-	if (ws.readyState == 1) {
-		let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+this.state.textValue+"\"}";
-		console.log(wsSendMessage);
-		ws.send(wsSendMessage);
-	} else {
-		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+	sendMessage(e) {
+		console.log("sendMessage");
+		/*  まずはReactでwriteする
+		var newMessages = this.state.messages.slice();	
+		newMessages.push({user_id: 1, message: this.state.textValue});
+			this.setState({
+				messages: newMessages,
+		  textValue: ""
+			});
+		*/
+		if (ws.readyState == 1) {
+			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+this.state.textValue+"\"}";
+			console.log(wsSendMessage);
+			ws.send(wsSendMessage);
+		} else {
+			ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 			this.setState({
 				snack: {
 					open: true,
@@ -159,8 +159,8 @@ export class ChatPage extends React.Component {
 					display: 'none',
 				},
 			});
+		}
 	}
-  }
 
 	onSnackClose(e) {
 		this.setState({
