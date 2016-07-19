@@ -34,8 +34,8 @@ export class MentoringPage extends React.Component {
 				covers: [],
 				avatar: '',
 				title: '',
-				duration: '',
-				price: '',
+				duration: 0,
+				price: 0,
 				star: 0,
 				digest: '',
 				countThx: 0,
@@ -79,7 +79,6 @@ export class MentoringPage extends React.Component {
 	}
 
 	onFollow(e) {
-		alert('follow');
 	}
 
 	onOffer(e) {
@@ -258,7 +257,7 @@ export class MentoringPage extends React.Component {
 					price={this.state.mentoring.price}
 				/>
 				<MentoringDigestWithAvatar
-					uid={this.state.mentoring.uid}
+					userId={this.state.mentoring.user_id}
 					avatar={this.state.mentoring.avatar}
 					star={this.state.mentoring.star}
 					digest={this.state.mentoring.digest}
@@ -339,7 +338,6 @@ export class EditMentoringPage extends React.Component {
 		this.onScroll = this.onScroll.bind(this);
 		this.onBack = this.onBack.bind(this);
 		this.onFollow = this.onFollow.bind(this);
-		this.onOffer = this.onOffer.bind(this);
 		this.onCoverSelected = this.onCoverSelected.bind(this);
 		this.onInputTitle = this.onInputTitle.bind(this);
 		this.onInputDuration = this.onInputDuration.bind(this);
@@ -369,7 +367,6 @@ export class EditMentoringPage extends React.Component {
 	}
 
 	onFollow(e) {
-		alert('follow');
 	}
 
 	onSnackClose(e) {

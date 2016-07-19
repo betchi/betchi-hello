@@ -366,7 +366,7 @@ export class MentoringDigestWithAvatar extends React.Component {
 	}
 
 	onAvatarTap(e) {
-		this.context.router.push('/mypage/' + this.props.uid);
+		this.context.router.push('/mypage/' + this.props.userId);
 	}
 
 	render() {
@@ -440,7 +440,7 @@ MentoringDigestWithAvatar.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 MentoringDigestWithAvatar.propTypes = {
-	uid: React.PropTypes.number.isRequired,
+	userId: React.PropTypes.number.isRequired,
 	avatar: React.PropTypes.string.isRequired,
 	star: React.PropTypes.number.isRequired,
 	digest: React.PropTypes.string.isRequired,

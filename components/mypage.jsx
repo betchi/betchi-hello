@@ -33,7 +33,6 @@ export class Profile extends React.Component {
 	}
 
 	onCreateMentorGroup() {
-		alert('onCrateMentorGroup');
 	}
 
 	render() {
@@ -118,8 +117,8 @@ export class Profile extends React.Component {
 						star={this.props.star}
 					/>
 					<div style={styles.summuryRoot}>
-						メンター{this.props.countMentors}人&nbsp;
-						フォロー{this.props.countFollowers}人&nbsp;
+						メンター{this.props.countMentor}人&nbsp;
+						フォロー{this.props.countFollower}人&nbsp;
 					</div>
 				</div>
 				<div style={styles.actionRoot}>
@@ -160,8 +159,8 @@ Profile.propTypes = {
 	avatar: React.PropTypes.string.isRequired,
 	countOffer: React.PropTypes.number.isRequired,
 	star: React.PropTypes.number.isRequired,
-	countMentors: React.PropTypes.number.isRequired,
-	countFollowers: React.PropTypes.number.isRequired,
+	countMentor: React.PropTypes.number.isRequired,
+	countFollower: React.PropTypes.number.isRequired,
 }
 
 export class MyPage extends React.Component {
@@ -169,33 +168,15 @@ export class MyPage extends React.Component {
 		super(props, context);
 		this.state = {
 			messages: [],
-			avatars: [
-				{id: 1, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 2, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 3, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 4, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 5, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 6, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 7, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 8, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 9, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 10, avatar: '/avatar.jpg', name: '杉江 規行'},
-				{id: 11, avatar: '/avatar.jpg', name: '杉江 規行'},
-			],
-			mentoring: {
-				id: this.props.params.id,
+			followers: [],
+			pageUser: {
 				cover: '',
-				covers: [],
 				avatar: '',
-				title: '',
-				duration: '',
-				price: '',
 				star: 0,
-				digest: '',
-				countThx: 0,
-				countMentors: 0,
-				countFollowers: 0,
+				count_mentor: 0,
+				count_follower: 0,
 			},
+			avatars: [],
 			snack: {
 				open: false,
 				message: '',
@@ -216,7 +197,7 @@ export class MyPage extends React.Component {
 	}
 
 	componentDidMount() {
-		//this.loadContents(this.props.params.id);
+		this.loadContents(this.props.params.id);
 		this.loadMessages(this.props.params.id);
 	}
 
@@ -234,7 +215,6 @@ export class MyPage extends React.Component {
 	}
 
 	onFollow(e) {
-		alert('follow');
 	}
 
 	onOffer(e) {
@@ -263,7 +243,7 @@ export class MyPage extends React.Component {
 
 	loadContents(id = 1) {
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/mentoring_' + id + '.json');
+		xhr.open('GET', '/api/user/' + id);
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
 				this.setState({
@@ -277,9 +257,9 @@ export class MyPage extends React.Component {
 				});
 				return;
 			}
-			let mentoring = JSON.parse(xhr.responseText);
+			let data = JSON.parse(xhr.responseText);
 			this.setState({
-				mentoring: mentoring,
+				pageUser: data.user,
 			});
 		}
 		xhr.send();
@@ -387,17 +367,17 @@ export class MyPage extends React.Component {
 					/>
 				</HeadRoom>
 				<Profile
-					cover={'/cover.jpg'}
-					avatar={'/avatar.jpg'}
+					cover={this.state.pageUser.cover}
+					avatar={this.state.pageUser.avatar}
 					countOffer={3}
-					star={3.5}
-					countMentors={11}
-					countFollowers={40}
+					star={this.state.pageUser.star}
+					countMentor={this.state.pageUser.count_mentor}
+					countFollower={this.state.pageUser.count_follower}
 				/>
 				<Divider />
 				<AvatarGrid
 					avatars={this.state.avatars}
-					countAvatar={12}
+					countAvatar={0}
 				/>
 				<Divider />
 				<ThxMessageList

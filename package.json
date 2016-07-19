@@ -5,15 +5,16 @@
   "main": "index.js",
   "dependencies": {
     "material-ui": "^0.15.0",
+    "moment": "^2.14.1",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-headroom": "^2.1.0",
     "react-motion": "^0.4.4",
     "react-router": "^2.4.1",
+    "react-scroll": "^1.0.24",
     "react-swipeable-views": "^0.6.2",
     "react-tap-event-plugin": "^1.0.0",
-    "react-time": "^4.2.0",
-    "react-scroll": "^1.0.24"
+    "react-time": "^4.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.9.1",
