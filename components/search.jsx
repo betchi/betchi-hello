@@ -73,7 +73,7 @@ export class SearchPage extends React.Component {
 		}
 
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/business.json?q=' + q + 'p=' + page);
+		xhr.open('GET', '/api/mentorings/business/' + page);
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
 				this.setState({
@@ -90,17 +90,17 @@ export class SearchPage extends React.Component {
 			let mentorings = [];
 			let data = JSON.parse(xhr.responseText);
 			if (page === 1) {
-				mentorings = data;
+				mentorings = data.mentorings;
 			} else {
 				mentorings = this.state.mentorings.slice();
-				for (var ii in data) {
-					mentorings.push(data[ii]);
+				for (var ii in data.mentorings) {
+					mentorings.push(data.mentorings[ii]);
 				}
 			}
 			this.setState({
 				mentorings: mentorings,
+				page: page,
 			});
-			this.state.page = page;
 
 			if (mentorings.length == 0) {
 				this.setState({
@@ -117,7 +117,16 @@ export class SearchPage extends React.Component {
 			if (page === 1) {
 				window.scrollTo(0,0);
 			}
-			window.addEventListener('scroll', this.onScroll);
+
+			if (!data.hasNext) {
+				this.setState({
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+			} else {
+				window.addEventListener('scroll', this.onScroll);
+			}
 		}
 		this.setState({
 			refreshStyle: {
