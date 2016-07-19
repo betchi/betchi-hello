@@ -38,46 +38,46 @@ export class ChatPage extends React.Component {
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.sendMessage = this.sendMessage.bind(this);
 		this.changeText = this.changeText.bind(this);
-    self = this;
+	self = this;
 	}
 
   componentWillMount() {
-    userId = sessionStorage.user.id;
-    roomId = this.props.location.query.roomId;
-    name = sessionStorage.user.username;
+	userId = sessionStorage.user.id;
+	roomId = this.props.location.query.roomId;
+	name = sessionStorage.user.username;
 
-    ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+	ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 
-    ws.onopen = function(e) {
-      console.log("onopen");
-      console.log(e);
-      console.log(ws);
-    };
+	ws.onopen = function(e) {
+		console.log("onopen");
+		console.log(e);
+		console.log(ws);
+	};
 
-    ws.onerror = function(e) {
-      console.log("onerror");
-      console.log(e);
-      console.log(ws);
-    };
+	ws.onerror = function(e) {
+		console.log("onerror");
+		console.log(e);
+		console.log(ws);
+	};
 
-    ws.onclose = function(e) {
-      console.log("onclose");
-      console.log(e);
-      console.log(ws);
-    };
+	ws.onclose = function(e) {
+		console.log("onclose");
+		console.log(e);
+		console.log(ws);
+	};
 
-    ws.onmessage = function(e) {
-      var model = eval("("+e.data+")")
-      //console.log(model);
-      var newMessages = self.state.messages.slice();    
-      newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
-      self.setState({
-        messages: newMessages,
-        textValue: ""
-      });
-    };
+	ws.onmessage = function(e) {
+		var model = eval("("+e.data+")")
+		//console.log(model);
+		var newMessages = self.state.messages.slice();	
+		newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
+		self.setState({
+		messages: newMessages,
+		textValue: ""
+	  });
+	};
 
-    /*
+	/*
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/messages.json');
 		xhr.onload = () => {
@@ -95,7 +95,7 @@ export class ChatPage extends React.Component {
 			}
 			let mentorings = [];
 			let data = JSON.parse(xhr.responseText);
-      console.log(data);
+			console.log(data);
 			this.setState({
 				messages: data.message_list,
 			});
@@ -121,7 +121,7 @@ export class ChatPage extends React.Component {
 			},
 		});
 		xhr.send();
-    */
+	*/
   }
 
 	onDrawerToggle(e) {
@@ -135,21 +135,21 @@ export class ChatPage extends React.Component {
   }
 
   sendMessage(e) {
-    console.log("sendMessage");
-    /*  まずはReactでwriteする
-    var newMessages = this.state.messages.slice();    
-    newMessages.push({user_id: 1, message: this.state.textValue});
+	console.log("sendMessage");
+	/*  まずはReactでwriteする
+	var newMessages = this.state.messages.slice();	
+	newMessages.push({user_id: 1, message: this.state.textValue});
 		this.setState({
 			messages: newMessages,
-      textValue: ""
+	  textValue: ""
 		});
-    */
-    if (ws.readyState == 1) {
-      let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+this.state.textValue+"\"}";
-      console.log(wsSendMessage);
-      ws.send(wsSendMessage);
-    } else {
-      ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+	*/
+	if (ws.readyState == 1) {
+		let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+this.state.textValue+"\"}";
+		console.log(wsSendMessage);
+		ws.send(wsSendMessage);
+	} else {
+		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 			this.setState({
 				snack: {
 					open: true,
@@ -159,7 +159,7 @@ export class ChatPage extends React.Component {
 					display: 'none',
 				},
 			});
-    }
+	}
   }
 
 	onSnackClose(e) {
@@ -173,92 +173,92 @@ export class ChatPage extends React.Component {
 
 	render() {
 		const styles = {
-      ul: {
-        paddingLeft: 0,
-        marginBottom: '70px',
-      },
-			headroom: {
-				WebkitTransition: 'all .3s ease-in-out',
-				MozTransition: 'all .3s ease-in-out',
-				OTransition: 'all .3s ease-in-out',
-				transition: 'all .3s ease-in-out',
-			},
-			title: {
-				fontSize: '1.2rem',
-				fontWeight: 'bold',
-			},
-      avatar: {
-        marginLeft: '10px',
-      },
-      leftBalloon: {
-        width: 'auto',
-        maxWidth: '60%',
-        wordBreak: 'break-all',
-        background: '#f1f0f0',
-        border: '0px solid #777',
-        padding: '5px 10px',
-        margin: '5px 10px 5px 60px',
-        borderRadius: '15px',
-        clear: 'both',
-        float: 'left',
-      },
-      rightBalloon: {
-        width: 'auto',
-        maxWidth: '70%',
-        wordBreak: 'break-all',
-        color: '#fff',
-        position: 'relative',
-        background: '#0084ff',
-        border: '0px solid #777',
-        padding: '5px 10px',
-        margin: '5px 10px 5px 10px',
-        borderRadius: '15px',
-        clear: 'both',
-        float: 'right',
-      },
-      clearBalloon: {
-        clear: 'both',
-      },
-      senderName: {
-        marginTop: '-30px',
-        marginLeft: '70px',
-        marginBottom: '-5px',
-        color: 'rgba(0, 0, 0, .40)',
-      },
-      textField: {
-        position: 'fixed',
-        bottom: '0',
-        marginBottom: '0',
-        borderTop: '1px solid #eeeeee',
-        backgroundColor: '#eeeeee',
-        width: '100%',
-        clear: 'both',
-      },
-      sendButton: {
-        marginRight: '20',
-        position: 'fixed',
-        bottom: '10px',
-        right: '0',
-        marginRight: '10px',
-        backgroundColor: '#3f51b5',
-      },
-      timeRight: {
-        fontSize: '0.6em',
-        color: '#666',
-        float: 'right',
-        marginTop: '10px',
-      },
-      timeLeft: {
-        fontSize: '0.6em',
-        color: '#666',
-        float: 'left',
-        marginTop: '10px',
-      },
-      textFieldWrap: {
-        margin: '10px',
-      },
-		};
-    var indents = [];
+		ul: {
+			paddingLeft: 0,
+			marginBottom: '70px',
+		},
+		headroom: {
+			WebkitTransition: 'all .3s ease-in-out',
+			MozTransition: 'all .3s ease-in-out',
+			OTransition: 'all .3s ease-in-out',
+			transition: 'all .3s ease-in-out',
+		},
+		title: {
+			fontSize: '1.2rem',
+			fontWeight: 'bold',
+		},
+		avatar: {
+			marginLeft: '10px',
+		},
+		leftBalloon: {
+			width: 'auto',
+			maxWidth: '60%',
+			wordBreak: 'break-all',
+			background: '#f1f0f0',
+			border: '0px solid #777',
+			padding: '5px 10px',
+			margin: '5px 10px 5px 60px',
+			borderRadius: '15px',
+			clear: 'both',
+			float: 'left',
+		},
+		rightBalloon: {
+			width: 'auto',
+			maxWidth: '70%',
+			wordBreak: 'break-all',
+			color: '#fff',
+			position: 'relative',
+			background: '#0084ff',
+			border: '0px solid #777',
+			padding: '5px 10px',
+			margin: '5px 10px 5px 10px',
+			borderRadius: '15px',
+			clear: 'both',
+			float: 'right',
+		},
+		clearBalloon: {
+			clear: 'both',
+		},
+		senderName: {
+			marginTop: '-30px',
+			marginLeft: '70px',
+			marginBottom: '-5px',
+			color: 'rgba(0, 0, 0, .40)',
+		},
+		textField: {
+			position: 'fixed',
+			bottom: '0',
+			marginBottom: '0',
+			borderTop: '1px solid #eeeeee',
+			backgroundColor: '#eeeeee',
+			width: '100%',
+			clear: 'both',
+		},
+		sendButton: {
+			marginRight: '20',
+			position: 'fixed',
+			bottom: '10px',
+			right: '0',
+			marginRight: '10px',
+			backgroundColor: '#3f51b5',
+		},
+		timeRight: {
+			fontSize: '0.6em',
+			color: '#666',
+			float: 'right',
+			marginTop: '10px',
+		},
+		timeLeft: {
+			fontSize: '0.6em',
+			color: '#666',
+			float: 'left',
+			marginTop: '10px',
+		},
+		textFieldWrap: {
+			margin: '10px',
+		},
+	};
+	var indents = [];
 		return (
 			<section>
 				<DrawerMenu 
@@ -268,37 +268,37 @@ export class ChatPage extends React.Component {
 				<HeadRoom
 					style={styles.headroom}
 				>
-					<AppBar
-						title='チャット'
-						titleStyle={styles.title}
-					/>
+				<AppBar
+					title='チャット'
+					titleStyle={styles.title}
+				/>
 				</HeadRoom>
-        <ul style={styles.ul}>
-          {(() => {
-            if (Array.isArray(this.state.messages)) {
-              let indents = [];
-              let messages = this.state.messages;
-              for (var i = 0; i < messages.length; i++) {
-                if (messages[i].user_id == userId) {
-                  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
-                } else {
-                  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
-                }
-              }
-              Scroll.animateScroll.scrollToBottom({duration: 0});
-              return indents;
-            }
-          })()}
-        </ul>
-        <TextField
-          id='textField'
-          style={styles.textField}
-          multiLine={true}
-          rows={1}
-          value={this.state.textValue}
-          onChange={this.changeText}
-        />
-        <RaisedButton label="送信" primary={true} style={styles.sendButton} onTouchTap={this.sendMessage} />
+				<ul style={styles.ul}>
+					{(() => {
+						if (Array.isArray(this.state.messages)) {
+							let indents = [];
+							let messages = this.state.messages;
+							for (var i = 0; i < messages.length; i++) {
+								if (messages[i].user_id == userId) {
+								  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
+								} else {
+								  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
+								}
+							}
+							Scroll.animateScroll.scrollToBottom({duration: 0});
+							return indents;
+						}
+					})()}
+				</ul>
+				<TextField
+					id='textField'
+					style={styles.textField}
+					multiLine={true}
+					rows={1}
+					value={this.state.textValue}
+					onChange={this.changeText}
+				/>
+				<RaisedButton label="送信" primary={true} style={styles.sendButton} onTouchTap={this.sendMessage} />
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}
