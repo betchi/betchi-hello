@@ -18,6 +18,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import HeadRoom from 'react-headroom';
 import {DrawerMenu} from './menu.jsx';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
+import PersonAdd from 'material-ui/svg-icons/social/person-add';
+import FlatButton from 'material-ui/FlatButton';
 
 var ws;
 var self;
@@ -41,6 +43,7 @@ export class ChatPage extends React.Component {
 		this.sendMessage = this.sendMessage.bind(this);
 		this.changeText = this.changeText.bind(this);
 		this.onBack = this.onBack.bind(this);
+		this.onOffer = this.onOffer.bind(this);
 		self = this;
 	}
 
@@ -183,6 +186,10 @@ export class ChatPage extends React.Component {
 		this.context.router.goBack();
 	}
 
+	onOffer(e) {
+		console.log("onOffer");
+	}
+
 	render() {
 		const styles = {
 		ul: {
@@ -273,10 +280,6 @@ export class ChatPage extends React.Component {
 	var indents = [];
 		return (
 			<section>
-				<DrawerMenu 
-					ref='drawerMenu'
-					loggedIn={sessionStorage.loggedIn}
-				/>
 				<HeadRoom
 					style={styles.headroom}
 				>
@@ -290,6 +293,14 @@ export class ChatPage extends React.Component {
 							>
 								<NavigationArrowBack />
 							</IconButton>
+						}
+						iconElementRight={
+							<FlatButton
+								primary={true}
+								label="オファー"
+								icon={<PersonAdd />}
+								onTouchTap={this.onOffer}
+							/>
 						}
 					/>
 				</HeadRoom>
