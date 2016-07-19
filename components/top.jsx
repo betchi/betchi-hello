@@ -173,7 +173,7 @@ export class TopPage extends React.Component {
 
 	loadContents(category = 'business', page = 1) {
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/' + category + '.json?p=' + page);
+		xhr.open('GET', '/api/mentorings/' + category + '/' + page);
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
 				this.setState({
@@ -190,18 +190,18 @@ export class TopPage extends React.Component {
 			let mentorings = [];
 			let data = JSON.parse(xhr.responseText);
 			if (page === 1) {
-				mentorings = data;
+				mentorings = data.mentorings;
 			} else {
 				mentorings = this.state.mentorings.slice();
-				for (var ii in data) {
-					mentorings.push(data[ii]);
+				for (var ii in data.mentorings) {
+					mentorings.push(data.mentorings[ii]);
 				}
 			}
 			this.setState({
 				mentorings: mentorings,
+				category: category,
+				page: page,
 			});
-			this.state.category = category;
-			this.state.page = page;
 
 			if (mentorings.length == 0) {
 				this.setState({
@@ -218,7 +218,16 @@ export class TopPage extends React.Component {
 			if (page === 1) {
 				window.scrollTo(0,0);
 			}
-			window.addEventListener('scroll', this.onScroll);
+
+			if (!data.hasNext) {
+				this.setState({
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+			} else {
+				window.addEventListener('scroll', this.onScroll);
+			}
 		}
 		this.setState({
 			refreshStyle: {
@@ -258,6 +267,7 @@ export class TopPage extends React.Component {
 	}
 
 	render() {
+		const user = sessionStorage.user;
 		const styles = {
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
@@ -283,7 +293,8 @@ export class TopPage extends React.Component {
 			<section>
 				<DrawerMenu 
 					ref='drawerMenu'
-					loggedIn={sessionStorage.loggedIn}
+					loggedIn={null != user}
+					user={user}
 				/>
 				<HeadRoom
 					style={styles.headroom}

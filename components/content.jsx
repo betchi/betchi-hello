@@ -57,7 +57,11 @@ export class MentoringCover extends React.Component {
 				<img style={styles.cover} src={this.props.cover} />
 				<img style={styles.avatar} src={this.props.avatar} />
 				<div style={styles.title}>{this.props.title}</div>
-				<div style={styles.price}>{this.props.duration}&nbsp;{this.props.price}</div>
+				<div style={styles.price}>{this.props.duration}分間&nbsp;
+					{(() => {
+						return this.props.price ? '&yen;' + String(this.props.price) : 'いいね値段'
+					})()}
+				</div>
 			</div>
 		);
 	}
@@ -143,7 +147,11 @@ export class MentoringCoverSwipe extends MentoringCover {
 					onChangeIndex={this.onChangeIndex}
 				/>
 				<div style={styles.title}>{this.props.title}</div>
-				<div style={styles.price}>{this.props.duration}&nbsp;{this.props.price}</div>
+				<div style={styles.price}>{this.props.duration}分間&nbsp;
+					{(() => {
+						return this.props.price ? '&yen;' + String(this.props.price) : 'いいね値段'
+					})()}
+				</div>
 			</div>
 		);
 	}
@@ -153,9 +161,60 @@ MentoringCoverSwipe.contextTypes = {
 }
 MentoringCoverSwipe.propTypes = {
 	title: React.PropTypes.string.isRequired,
-	price: React.PropTypes.string.isRequired,
-	duration: React.PropTypes.string.isRequired,
+	price: React.PropTypes.number.isRequired,
+	duration: React.PropTypes.number.isRequired,
 	covers: React.PropTypes.array.isRequired,
+}
+
+export class SelectableCover extends React.Component {
+	constructor(props, context) {
+		super(props, context);
+		this.state = {
+		};
+		this.onTap = this.onTap.bind(this);
+	}
+
+	onTap(e) {
+		const src = e.target.src;
+		this.props.onTap(src);
+	}
+
+	render() {
+		const styles = {
+			root: {
+				width: '100%',
+				overflow: 'scroll',
+			},
+			covers: {
+				width: '200%',
+				display: 'flex',
+				flexFlow: 'row nowrap',
+			},
+			cover: {
+				flexGrow: 1,
+				width: '100%',
+				flexBasis: '90px',
+			},
+		};
+
+		return (
+			<div style={styles.root}>
+				<div style={styles.covers}>
+					{this.props.images.map((cover, index) => {
+						let key = 'cover_' + cover.id;
+						return <div key={key} style={styles.cover}><img style={styles.cover} src={cover.url} onTouchTap={this.onTap} /></div>
+					})}
+				</div>
+			</div>
+		);
+	}
+}
+SelectableCover.contextTypes = {
+	router: React.PropTypes.object.isRequired
+}
+SelectableCover.propTypes = {
+	images: React.PropTypes.array.isRequired,
+	onTap: React.PropTypes.func.isRequired,
 }
 
 export class RatingStar extends React.Component {
@@ -212,8 +271,8 @@ export class ThxSummury extends React.Component {
 		return (
 			<div style={this.props.rootStyle}>
 				お礼{this.props.countThx}件&nbsp;
-				メンター{this.props.countMentors}人&nbsp;
-				フォロー{this.props.countFollowers}人&nbsp;
+				メンター{this.props.countMentor}人&nbsp;
+				フォロー{this.props.countFollower}人&nbsp;
 			</div>
 		);
 	}
@@ -224,15 +283,15 @@ ThxSummury.contextTypes = {
 ThxSummury.propTypes = {
 	rootStyle: React.PropTypes.object,
 	countThx: React.PropTypes.number.isRequired,
-	countMentors: React.PropTypes.number.isRequired,
-	countFollowers: React.PropTypes.number.isRequired,
+	countMentor: React.PropTypes.number.isRequired,
+	countFollower: React.PropTypes.number.isRequired,
 }
 ThxSummury.defaultProps = {
 	rootStyle: {
 	},
 	countThx: 0,
-	countMentors: 0,
-	countFollowers: 0,
+	countMentor: 0,
+	countFollower: 0,
 }
 
 export class MentoringDigest extends React.Component {
@@ -281,8 +340,8 @@ export class MentoringDigest extends React.Component {
 					<ThxSummury
 						rootStyle={styles.thxRoot}
 						countThx={this.props.countThx}
-						countMentors={this.props.countMentors}
-						countFollowers={this.props.countFollowers}
+						countMentor={this.props.countMentor}
+						countFollower={this.props.countFollower}
 					/>
 				</div>
 			</div>
@@ -296,8 +355,8 @@ MentoringDigest.propTypes = {
 	digest: React.PropTypes.string.isRequired,
 	star: React.PropTypes.number.isRequired,
 	countThx: React.PropTypes.number.isRequired,
-	countMentors: React.PropTypes.number.isRequired,
-	countFollowers: React.PropTypes.number.isRequired,
+	countMentor: React.PropTypes.number.isRequired,
+	countFollower: React.PropTypes.number.isRequired,
 }
 
 export class MentoringDigestWithAvatar extends React.Component {
@@ -369,8 +428,8 @@ export class MentoringDigestWithAvatar extends React.Component {
 					<ThxSummury
 						rootStyle={styles.thxRoot}
 						countThx={this.props.countThx}
-						countMentors={this.props.countMentors}
-						countFollowers={this.props.countFollowers}
+						countMentor={this.props.countMentor}
+						countFollower={this.props.countFollower}
 					/>
 				</div>
 			</div>
@@ -386,8 +445,8 @@ MentoringDigestWithAvatar.propTypes = {
 	star: React.PropTypes.number.isRequired,
 	digest: React.PropTypes.string.isRequired,
 	countThx: React.PropTypes.number.isRequired,
-	countMentors: React.PropTypes.number.isRequired,
-	countFollowers: React.PropTypes.number.isRequired,
+	countMentor: React.PropTypes.number.isRequired,
+	countFollower: React.PropTypes.number.isRequired,
 }
 
 export class MentoringCard extends React.Component {
@@ -430,8 +489,8 @@ export class MentoringCard extends React.Component {
 					digest={this.props.mentoring.digest}
 					star={this.props.mentoring.star}
 					countThx={this.props.mentoring.countThx}
-					countMentors={this.props.mentoring.countMentors}
-					countFollowers={this.props.mentoring.countFollowers}
+					countMentor={this.props.mentoring.countMentor}
+					countFollower={this.props.mentoring.countFollower}
 				/>
 			</Card>
 		);

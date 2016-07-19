@@ -24,6 +24,16 @@ import {AvatarGrid} from './avatar.jsx';
 export class Profile extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.onCreateMentoring = this.onCreateMentoring.bind(this);
+		this.onCreateMentorGroup = this.onCreateMentorGroup.bind(this);
+	}
+
+	onCreateMentoring() {
+		this.context.router.push('/mentoring/0/edit');
+	}
+
+	onCreateMentorGroup() {
+		alert('onCrateMentorGroup');
 	}
 
 	render() {
@@ -118,6 +128,7 @@ export class Profile extends React.Component {
 							label={'メンタリングをする'}
 							labelStyle={styles.actionLabel}
 							icon={<PeopleOutline />}
+							onTouchTap={this.onCreateMentoring}
 						/>
 					</div>
 					<div style={styles.action}>
@@ -125,6 +136,7 @@ export class Profile extends React.Component {
 							label={'メンターライブをする'}
 							labelStyle={styles.actionLabel}
 							icon={<LiveTv />}
+							onTouchTap={this.onCreateMentoring}
 						/>
 					</div>
 					<div style={styles.action}>
@@ -132,6 +144,7 @@ export class Profile extends React.Component {
 							label={'メンターグループをする'}
 							labelStyle={styles.actionLabel}
 							icon={<PeopleOutline />}
+							onTouchTap={this.onCreateMentorGroup}
 						/>
 					</div>
 				</div>
@@ -366,7 +379,6 @@ export class MyPage extends React.Component {
 						titleStyle={styles.title}
 						iconElementLeft={
 							<IconButton
-								style={styles.backIcon}
 								onTouchTap={this.onBack}
 							>
 								<NavigationArrowBack />

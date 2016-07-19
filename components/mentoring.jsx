@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import {Card} from 'material-ui/Card';
+import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import AppBar from 'material-ui/AppBar';
 import Snackbar from 'material-ui/Snackbar';
@@ -12,10 +13,12 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
+import DatePicker from 'material-ui/DatePicker';
+import TimePicker from 'material-ui/TimePicker';
 
 import HeadRoom from 'react-headroom';
 
-import {MentoringCoverSwipe, MentoringDigestWithAvatar} from './content.jsx';
+import {MentoringCoverSwipe, MentoringDigestWithAvatar, SelectableCover} from './content.jsx';
 import {ThxMessageList} from './message.jsx';
 
 export class MentoringPage extends React.Component {
@@ -23,9 +26,10 @@ export class MentoringPage extends React.Component {
 		super(props, context);
 		this.state = {
 			messages: [],
+			user: sessionStorage.user,
 			mentoring: {
 				id: this.props.params.id,
-				uid: 0,
+				user_id: 0,
 				cover: '',
 				covers: [],
 				avatar: '',
@@ -35,8 +39,6 @@ export class MentoringPage extends React.Component {
 				star: 0,
 				digest: '',
 				countThx: 0,
-				countMentors: 0,
-				countFollowers: 0,
 			},
 			snack: {
 				open: false,
@@ -106,7 +108,7 @@ export class MentoringPage extends React.Component {
 
 	loadContents(id = 1) {
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/mentoring_' + id + '.json');
+		xhr.open('GET', '/api/mentoring/' + id);
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
 				this.setState({
@@ -120,9 +122,9 @@ export class MentoringPage extends React.Component {
 				});
 				return;
 			}
-			let mentoring = JSON.parse(xhr.responseText);
+			let data = JSON.parse(xhr.responseText);
 			this.setState({
-				mentoring: mentoring,
+				mentoring: data.mentoring,
 			});
 		}
 		xhr.send();
@@ -260,10 +262,10 @@ export class MentoringPage extends React.Component {
 					avatar={this.state.mentoring.avatar}
 					star={this.state.mentoring.star}
 					digest={this.state.mentoring.digest}
-					countThx={this.state.mentoring.countThx}
-					countMentors={this.state.mentoring.countMentors}
-					countFollowers={this.state.mentoring.countFollowers}
-				/>
+					countThx={this.state.mentoring.count_thx}
+					countMentor={this.state.user.count_mentor}
+					countFollower={this.state.user.count_follower}
+				/>s
 				<ThxMessageList
 					key={'thx-message_' + this.props.params.id}
 					messages={this.state.messages}
@@ -302,6 +304,398 @@ MentoringPage.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 MentoringPage.propTypes = {
+	params: React.PropTypes.object.isRequired
+}
+
+export class EditMentoringPage extends React.Component {
+	constructor(props, context) {
+		super(props, context);
+		this.state = {
+			messages: [],
+			mentoring: {
+				id: Number(this.props.params.id),
+				user_id: sessionStorage.user.id,
+				cover: '',
+				covers: [],
+				avatar: '',
+				title: '',
+				duration: 0,
+				price: 0,
+				star: 0,
+				digest: '',
+				day: '',
+				time: '',
+			},
+			covers: [],
+			snack: {
+				open: false,
+				message: '',
+			},
+			page: 1,
+		};
+		this.onSnackClose = this.onSnackClose.bind(this);
+		this.loadContents = this.loadContents.bind(this);
+		this.loadCovers = this.loadCovers.bind(this);
+		this.onScroll = this.onScroll.bind(this);
+		this.onBack = this.onBack.bind(this);
+		this.onFollow = this.onFollow.bind(this);
+		this.onOffer = this.onOffer.bind(this);
+		this.onCoverSelected = this.onCoverSelected.bind(this);
+		this.onInputTitle = this.onInputTitle.bind(this);
+		this.onInputDuration = this.onInputDuration.bind(this);
+		this.onInputDigest = this.onInputDigest.bind(this);
+		this.onChangeDay = this.onChangeDay.bind(this);
+		this.onChangeTime = this.onChangeTime.bind(this);
+		this.onSubmit = this.onSubmit.bind(this);
+	}
+
+	componentDidMount() {
+		this.loadContents(this.props.params.id);
+		this.loadCovers();
+	}
+
+	componentWillReceiveProps(nextProps) {
+		window.removeEventListener('scroll', this.onScroll);
+		this.loadContents(nextProps.params.id);
+		this.loadMessages()
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('scroll', this.onScroll);
+	}
+
+	onBack(e) {
+		this.context.router.goBack();
+	}
+
+	onFollow(e) {
+		alert('follow');
+	}
+
+	onOffer(e) {
+		alert('offer');
+	}
+
+	onSnackClose(e) {
+		this.setState({
+			snack: {
+				open: false,
+				message: '',
+			}
+		})
+	}
+
+	onCoverSelected(img) {
+		const mentoring = this.state.mentoring;
+		if (mentoring.cover == '') {
+			mentoring.covers.shift();
+		}
+		mentoring.covers.push(img);
+		mentoring.cover = mentoring.covers[0];
+		this.setState({
+			mentoring: mentoring,
+		});
+	}
+
+	onInputTitle(e) {
+		const mentoring = this.state.mentoring;
+		mentoring.title = e.target.value.trim();
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onInputDuration(e) {
+		const mentoring = this.state.mentoring;
+		mentoring.duration = Number(e.target.value.trim());
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onInputDigest(e) {
+		const mentoring = this.state.mentoring;
+		mentoring.digest = e.target.value;
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onChangeDay(e, day) {
+		console.log(day);
+		const mentoring = this.state.mentoring;
+		mentoring.day = day;
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onChangeTime(e, time) {
+		console.log(time);
+		const mentoring = this.state.mentoring;
+		mentoring.time = time;
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onSubmit(e) {
+		e.preventDefault();
+		this.refs.titleTextField.blur();
+		this.refs.durationTextField.blur();
+		this.refs.digestTextField.blur();
+
+		const xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/mentoring', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			if (data.ok == false) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '登録に失敗しました。',
+					},
+				});
+				return;
+			}
+			this.context.router.push('/');
+		}
+		const json = JSON.stringify({mentoring: this.state.mentoring});
+		console.log(json);
+		xhr.send(json);
+		return
+	}
+
+	onScroll(e) {
+		let body = window.document.body;
+		let html = window.document.documentElement;
+		let scrollTop = body.scrollTop || html.scrollTop;
+		let bottom = html.scrollHeight - html.clientHeight - scrollTop;
+		if (bottom <= 60) {
+			window.removeEventListener('scroll', this.onScroll);
+			//this.loadMessages(this.props.params.id, this.state.page + 1);
+		}
+	}
+
+	loadContents(id = 0) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/mentoring/' + id);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			this.setState({
+				mentoring: data.mentoring,
+			});
+		}
+		xhr.send();
+	}
+
+	loadCovers(category = 'all', page = 1) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/cover_mentoring/' + category + '/' + page);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+				});
+				return;
+			}
+			let covers = [];
+			let data = JSON.parse(xhr.responseText);
+			console.log(data)
+			if (page === 1) {
+				covers = data.images;
+			} else {
+				covers = this.state.covers.slice();
+				for (var ii in data.images) {
+					covers.push(data.images[ii]);
+				}
+			}
+			this.setState({
+				covers: covers,
+			});
+			this.state.page = page;
+
+			if (covers.length == 0) {
+				this.setState({
+					snack: {
+						open: true,
+						message: 'カバー画像が見つかりません。',
+					},
+				});
+				return;
+			}
+			//window.addEventListener('scroll', this.onScroll);
+		}
+		xhr.send();
+	}
+
+	render() {
+		const styles = {
+			root: {
+				backgroundColor: 'white',
+			},
+			headroom: {
+				WebkitTransition: 'all .3s ease-in-out',
+				MozTransition: 'all .3s ease-in-out',
+				OTransition: 'all .3s ease-in-out',
+				transition: 'all .3s ease-in-out',
+			},
+			title: {
+				fontSize: '1.2rem',
+				fontWeight: 'bold',
+			},
+			buttons: {
+				width: '96%',
+				margin: '0 2% 1rem 2%',
+				left: 0,
+				textAlign: 'center',
+			},
+			offer: {
+				width: '100%',
+			},
+			titleText: {
+				fontSize: '0.8rem',
+				width: '90%',
+				margin: '0 5%',
+				lineHeight: '1.5rem',
+			},
+			dateRoot: {
+				display: 'flex',
+				flexFlow: 'row nowrap',
+				width: '90%',
+				margin: '0 5%',
+			},
+			dateText: {
+				width: '100%',
+				fontSize: '0.8rem',
+				lineHeight: '1.5rem',
+				flexGrow: 1,
+			},
+			digestText: {
+				width: '90%',
+				margin: '0 5%',
+				fontSize: '0.8rem',
+				lineHeight: '1.5rem',
+			},
+		}
+
+		return (
+			<section style={styles.root}>
+				<HeadRoom
+					style={styles.headroom}
+				>
+					<AppBar
+						title='応援し合う世界へ'
+						titleStyle={styles.title}
+						iconElementLeft={
+							<IconButton
+								style={styles.backIcon}
+								onTouchTap={this.onBack}
+							>
+								<NavigationArrowBack />
+							</IconButton>
+						}
+					/>
+				</HeadRoom>
+				<MentoringCoverSwipe
+					covers={this.state.mentoring.covers}
+					title={this.state.mentoring.title}
+					duration={this.state.mentoring.duration}
+					price={this.state.mentoring.price}
+				/>
+				<SelectableCover
+					images={this.state.covers}
+					onTap={this.onCoverSelected}
+				/>
+				<form onSubmit={this.onSubmit}>
+					<TextField
+						style={styles.titleText}
+						hintText='教えたいこと（40文字）'
+						errorText={this.state.errorTitle}
+						value={this.state.mentoring.title}
+						onChange={this.onInputTitle}
+						ref='titleTextField'
+					/>
+					<div style={styles.dateRoot}>
+						<DatePicker
+							hintText="開催日"
+							textFieldStyle={styles.dateText}
+							value={this.state.mentoring.day}
+							onChange={this.onChangeDay}
+						/>
+						<TimePicker
+							hintText="開催時刻"
+							textFieldStyle={styles.dateText}
+							format="24hr"
+							value={this.state.mentoring.time}
+							onChange={this.onChangeTime}
+						/>
+						<TextField
+							style={styles.dateText}
+							hintText='何分間'
+							errorText={this.state.errorDuration}
+							value={this.state.mentoring.Duration}
+							type="number"
+							onChange={this.onInputDuration}
+							ref='durationTextField'
+						/>
+					</div>
+					<TextField
+						style={styles.digestText}
+						hintText='事前メッセージ・告知'
+						errorText={this.state.errorDigest}
+						value={this.state.mentoring.digest}
+						onChange={this.onInputDigest}
+						ref='digestTextField'
+						rows={10}
+						multiLine={true}
+					/>
+					<div style={styles.buttons}>
+						<RaisedButton
+							style={styles.offer}
+							primary={true}
+							label="登録する"
+							onTouchTap={this.onSubmit}
+						/>
+					</div>
+				</form>
+				<Divider />
+				<Snackbar
+					open={this.state.snack.open}
+					message={this.state.snack.message}
+					autoHideDuration={4000}
+					onRequestClose={this.onSnackClose}
+				/>
+			</section>
+		);
+	}
+}
+EditMentoringPage.contextTypes = {
+	router: React.PropTypes.object.isRequired
+}
+EditMentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired
 }
 
