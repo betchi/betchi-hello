@@ -12,7 +12,7 @@ import {RegisterPage} from './components/register.jsx';
 import {TopPage} from './components/top.jsx';
 import {ChatPage} from './components/chat.jsx';
 import {SearchPage} from './components/search.jsx';
-import {MentoringPage} from './components/mentoring.jsx';
+import {MentoringPage,EditMentoringPage} from './components/mentoring.jsx';
 import {MyPage} from './components/mypage.jsx';
 //import {MessageList} from './components/messageList.js';
 
@@ -26,20 +26,33 @@ Object.defineProperty(String.prototype, 'isValidEmail', {
 	}
 });
 
-Object.defineProperty(Storage.prototype, 'loggedIn', {
+Object.defineProperty(Storage.prototype, 'user', {
 	configurable: true,
 	enumerable: false,
-	set: function(loggedIn) {
-		this.setItem('loggedIn', loggedIn);
+	set: function(user) {
+		if (user == null || !user.id || !user.username) {
+			this.removeItem('user');
+		} else {
+			this.setItem('user', JSON.stringify(user));
+		}
 	},
 	get: function() {
-		return (this.getItem('loggedIn') === 'true');
+		const user = this.getItem('user');
+		if (user == null) {
+			return null;
+		}
+		try {
+			return JSON.parse(user);
+		} catch (e) {
+			this.removeItem('user');
+			return null
+		}
 	}
 });
 
 function requireAuth(next, replace) {
 	const goLogin = () => {
-		sessionStorage.loggedIn = false;
+		sessionStorage.user = null;
 		replace({
 			pathname: '/login',
 			state: {
@@ -58,9 +71,10 @@ function requireAuth(next, replace) {
 			goLogin();
 			return
 		}
-		sessionStorage.loggedIn = true;
+		sessionStorage.user = data.user;
 	};
 	xhr.send();
+	console.log(sessionStorage.user);
 }
 
 ReactDOM.render(
@@ -69,10 +83,11 @@ ReactDOM.render(
 			<Route path="/" component={TopPage} onEnter={requireAuth} />
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
-			<Route path="/search" component={SearchPage} />
-			<Route path="/chat" component={ChatPage} />
-			<Route path="/mentoring/:id" component={MentoringPage} />
-			<Route path="/mypage/:id" component={MyPage} />
+			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
+			<Route path="/chat" component={ChatPage} onEnter={requireAuth} />
+			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
+			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
+			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
 		</Router>
 	</MuiThemeProvider>
 	,document.getElementById("content")

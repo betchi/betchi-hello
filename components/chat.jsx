@@ -42,9 +42,9 @@ export class ChatPage extends React.Component {
 	}
 
   componentWillMount() {
-    userId = this.props.location.query.userId;
+    userId = sessionStorage.user.id;
     roomId = this.props.location.query.roomId;
-    name = this.props.location.query.name;
+    name = sessionStorage.user.username;
 
     ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 
