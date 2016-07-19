@@ -8,12 +8,14 @@ import MenuItem from 'material-ui/MenuItem';
 import ActionHome from 'material-ui/svg-icons/action/home';
 import ActionSearch from 'material-ui/svg-icons/action/search';
 import IconButton from 'material-ui/IconButton';
+import Person from 'material-ui/svg-icons/social/person';
 
 export class DrawerMenu extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {open: false};
 		this.onToggle = this.onToggle.bind(this);
+		this.moveMypage = this.moveMypage.bind(this);
 		this.moveTop = this.moveTop.bind(this);
 		this.moveChat = this.moveChat.bind(this);
 		this.moveSearch = this.moveSearch.bind(this);
@@ -23,6 +25,11 @@ export class DrawerMenu extends React.Component {
 
 	onToggle(e) {
 		this.setState({open: !this.state.open});
+	}
+
+	moveMypage(e) {
+		this.onToggle(e);
+		this.context.router.push('/mypage/' + this.props.user.id);
 	}
 
 	moveTop(e) {
@@ -68,7 +75,10 @@ export class DrawerMenu extends React.Component {
 			},
 			drawerItem: {
 				color: baseTheme.palette.alternateTextColor,
-			}
+			},
+			title: {
+					fontSize: '1rem',
+			},
 		};
 		return (
 			<div>
@@ -79,17 +89,23 @@ export class DrawerMenu extends React.Component {
 					onRequestChange={(open) => this.setState({open})}
 				>
 					<AppBar
-						title='mentor'
-						showMenuIconButton={false}
+						title={<span style={styles.title}>マイページ</span>}
+						onTitleTouchTap={this.moveMypage}
+						iconElementLeft={
+							<IconButton
+								onTouchTap={this.moveMypage}
+							>
+								<Person />
+							</IconButton>
+						}
 					/>
-					<MenuItem onTouchTap={this.moveTop} primaryText='Top' leftIcon={<ActionHome />} />
-					<MenuItem onTouchTap={this.moveSearch} primaryText='Search' leftIcon={<ActionSearch />} />
-					<MenuItem onTouchTap={this.moveChat} primaryText='Chat' leftIcon={<ActionSearch />} />
+					<MenuItem onTouchTap={this.moveTop} primaryText='トップページ' leftIcon={<ActionHome />} />
+					<MenuItem onTouchTap={this.moveSearch} primaryText='検索' leftIcon={<ActionSearch />} />
 					{(() => {
-						return this.props.loggedIn ? '' : <MenuItem onTouchTap={this.moveLogin} primaryText='Login' />
+						return this.props.loggedIn ? '' : <MenuItem onTouchTap={this.moveLogin} primaryText='ログイン' />
 					})()}
 					{(() => {
-						return this.props.loggedIn ? <MenuItem onTouchTap={this.moveLogout} primaryText='Logout' /> : ''
+						return this.props.loggedIn ? <MenuItem onTouchTap={this.moveLogout} primaryText='ログアウト' /> : ''
 					})()}
 				</Drawer>
 			</div>
@@ -101,5 +117,6 @@ DrawerMenu.contextTypes = {
 }
 DrawerMenu.propTypes = {
 	loggedIn: React.PropTypes.bool.isRequired,
+	user: React.PropTypes.object.isRequired,
 }
 
