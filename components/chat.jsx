@@ -27,6 +27,38 @@ var userId;
 var roomId;
 var roomName;
 var name;
+var styleUl = {
+	paddingLeft: 0,
+	marginBottom: '70px',
+	listStyleType: 'none',
+};
+var styleTextField = {
+	position: 'fixed',
+	bottom: '10',
+	marginTop: '0px',
+	marginLeft: '10px',
+	paddingLeft: '10px',
+	backgroundColor: '#eeeeee',
+	width: '85%',
+	clear: 'both',
+	backgroundColor: 'white',
+	border: '0px solid #777',
+	borderRadius: '5px',
+};
+var styleTextFieldWrap = {
+	position: 'fixed',
+	bottom: '0',
+	width: '100%',
+	height: '70px',
+	backgroundColor: '#ededed',
+}
+var styleSendButton = {
+	position: 'fixed',
+	bottom: '20px',
+	left: '84%',
+	width: '50px',
+	fontSize: '2em',
+};
 
 export class ChatPage extends React.Component {
 
@@ -95,52 +127,6 @@ export class ChatPage extends React.Component {
 				textValue: ""
 			});
 		};
-
-		/*
-		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/messages.json');
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '通信に失敗しました。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			let mentorings = [];
-			let data = JSON.parse(xhr.responseText);
-			console.log(data);
-			this.setState({
-				messages: data.message_list,
-			});
-
-			if (data.message_list.length == 0) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '検索ヒット0件です。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			window.addEventListener('scroll', this.onScroll);
-		}
-		this.setState({
-			refreshStyle: {
-				position: 'relative',
-				display: 'inline-block',
-			},
-		});
-		xhr.send();
-		*/
 	}
 
 	componentWillUnmount() {
@@ -152,6 +138,24 @@ export class ChatPage extends React.Component {
 	}
 
 	changeText(e) {
+		var str = e.target.value;
+		var enterCount = (str.match(new RegExp("\n", "g")) || []).length;
+		var ulPaddingBottom = enterCount * 30;
+		var sendButtonBottom = enterCount * 21;
+		if (enterCount == 0) {
+			styleTextFieldWrap.height = '70px';
+			styleSendButton.bottom = '20px';
+		} else if (enterCount < 3) {
+			styleUl.paddingBottom = ulPaddingBottom + 'px';
+			styleTextField.paddingBottom = '0px';
+			styleTextFieldWrap.height = (ulPaddingBottom + 60) + 'px';
+			styleSendButton.bottom = (sendButtonBottom + 10) + 'px';
+		} else if (enterCount == 3) {
+			styleTextField.paddingBottom = '15px';
+			styleUl.paddingBottom = (ulPaddingBottom + 10) + 'px';
+			styleTextFieldWrap.height = (ulPaddingBottom + 70) + 'px';
+			styleSendButton.bottom = (sendButtonBottom * 1) + 'px';
+		}
 		this.setState({
 			textValue: e.target.value
 		});
@@ -182,6 +186,7 @@ export class ChatPage extends React.Component {
 				},
 			});
 		}
+		styleSendButton.backgroundColor = 'rgba(255, 255, 255, 0.0)';
 	}
 
 	onSnackClose(e) {
@@ -203,11 +208,6 @@ export class ChatPage extends React.Component {
 
 	render() {
 		const styles = {
-		ul: {
-			paddingLeft: 0,
-			marginBottom: '70px',
-			listStyleType: 'none',
-		},
 		headroom: {
 			WebkitTransition: 'all .3s ease-in-out',
 			MozTransition: 'all .3s ease-in-out',
@@ -257,23 +257,6 @@ export class ChatPage extends React.Component {
 			marginBottom: '-5px',
 			color: 'rgba(0, 0, 0, .40)',
 		},
-		textField: {
-			position: 'fixed',
-			bottom: '0',
-			marginBottom: '0',
-			borderTop: '1px solid #eeeeee',
-			backgroundColor: '#eeeeee',
-			width: '100%',
-			clear: 'both',
-		},
-		sendButton: {
-			marginRight: '20',
-			position: 'fixed',
-			bottom: '10px',
-			right: '0',
-			marginRight: '10px',
-			backgroundColor: '#3f51b5',
-		},
 		timeRight: {
 			fontSize: '0.6em',
 			color: '#666',
@@ -293,10 +276,10 @@ export class ChatPage extends React.Component {
 			wordBreak: 'break-all',
 			background: '#9a9a9a',
 			border: '0px solid #777',
+			borderRadius: '15px',
 			padding: '5px 10px',
 			margin: '-12px 0 20px 43%',
 			textAlign: 'center',
-			borderRadius: '15px',
 			clear: 'both',
 			float: 'left',
 		},
@@ -338,7 +321,7 @@ export class ChatPage extends React.Component {
 						}
 					/>
 				</HeadRoom>
-				<ul style={styles.ul}>
+				<ul style={styleUl}>
 					{(() => {
 						if (Array.isArray(this.state.messages)) {
 							let indents = [];
@@ -360,15 +343,19 @@ export class ChatPage extends React.Component {
 						}
 					})()}
 				</ul>
-				<TextField
-					id='textField'
-					style={styles.textField}
-					multiLine={true}
-					rows={1}
-					value={this.state.textValue}
-					onChange={this.changeText}
-				/>
-				<RaisedButton icon={<ContentSend />} primary={true} style={styles.sendButton} onTouchTap={this.sendMessage} />
+				<div style={styleTextFieldWrap}>
+					<TextField
+						id='textField'
+						style={styleTextField}
+						multiLine={true}
+						underlineShow={false}
+						rows={1}
+						rowsMax={4}
+						value={this.state.textValue}
+						onChange={this.changeText}
+					/>
+				</div>
+				<FlatButton icon={<ContentSend />} primary={true} style={styleSendButton} onTouchTap={this.sendMessage} />
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}
