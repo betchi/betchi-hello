@@ -11,7 +11,6 @@ import Avatar from 'material-ui/Avatar';
 import Subheader from 'material-ui/Subheader';
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
 import TextField from 'material-ui/TextField';
-import Time from 'react-time';
 import Scroll from 'react-scroll';
 import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -19,6 +18,7 @@ import HeadRoom from 'react-headroom';
 import {DrawerMenu} from './menu.jsx';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
+import ContentSend from 'material-ui/svg-icons/content/send';
 import FlatButton from 'material-ui/FlatButton';
 
 var ws;
@@ -53,7 +53,7 @@ export class ChatPage extends React.Component {
 		roomName = this.props.location.query.roomName;
 		name = sessionStorage.user.username;
 
-		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
+		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + roomId + "/user/" + userId);
 
 		ws.onopen = function(e) {
 			console.log("onopen");
@@ -75,13 +75,14 @@ export class ChatPage extends React.Component {
 
 		ws.onmessage = function(e) {
 			var model = eval("("+e.data+")")
-			//console.log(model);
+			var date = new Date( model.registerd_at * 1000 );
+			var registerdAt = date.getHours() + ":" + date.getMinutes()
 			var newMessages = self.state.messages.slice();	
-			newMessages.push({user_id: model.user_id, name: model.name, message: model.message, registerd_at: model.registerd_at});
+			newMessages.push({user_id: model.user_id, username: model.username, message: model.message, registerd_at: registerdAt, avatar: model.avatar});
 			self.setState({
-			messages: newMessages,
-			textValue: ""
-		  });
+				messages: newMessages,
+				textValue: ""
+			});
 		};
 
 		/*
@@ -239,6 +240,7 @@ export class ChatPage extends React.Component {
 			clear: 'both',
 		},
 		senderName: {
+			fontSize: '0.6em',
 			marginTop: '-30px',
 			marginLeft: '70px',
 			marginBottom: '-5px',
@@ -311,9 +313,9 @@ export class ChatPage extends React.Component {
 							let messages = this.state.messages;
 							for (var i = 0; i < messages.length; i++) {
 								if (messages[i].user_id == userId) {
-								  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
+								  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}>{messages[i].registerd_at}</div><p style={styles.clearBalloon}></p></li>);
 								} else {
-								  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar_url} /><p style={styles.senderName}>{messages[i].name}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}><Time value={messages[i].registerd_at} format="hh:mm" /></div><p style={styles.clearBalloon}></p></li>);
+								  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}>{messages[i].registerd_at}</div><p style={styles.clearBalloon}></p></li>);
 								}
 							}
 							Scroll.animateScroll.scrollToBottom({duration: 0});
@@ -329,7 +331,7 @@ export class ChatPage extends React.Component {
 					value={this.state.textValue}
 					onChange={this.changeText}
 				/>
-				<RaisedButton label="送信" primary={true} style={styles.sendButton} onTouchTap={this.sendMessage} />
+				<RaisedButton icon={<ContentSend />} primary={true} style={styles.sendButton} onTouchTap={this.sendMessage} />
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}

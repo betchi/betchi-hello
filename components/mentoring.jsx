@@ -82,7 +82,7 @@ export class MentoringPage extends React.Component {
 	}
 
 	onOffer(e) {
-		this.context.router.push({ pathname: '/chat', query: {roomId: 1, roomName: this.state.mentoring.title}});
+		this.context.router.push({ pathname: '/chat', query: {roomId: this.props.params.id, roomName: this.state.mentoring.title}});
 	}
 
 	onSnackClose(e) {
