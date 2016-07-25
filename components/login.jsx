@@ -49,6 +49,12 @@ export class LoginForm extends React.Component {
 		this.onSubmit = this.onSubmit.bind(this);
 	}
 
+	componentWillMount() {
+		if (sessionStorage.user != null) {
+			this.context.router.push('/');
+		}
+	}
+
 	onSubmit(e) {
 		e.preventDefault();
 		this.refs.emailTextField.blur();
