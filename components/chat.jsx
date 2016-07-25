@@ -85,9 +85,11 @@ export class ChatPage extends React.Component {
 		ws.onmessage = function(e) {
 			var model = eval("("+e.data+")")
 			var date = new Date( model.registerd_at * 1000 );
-			var registerdAt = date.getHours() + ":" + date.getMinutes()
+			var mmdd = (date.getMonth() + 1) + "/" + date.getDate();
+			var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
+
 			var newMessages = self.state.messages.slice();	
-			newMessages.push({user_id: model.user_id, username: model.username, message: model.message, registerd_at: registerdAt, avatar: model.avatar});
+			newMessages.push({user_id: model.user_id, username: model.username, message: model.message, registerd_mmdd: mmdd, registerd_hhmm: hhmm, avatar: model.avatar});
 			self.setState({
 				messages: newMessages,
 				textValue: ""
@@ -204,6 +206,7 @@ export class ChatPage extends React.Component {
 		ul: {
 			paddingLeft: 0,
 			marginBottom: '70px',
+			listStyleType: 'none',
 		},
 		headroom: {
 			WebkitTransition: 'all .3s ease-in-out',
@@ -283,8 +286,29 @@ export class ChatPage extends React.Component {
 			float: 'left',
 			marginTop: '10px',
 		},
+		date: {
+			fontSize: '0.6em',
+			color: '#efefef',
+			width: 'auto',
+			wordBreak: 'break-all',
+			background: '#9a9a9a',
+			border: '0px solid #777',
+			padding: '5px 10px',
+			margin: '-12px 0 20px 43%',
+			textAlign: 'center',
+			borderRadius: '15px',
+			clear: 'both',
+			float: 'left',
+		},
 		textFieldWrap: {
 			margin: '10px',
+		},
+		dateLi: {
+			marginTop: '30px',
+		},
+		hr: {
+			width: '100%',
+			borderTop: '1px solid #cecece',
 		},
 	};
 	var indents = [];
@@ -319,11 +343,16 @@ export class ChatPage extends React.Component {
 						if (Array.isArray(this.state.messages)) {
 							let indents = [];
 							let messages = this.state.messages;
+							let workmmdd = "";
 							for (var i = 0; i < messages.length; i++) {
+								if (workmmdd != messages[i].registerd_mmdd) {
+									indents.push(<li style={styles.dateLi}><p style={styles.date}>{messages[i].registerd_mmdd}</p><div style={styles.hr} /><p style={styles.clearBalloon}></p></li>)
+								}
+								workmmdd = messages[i].registerd_mmdd;
 								if (messages[i].user_id == userId) {
-								  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}>{messages[i].registerd_at}</div><p style={styles.clearBalloon}></p></li>);
+								  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
 								} else {
-								  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}>{messages[i].registerd_at}</div><p style={styles.clearBalloon}></p></li>);
+								  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
 								}
 							}
 							Scroll.animateScroll.scrollToBottom({duration: 0});
