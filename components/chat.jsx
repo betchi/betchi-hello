@@ -71,6 +71,15 @@ export class ChatPage extends React.Component {
 			console.log("onclose");
 			console.log(e);
 			console.log(ws);
+			self.setState({
+				snack: {
+					open: true,
+					message: '通信に失敗しました。',
+				},
+				refreshStyle: {
+					display: 'none',
+				},
+			});
 		};
 
 		ws.onmessage = function(e) {
@@ -161,7 +170,6 @@ export class ChatPage extends React.Component {
 			console.log(wsSendMessage);
 			ws.send(wsSendMessage);
 		} else {
-			ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/entry");
 			this.setState({
 				snack: {
 					open: true,
