@@ -8,36 +8,6 @@ import Snackbar from 'material-ui/Snackbar';
 
 import {LoginIcon} from './login.jsx';
 
-const styles = {
-	formBox: {
-		width: '100%',
-		maxWidth: '30rem',
-		margin: 'auto',
-	},
-	form: {
-		margin: '8px',
-	},
-	card: {
-	},
-	text: {
-		fontSize: '0.8rem',
-		width: '90%',
-		marginLeft: '1rem',
-		marginRight: '1rem',
-		lineHeight: '1.5rem',
-	},
-	register: {
-		width: '100%',
-		maxWidth: '30rem',
-		marginTop: '0.5rem',
-	},
-	register: {
-		width: '100%',
-		maxWidth: '30rem',
-		marginTop: '0.5rem',
-	},
-};
-
 export class RegisterForm extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -55,10 +25,17 @@ export class RegisterForm extends React.Component {
 			},
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
+		this.onTapLogin = this.onTapLogin.bind(this);
 		this.onInputEmail = this.onInputEmail.bind(this);
 		this.onInputPassword = this.onInputPassword.bind(this);
 		this.onInputPasswordConfirm = this.onInputPasswordConfirm.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
+	}
+
+	componentWillMount() {
+		if (sessionStorage.user != null) {
+			this.context.router.push('/');
+		}
 	}
 
 	onSubmit(e) {
@@ -126,6 +103,10 @@ export class RegisterForm extends React.Component {
 		return
 	}
 
+	onTapLogin(e) {
+		this.context.router.push('/login');
+	}
+
 	onInputEmail(e) {
 		this.setState({
 			email: e.target.value.trim()
@@ -154,6 +135,36 @@ export class RegisterForm extends React.Component {
 	}
 
 	render() {
+		const styles = {
+			formBox: {
+				width: '100%',
+				maxWidth: '30rem',
+				margin: 'auto',
+			},
+			form: {
+				margin: '8px',
+			},
+			card: {
+			},
+			text: {
+				fontSize: '0.8rem',
+				width: '90%',
+				marginLeft: '1rem',
+				marginRight: '1rem',
+				lineHeight: '1.5rem',
+			},
+			register: {
+				width: '100%',
+				maxWidth: '30rem',
+				marginTop: '0.5rem',
+			},
+			login: {
+				width: '100%',
+				maxWidth: '30rem',
+				marginTop: '0.5rem',
+			},
+		};
+
 		return (
 			<section style={styles.formBox}>
 				<form style={styles.form} onSubmit={this.onSubmit}>
@@ -194,6 +205,7 @@ export class RegisterForm extends React.Component {
 						/>
 					</Card>
 					<RaisedButton label="登録" primary={true} style={styles.register} type="submit" />
+					<RaisedButton label="ログイン" primary={true} style={styles.login} onTouchTap={this.onTapLogin} />
 				</form>
 					<Snackbar
 						open={this.state.snack.open}
