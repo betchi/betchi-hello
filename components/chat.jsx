@@ -27,6 +27,7 @@ var userId;
 var roomId;
 var roomName;
 var name;
+var isDoneFirstShow = false;
 var styleUl = {
 	paddingLeft: 0,
 	marginBottom: '70px',
@@ -189,7 +190,10 @@ export class ChatPage extends React.Component {
 	}
 
 	sendMessage(e) {
-		console.log("sendMessage");
+		styleSendButton.backgroundColor = 'rgba(255, 255, 255, 0.0)';
+		if (this.state.textValue == "") {
+			return;
+		}
 		/*  まずはReactでwriteする
 		var newMessages = this.state.messages.slice();	
 		newMessages.push({user_id: 1, message: this.state.textValue});
@@ -199,6 +203,7 @@ export class ChatPage extends React.Component {
 			});
 		*/
 		if (ws.readyState == 1) {
+			isDoneFirstShow = true;
 			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+escape(this.state.textValue)+"\"}";
 			console.log(wsSendMessage);
 			ws.send(wsSendMessage);
@@ -213,7 +218,6 @@ export class ChatPage extends React.Component {
 				},
 			});
 		}
-		styleSendButton.backgroundColor = 'rgba(255, 255, 255, 0.0)';
 	}
 
 	onSnackClose(e) {
@@ -359,7 +363,7 @@ export class ChatPage extends React.Component {
 									return <span>{line}<br /></span>;
 								});
 								if (workmmdd != messages[i].registerd_mmdd) {
-									indents.push(<li style={styles.dateLi}><p style={styles.date}>{messages[i].registerd_mmdd}</p><div style={styles.hr} /><p style={styles.clearBalloon}></p></li>)
+									indents.push(<li key={messages[i].registerd_mmdd} style={styles.dateLi}><p style={styles.date}>{messages[i].registerd_mmdd}</p><div style={styles.hr} /><p style={styles.clearBalloon}></p></li>)
 								}
 								workmmdd = messages[i].registerd_mmdd;
 								if (messages[i].user_id == userId) {
@@ -368,7 +372,11 @@ export class ChatPage extends React.Component {
 									indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><div style={styles.leftBalloon}>{message}</div><div style={styles.timeLeft}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
 								}
 							}
-							Scroll.animateScroll.scrollToBottom({duration: 0});
+							if (isDoneFirstShow) {
+								Scroll.animateScroll.scrollToBottom({duration: 1500});
+							} else {
+								Scroll.animateScroll.scrollToBottom({duration: 0});
+							}
 							return indents;
 						}
 					})()}
@@ -381,6 +389,8 @@ export class ChatPage extends React.Component {
 						underlineShow={false}
 						rows={1}
 						rowsMax={4}
+						defaultValue={this.state.textValue}
+						value={this.state.textValue}
 						onChange={this.changeText}
 					/>
 				</div>
