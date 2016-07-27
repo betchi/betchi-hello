@@ -190,8 +190,9 @@ export class ChatPage extends React.Component {
 				styleSendButton.bottom = '2.8rem';
 				break;
 			case 3:
-				styleTextFieldWrap.height = '8.7rem';
+				styleTextFieldWrap.height = '9.7rem';
 				styleSendButton.bottom = '3.6rem';
+				styleTextField.paddingBottom = '1rem';
 				break;
 			default:
 				break;
