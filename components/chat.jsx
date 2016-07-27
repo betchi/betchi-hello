@@ -142,7 +142,7 @@ export class ChatPage extends React.Component {
 		};
 
 		ws.onmessage = function(e) {
-			var model = eval("("+e.data+")")
+			var model = JSON.parse(e.data);
 			var date = new Date( model.registerd_at * 1000 );
 			var mmdd = (date.getMonth() + 1) + "/" + date.getDate();
 			var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
@@ -199,7 +199,7 @@ export class ChatPage extends React.Component {
 			});
 		*/
 		if (ws.readyState == 1) {
-			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+this.state.textValue+"\"}";
+			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+escape(this.state.textValue)+"\"}";
 			console.log(wsSendMessage);
 			ws.send(wsSendMessage);
 		} else {
@@ -355,14 +355,17 @@ export class ChatPage extends React.Component {
 							let messages = this.state.messages;
 							let workmmdd = "";
 							for (var i = 0; i < messages.length; i++) {
+								var message = messages[i].message.split('\n').map(function(line) {
+									return <span>{line}<br /></span>;
+								});
 								if (workmmdd != messages[i].registerd_mmdd) {
 									indents.push(<li style={styles.dateLi}><p style={styles.date}>{messages[i].registerd_mmdd}</p><div style={styles.hr} /><p style={styles.clearBalloon}></p></li>)
 								}
 								workmmdd = messages[i].registerd_mmdd;
 								if (messages[i].user_id == userId) {
-								  indents.push(<li key={i}><p style={styles.rightBalloon}>{messages[i].message}</p><div style={styles.timeRight}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
+									indents.push(<li key={i}><p style={styles.rightBalloon}>{message}</p><div style={styles.timeRight}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
 								} else {
-								  indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><p style={styles.leftBalloon}>{messages[i].message}</p><div style={styles.timeLeft}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
+									indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><div style={styles.leftBalloon}>{message}</div><div style={styles.timeLeft}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
 								}
 							}
 							Scroll.animateScroll.scrollToBottom({duration: 0});
