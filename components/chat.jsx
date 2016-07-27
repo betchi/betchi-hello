@@ -161,6 +161,9 @@ export class ChatPage extends React.Component {
 
 	componentWillUnmount() {
 		ws.close();
+		self.setState({
+			textValue: ""
+		});
 	}
 
 	onDrawerToggle(e) {
@@ -193,7 +196,8 @@ export class ChatPage extends React.Component {
 
 	sendMessage(e) {
 		styleSendButton.backgroundColor = 'rgba(255, 255, 255, 0.0)';
-		if (this.state.textValue == "") {
+		var message = this.state.textValue.replace(/\s|\n|　/g, "");
+		if (message == "") {
 			return;
 		}
 		/*  まずはReactでwriteする
