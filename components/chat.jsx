@@ -148,8 +148,10 @@ export class ChatPage extends React.Component {
 			var mmdd = (date.getMonth() + 1) + "/" + date.getDate();
 			var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 
+			var decodeMessage = decodeURI(model.message);
+
 			var newMessages = self.state.messages.slice();	
-			newMessages.push({user_id: model.user_id, username: model.username, message: model.message, registerd_mmdd: mmdd, registerd_hhmm: hhmm, avatar: model.avatar});
+			newMessages.push({user_id: model.user_id, username: model.username, message: decodeMessage, registerd_mmdd: mmdd, registerd_hhmm: hhmm, avatar: model.avatar});
 			self.setState({
 				messages: newMessages,
 				textValue: ""
@@ -204,7 +206,7 @@ export class ChatPage extends React.Component {
 		*/
 		if (ws.readyState == 1) {
 			isDoneFirstShow = true;
-			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+escape(this.state.textValue)+"\"}";
+			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+encodeURI(this.state.textValue)+"\"}";
 			console.log(wsSendMessage);
 			ws.send(wsSendMessage);
 		} else {
