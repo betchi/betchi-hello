@@ -30,6 +30,7 @@ var name;
 var isDoneFirstShow = false;
 var styleUl = {
 	paddingLeft: 0,
+	paddingBottom: '1rem',
 	marginBottom: '70px',
 	listStyleType: 'none',
 };
@@ -39,6 +40,7 @@ var styleTextField = {
 	marginTop: '0px',
 	marginLeft: '10px',
 	paddingLeft: '10px',
+	paddingBottom: '0',
 	backgroundColor: '#eeeeee',
 	width: '85%',
 	clear: 'both',
@@ -50,12 +52,12 @@ var styleTextFieldWrap = {
 	position: 'fixed',
 	bottom: '0',
 	width: '100%',
-	height: '70px',
+	height: '4.25rem',
 	backgroundColor: '#ededed',
 }
 var styleSendButton = {
 	position: 'fixed',
-	bottom: '20px',
+	bottom: '1.2rem',
 	left: '84%',
 	width: '50px',
 	fontSize: '2em',
@@ -160,9 +162,10 @@ export class ChatPage extends React.Component {
 	}
 
 	componentWillUnmount() {
-		styleTextFieldWrap.height = '70px';
-		styleTextField.paddingBottom = '0px';
-		styleSendButton.bottom = '20px';
+		styleUl.paddingBottom = '1rem';
+		styleTextFieldWrap.height = '4.25rem';
+		styleSendButton.bottom = '1.2rem';
+		styleTextField.paddingBottom = '0';
 		ws.close();
 		self.setState({
 			textValue: ""
@@ -178,18 +181,25 @@ export class ChatPage extends React.Component {
 		var enterCount = (str.match(new RegExp("\n", "g")) || []).length;
 		switch (enterCount) {
 			case 0:
+				styleUl.paddingBottom = '1rem';
 				styleTextFieldWrap.height = '4.25rem';
 				styleSendButton.bottom = '1.2rem';
+				styleTextField.paddingBottom = '0';
 				break;
 			case 1:
+				styleUl.paddingBottom = '2.4rem';
 				styleTextFieldWrap.height = '5.75rem';
 				styleSendButton.bottom = '2rem';
+				styleTextField.paddingBottom = '0';
 				break;
 			case 2:
+				styleUl.paddingBottom = '4rem';
 				styleTextFieldWrap.height = '7.2rem';
 				styleSendButton.bottom = '2.8rem';
+				styleTextField.paddingBottom = '0';
 				break;
 			case 3:
+				styleUl.paddingBottom = '6.4rem';
 				styleTextFieldWrap.height = '9.7rem';
 				styleSendButton.bottom = '3.6rem';
 				styleTextField.paddingBottom = '1rem';
@@ -205,6 +215,11 @@ export class ChatPage extends React.Component {
 
 	sendMessage(e) {
 		styleSendButton.backgroundColor = 'rgba(255, 255, 255, 0.0)';
+		styleUl.paddingBottom = '1rem';
+		styleTextFieldWrap.height = '4.25rem';
+		styleSendButton.bottom = '1.2rem';
+		styleTextField.paddingBottom = '0';
+
 		var message = this.state.textValue.replace(/\s|\n|　/g, "");
 		if (message == "") {
 			return;
