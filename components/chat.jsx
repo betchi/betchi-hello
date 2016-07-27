@@ -88,6 +88,7 @@ export class ChatPage extends React.Component {
 		roomId = this.props.location.query.roomId;
 		roomName = this.props.location.query.roomName;
 		name = sessionStorage.user.username;
+		isDoneFirstShow = false;
 
 		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + roomId + "/user/" + userId);
 
