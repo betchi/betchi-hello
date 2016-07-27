@@ -64,6 +64,7 @@ export class ChatPage extends React.Component {
 
 	constructor(props, context) {
 		super(props, context);
+
 		this.state = {
 			messages: [],
 			snack: {
@@ -91,6 +92,32 @@ export class ChatPage extends React.Component {
 			console.log("onopen");
 			console.log(e);
 			console.log(ws);
+
+			if (ws.readyState == 1) {
+				var wsSendMessage;
+
+				// send Room Name
+				wsSendMessage = "{\"room_name\":\""+roomName+"\"}";
+				console.log(wsSendMessage);
+				ws.send(wsSendMessage);
+
+				// send Amazon SNS Endpoint Arn & Device Token
+				if (snsEndpointArn != undefined && deviceToken != undefined) {
+					wsSendMessage = "{\"sns_endpoint_arn\":\""+snsEndpointArn+"\",\"device_token\":\""+deviceToken+"\"}";
+					console.log(wsSendMessage);
+					ws.send(wsSendMessage);
+				}
+			} else {
+				self.setState({
+					snack: {
+						open: true,
+						message: '送信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+			}
 		};
 
 		ws.onerror = function(e) {
