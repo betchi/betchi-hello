@@ -381,7 +381,6 @@ export class ChatPage extends React.Component {
 						underlineShow={false}
 						rows={1}
 						rowsMax={4}
-						value={this.state.textValue}
 						onChange={this.changeText}
 					/>
 				</div>
