@@ -160,6 +160,9 @@ export class ChatPage extends React.Component {
 	}
 
 	componentWillUnmount() {
+		styleTextFieldWrap.height = '70px';
+		styleTextField.paddingBottom = '0px';
+		styleSendButton.bottom = '20px';
 		ws.close();
 		self.setState({
 			textValue: ""
@@ -173,22 +176,27 @@ export class ChatPage extends React.Component {
 	changeText(e) {
 		var str = e.target.value;
 		var enterCount = (str.match(new RegExp("\n", "g")) || []).length;
-		var ulPaddingBottom = enterCount * 30;
-		var sendButtonBottom = enterCount * 21;
-		if (enterCount == 0) {
-			styleTextFieldWrap.height = '70px';
-			styleSendButton.bottom = '20px';
-		} else if (enterCount < 3) {
-			styleUl.paddingBottom = ulPaddingBottom + 'px';
-			styleTextField.paddingBottom = '0px';
-			styleTextFieldWrap.height = (ulPaddingBottom + 60) + 'px';
-			styleSendButton.bottom = (sendButtonBottom + 10) + 'px';
-		} else if (enterCount == 3) {
-			styleTextField.paddingBottom = '15px';
-			styleUl.paddingBottom = (ulPaddingBottom + 10) + 'px';
-			styleTextFieldWrap.height = (ulPaddingBottom + 70) + 'px';
-			styleSendButton.bottom = (sendButtonBottom * 1) + 'px';
+		switch (enterCount) {
+			case 0:
+				styleTextFieldWrap.height = '4.25rem';
+				styleSendButton.bottom = '1.2rem';
+				break;
+			case 1:
+				styleTextFieldWrap.height = '5.75rem';
+				styleSendButton.bottom = '2rem';
+				break;
+			case 2:
+				styleTextFieldWrap.height = '7.2rem';
+				styleSendButton.bottom = '2.8rem';
+				break;
+			case 3:
+				styleTextFieldWrap.height = '8.7rem';
+				styleSendButton.bottom = '3.6rem';
+				break;
+			default:
+				break;
 		}
+
 		this.setState({
 			textValue: e.target.value
 		});
