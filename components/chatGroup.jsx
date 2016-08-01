@@ -29,6 +29,9 @@ export class ChatGroupPage extends React.Component {
 					backgroundColor: '#232323',
 					width: '100%',
 					height: '4.5rem',
+					overflowX: 'auto',
+					overflowY: 'hidden',
+					whiteSpace: 'nowrap',
 					marginTop: '0px',
 					position: 'fixed',
 					bottom: '0px',
@@ -40,6 +43,7 @@ export class ChatGroupPage extends React.Component {
 			},
 		};
 		this.onItemTap = this.onItemTap.bind(this);
+		this.onCancelTap = this.onCancelTap.bind(this);
 		this.rightIcon = this.rightIcon.bind(this);
 		this.onSnackClose = this.onSnackClose.bind(this);
 	}
@@ -87,12 +91,8 @@ export class ChatGroupPage extends React.Component {
 	}
 
 	onItemTap(contact) {
-		console.log("tap");
-		console.log(contact);
 		let selectedAvatarList = this.state.selectedAvatarList;
-		selectedAvatarList[contact.user_id] = contact;
-		console.log(selectedAvatarList);
-
+		selectedAvatarList.push(contact);
 		let stylesAvatarBar = this.state.styles.avatarBar;
 		stylesAvatarBar.display = 'block';
 		this.setState({
@@ -101,6 +101,28 @@ export class ChatGroupPage extends React.Component {
 			},
 			selectedAvatarList: selectedAvatarList,
 		});
+	}
+
+	onCancelTap(index) {
+		let selectedAvatarList = this.state.selectedAvatarList;
+		delete selectedAvatarList[index];
+		this.setState({
+			selectedAvatarList: selectedAvatarList,
+		});
+
+		let isNone = true;
+		for (var index in selectedAvatarList) {
+			isNone = false;
+		}
+		if (isNone) {
+			let stylesAvatarBar = this.state.styles.avatarBar;
+			stylesAvatarBar.display = 'none';
+			this.setState({
+				styles: {
+					avatarBar: stylesAvatarBar,
+				},
+			});
+		}
 	}
 
 	onSnackClose(e) {
@@ -150,7 +172,9 @@ export class ChatGroupPage extends React.Component {
 			avatar: {
 				marginTop: '-0.3rem',
 				marginLeft: '0.8rem',
-				float: 'left',
+				display: 'inline-block',
+				whiteSpace: 'normal',
+				verticalAlign: 'top',
 			},
 			avatarName: {
 				color: 'white',
@@ -231,9 +255,12 @@ export class ChatGroupPage extends React.Component {
 						{(() => {
 							if (Array.isArray(this.state.selectedAvatarList)) {
 								let selectedAvatarList = [];
-								for (var i = 0; i < this.state.selectedAvatarList.length; i++) {
-									selectedAvatarList.push(<Avatar key={i} style={styles.avatar} src="avatar.jpg"><CancelButton style={styles.avatarCancel} /><p style={styles.avatarName}>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p></Avatar>);
+								for (var index in this.state.selectedAvatarList) {
+									selectedAvatarList.push(<Avatar key={this.state.selectedAvatarList[index].user_id} style={styles.avatar} src={this.state.selectedAvatarList[index].avatar}><CancelButton style={styles.avatarCancel} onTouchTap={this.onCancelTap.bind(this, index)} /><p style={styles.avatarName}>{this.state.selectedAvatarList[index].name}</p></Avatar>);
 								}
+								//for (var i = 0; i < this.state.selectedAvatarList.length; i++) {
+								//	selectedAvatarList.push(<Avatar key={this.state.selectedAvatarList[i].user_id} style={styles.avatar} src={this.state.selectedAvatarList[i].avatar}><CancelButton style={styles.avatarCancel} onTouchTap={this.onCancelTap.bind(this, i)} /><p style={styles.avatarName}>{this.state.selectedAvatarList[i].name}</p></Avatar>);
+								//};
 								return selectedAvatarList;
 							}
 						})()}
