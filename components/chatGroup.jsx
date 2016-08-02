@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Modal from 'react-modal';
 import Avatar from 'material-ui/Avatar';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
@@ -36,11 +35,17 @@ export class ChatGroupPage extends React.Component {
 					position: 'fixed',
 					bottom: '0px',
 				},
+				contactListWrap: {
+					position: 'relative',
+					top: '8rem',
+					marginBottom: '0rem',
+				},
 			},
 			snack: {
 				open: false,
 				message: '',
 			},
+			animationName: ''
 		};
 		this.onItemTap = this.onItemTap.bind(this);
 		this.onCancelTap = this.onCancelTap.bind(this);
@@ -90,39 +95,70 @@ export class ChatGroupPage extends React.Component {
 		return <DoneButton />;
 	}
 
-	onItemTap(contact) {
+	onItemTap(index, contact) {
 		let selectedAvatarList = this.state.selectedAvatarList;
-		selectedAvatarList.push(contact);
-		let stylesAvatarBar = this.state.styles.avatarBar;
-		stylesAvatarBar.display = 'block';
+		if (index in this.state.selectedAvatarList) {
+			delete selectedAvatarList[index];
+		} else {
+			selectedAvatarList[index] = contact;
+		}
 		this.setState({
-			styles: {
-				avatarBar: stylesAvatarBar,
-			},
 			selectedAvatarList: selectedAvatarList,
 		});
+		this.displayAvatarBar(index);
+
+		return;
 	}
 
 	onCancelTap(index) {
+		this.clickHdl()
 		let selectedAvatarList = this.state.selectedAvatarList;
 		delete selectedAvatarList[index];
 		this.setState({
 			selectedAvatarList: selectedAvatarList,
 		});
+		this.displayAvatarBar();
+		return;
+	}
 
+	clickHdl() {
+		let styleSheet = document.styleSheets[0];
+		let animationName = `animation${Math.round(Math.random() * 100)}`;
+		let keyframes =
+		`@-webkit-keyframes ${animationName} {
+				10% {-webkit-transform:translate(${Math.random() * 300}px, ${Math.random() * 300}px)} 
+				90% {-webkit-transform:translate(${Math.random() * 300}px, ${Math.random() * 300}px)}
+				100% {-webkit-transform:translate(${Math.random() * 300}px, ${Math.random() * 300}px)}
+		}`;
+		styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+		
+		this.setState({
+			//			animationName: animationName
+		});
+	}
+
+	displayAvatarBar(index) {
 		let isNone = true;
-		for (var index in selectedAvatarList) {
+		for (var index in this.state.selectedAvatarList) {
 			isNone = false;
 		}
+
+		let stylesAvatarBar = this.state.styles.avatarBar;
+		let stylesContactListWrap = this.state.styles.contactListWrap;
 		if (isNone) {
-			let stylesAvatarBar = this.state.styles.avatarBar;
 			stylesAvatarBar.display = 'none';
-			this.setState({
-				styles: {
-					avatarBar: stylesAvatarBar,
-				},
-			});
+			stylesContactListWrap.marginBottom = '0rem';
+		} else {
+			stylesAvatarBar.display = 'block';
+			stylesContactListWrap.marginBottom = '4.5rem';
 		}
+		this.setState({
+			styles: {
+				avatarBar: stylesAvatarBar,
+				contactListWrap: stylesContactListWrap,
+			},
+		});
+		return;
 	}
 
 	onSnackClose(e) {
@@ -163,18 +199,21 @@ export class ChatGroupPage extends React.Component {
 				border: '1px solid #ccc',
 				borderRadius: '5px',
 			},
-			contactListWrap: {
-				position: 'relative',
-				top: '8rem',
-			},
 			avatarWrap: {
 			},
 			avatar: {
-				marginTop: '-0.3rem',
-				marginLeft: '0.8rem',
+				marginTop: '-0.2rem',
+				marginLeft: '1rem',
 				display: 'inline-block',
 				whiteSpace: 'normal',
 				verticalAlign: 'top',
+      animationName: this.state.animationName,
+      animationTimingFunction: 'ease-in-out',
+      animationDuration: '0.6s',
+      animationDelay: '0.0s',
+      animationIterationCount: 1,
+      animationDirection: 'normal',
+      animationFillMode: 'forwards'
 			},
 			avatarName: {
 				color: 'white',
@@ -191,7 +230,7 @@ export class ChatGroupPage extends React.Component {
 				backgroundColor: 'white',
 				borderRadius: '50%',
 				position: 'relative',
-				top: '-0.7rem',
+				top: '-0.6rem',
 				left: '1.1rem',
 			},
 		};
@@ -229,7 +268,7 @@ export class ChatGroupPage extends React.Component {
 						hintText="名前で検索"
 					/>
 				</div>
-				<div style={styles.contactListWrap}>
+				<div style={this.state.styles.contactListWrap}>
 					<List>
 					{(() => {
 						if (Array.isArray(this.state.contactList)) {
@@ -238,7 +277,12 @@ export class ChatGroupPage extends React.Component {
 								contactList.push(<Subheader>{this.state.contactList[i].list_name}</Subheader>);
 								if (Array.isArray(this.state.contactList[i].list)) {
 									for (var j = 0; j < this.state.contactList[i].list.length; j++) {
-										contactList.push(<ListItem key={'list'+i+'-user'+j} primaryText={this.state.contactList[i].list[j].name} leftAvatar={<Avatar src={this.state.contactList[i].list[j].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].list[j])} rightIcon={<DoneButton />} />);
+										var key = 'list'+this.state.contactList[i].list_id+'-user'+this.state.contactList[i].list[j].user_id;
+										if (key in this.state.selectedAvatarList) {
+											contactList.push(<ListItem key={key} primaryText={this.state.contactList[i].list[j].name} leftAvatar={<Avatar src={this.state.contactList[i].list[j].avatar} />} onTouchTap={this.onItemTap.bind(this, key, this.state.contactList[i].list[j])} rightIcon={<DoneButton />} />);
+										} else {
+											contactList.push(<ListItem key={key} primaryText={this.state.contactList[i].list[j].name} leftAvatar={<Avatar src={this.state.contactList[i].list[j].avatar} />} onTouchTap={this.onItemTap.bind(this, key, this.state.contactList[i].list[j])} />);
+										}
 									}
 								}
 								if ((this.state.contactList.length - 1) != i) {
@@ -258,9 +302,6 @@ export class ChatGroupPage extends React.Component {
 								for (var index in this.state.selectedAvatarList) {
 									selectedAvatarList.push(<Avatar key={this.state.selectedAvatarList[index].user_id} style={styles.avatar} src={this.state.selectedAvatarList[index].avatar}><CancelButton style={styles.avatarCancel} onTouchTap={this.onCancelTap.bind(this, index)} /><p style={styles.avatarName}>{this.state.selectedAvatarList[index].name}</p></Avatar>);
 								}
-								//for (var i = 0; i < this.state.selectedAvatarList.length; i++) {
-								//	selectedAvatarList.push(<Avatar key={this.state.selectedAvatarList[i].user_id} style={styles.avatar} src={this.state.selectedAvatarList[i].avatar}><CancelButton style={styles.avatarCancel} onTouchTap={this.onCancelTap.bind(this, i)} /><p style={styles.avatarName}>{this.state.selectedAvatarList[i].name}</p></Avatar>);
-								//};
 								return selectedAvatarList;
 							}
 						})()}
