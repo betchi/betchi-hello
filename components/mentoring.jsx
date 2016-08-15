@@ -15,11 +15,14 @@ import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
+import SupervisorAccountButton from 'material-ui/svg-icons/action/supervisor-account';
+import Modal from 'react-modal';
 
 import HeadRoom from 'react-headroom';
 
 import {MentoringCoverSwipe, MentoringDigestWithAvatar, SelectableCover} from './content.jsx';
 import {ThxMessageList} from './message.jsx';
+import {ContactList} from './contactList.jsx';
 
 export class MentoringPage extends React.Component {
 	constructor(props, context) {
@@ -306,11 +309,14 @@ MentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired
 }
 
+const defaultSelectMemberLabel = "メンバーを招待する";
+
 export class EditMentoringPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
 			messages: [],
+			selectedAvatarList: [],
 			mentoring: {
 				id: Number(this.props.params.id),
 				user_id: sessionStorage.user.id,
@@ -324,6 +330,7 @@ export class EditMentoringPage extends React.Component {
 				digest: '',
 				day: '',
 				time: '',
+				members: [],
 			},
 			covers: [],
 			snack: {
@@ -331,6 +338,8 @@ export class EditMentoringPage extends React.Component {
 				message: '',
 			},
 			page: 1,
+			selectMemberLabel: defaultSelectMemberLabel,
+			modalIsOpen: false,
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.loadContents = this.loadContents.bind(this);
@@ -345,6 +354,9 @@ export class EditMentoringPage extends React.Component {
 		this.onChangeDay = this.onChangeDay.bind(this);
 		this.onChangeTime = this.onChangeTime.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
+		this.onOpenModal = this.onOpenModal.bind(this);
+		this.onCloseModal = this.onCloseModal.bind(this);
+		self = this;
 	}
 
 	componentDidMount() {
@@ -415,7 +427,6 @@ export class EditMentoringPage extends React.Component {
 	}
 
 	onChangeDay(e, day) {
-		console.log(day);
 		const mentoring = this.state.mentoring;
 		mentoring.day = day;
 		this.setState({
@@ -424,7 +435,6 @@ export class EditMentoringPage extends React.Component {
 	}
 
 	onChangeTime(e, time) {
-		console.log(time);
 		const mentoring = this.state.mentoring;
 		mentoring.time = time;
 		this.setState({
@@ -464,9 +474,39 @@ export class EditMentoringPage extends React.Component {
 			this.context.router.push('/');
 		}
 		const json = JSON.stringify({mentoring: this.state.mentoring});
-		console.log(json);
 		xhr.send(json);
 		return
+	}
+
+	onOpenModal(e) {
+		this.setState({
+			modalIsOpen: true,
+		})
+	}
+
+	onCloseModal(selectedAvatarList) {
+		var selectedAvatarListCount = 0;
+		if (selectedAvatarList !== undefined) {
+			for (var index in selectedAvatarList) {
+				selectedAvatarListCount++;
+			}
+		}
+
+		let mentoring = this.state.mentoring;
+		mentoring.members = selectedAvatarList;
+		let selectMemberLabel;
+		if (selectedAvatarListCount !== 0) {
+			selectMemberLabel = selectedAvatarListCount + '名を招待しようとしています';
+		} else {
+			selectMemberLabel = defaultSelectMemberLabel;
+		}
+
+		this.setState({
+			modalIsOpen: false,
+			mentoring: mentoring,
+			selectMemberLabel: selectMemberLabel,
+			selectedAvatarList: selectedAvatarList,
+		})
 	}
 
 	onScroll(e) {
@@ -516,7 +556,6 @@ export class EditMentoringPage extends React.Component {
 			}
 			let covers = [];
 			let data = JSON.parse(xhr.responseText);
-			console.log(data)
 			if (page === 1) {
 				covers = data.images;
 			} else {
@@ -593,7 +632,29 @@ export class EditMentoringPage extends React.Component {
 				lineHeight: '1.5rem',
 			},
 		}
-
+		const modalStyles = {
+			overlay : {
+				zIndex: "9999",
+				position: "fixed",
+				top: "0",
+				bottom: "0",
+				left: "0",
+				right: "0",
+				backgroundColor: "gray",
+			},
+			content : {
+				zIndex: "10000",
+				position: "fixed",
+				top: "1%",
+				bottom: "1%",
+				left: "3%",
+				right: "3%",
+				padding: "0",
+				backgroundColor: "white",
+				borderRadius: '5px',
+				overflowX: 'hidden',
+			}
+		}
 		return (
 			<section style={styles.root}>
 				<HeadRoom
@@ -668,6 +729,14 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.buttons}>
 						<RaisedButton
 							style={styles.offer}
+							label={this.state.selectMemberLabel}
+							icon={<SupervisorAccountButton />}
+							onTouchTap={this.onOpenModal}
+						/>
+					</div>
+					<div style={styles.buttons}>
+						<RaisedButton
+							style={styles.offer}
 							primary={true}
 							label="登録する"
 							onTouchTap={this.onSubmit}
@@ -681,6 +750,13 @@ export class EditMentoringPage extends React.Component {
 					autoHideDuration={4000}
 					onRequestClose={this.onSnackClose}
 				/>
+				<Modal
+					isOpen={this.state.modalIsOpen}
+					onRequestClose={this.onCloseModal}
+					style={modalStyles}
+				>
+					<ContactList onCloseModal={this.onCloseModal} selectedAvatarList={this.state.selectedAvatarList} />
+				</Modal>
 			</section>
 		);
 	}
