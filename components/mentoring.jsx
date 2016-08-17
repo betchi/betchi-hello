@@ -60,6 +60,7 @@ export class MentoringPage extends React.Component {
 		this.onBack = this.onBack.bind(this);
 		this.onFollow = this.onFollow.bind(this);
 		this.onOffer = this.onOffer.bind(this);
+		this.onOfferList = this.onOfferList.bind(this);
 	}
 
 	componentDidMount() {
@@ -85,7 +86,11 @@ export class MentoringPage extends React.Component {
 	}
 
 	onOffer(e) {
-		this.context.router.push({ pathname: '/chat', query: {roomId: this.props.params.id, roomName: this.state.mentoring.title}});
+		this.context.router.push({pathname: '/chat/' + this.state.mentoring.id + '/' + this.state.mentoring.title});
+	}
+
+	onOfferList(e) {
+		this.context.router.push({pathname: '/offers/' + this.state.mentoring.id + '/' + this.state.mentoring.title});
 	}
 
 	onSnackClose(e) {
@@ -267,7 +272,7 @@ export class MentoringPage extends React.Component {
 					countThx={this.state.mentoring.count_thx}
 					countMentor={this.state.user.mentors.length}
 					countFollower={this.state.user.followers.length}
-				/>s
+				/>
 				<ThxMessageList
 					key={'thx-message_' + this.props.params.id}
 					messages={this.state.messages}
@@ -290,14 +295,13 @@ export class MentoringPage extends React.Component {
 					autoHideDuration={4000}
 					onRequestClose={this.onSnackClose}
 				/>
-				<div style={styles.buttons}>
-					<RaisedButton
-						style={styles.offer}
-						primary={true}
-						label="オファーする・メッセージを送る"
-						onTouchTap={this.onOffer}
-					/>
-				</div>
+				{(() => {
+					if (this.state.mentoring.user_id == sessionStorage.user.id) {
+						return <div style={styles.buttons}><RaisedButton style={styles.offer} primary={true} label="オファーを確認する" onTouchTap={this.onOfferList} /></div>
+					} else {
+						return <div style={styles.buttons}><RaisedButton style={styles.offer} primary={true} label="オファーする" onTouchTap={this.onOffer} /></div>
+					}
+				})()}
 			</section>
 		);
 	}
@@ -330,7 +334,7 @@ export class EditMentoringPage extends React.Component {
 				digest: '',
 				day: '',
 				time: '',
-				members: [],
+				invitaions: [],
 			},
 			covers: [],
 			snack: {
@@ -473,7 +477,9 @@ export class EditMentoringPage extends React.Component {
 			}
 			this.context.router.push('/');
 		}
+		console.log(this.state.mentoring);
 		const json = JSON.stringify({mentoring: this.state.mentoring});
+		console.log(json);
 		xhr.send(json);
 		return
 	}
@@ -487,13 +493,18 @@ export class EditMentoringPage extends React.Component {
 	onCloseModal(selectedAvatarList) {
 		var selectedAvatarListCount = 0;
 		if (selectedAvatarList !== undefined) {
+			var invitaions = [];
+			var i = 0;
 			for (var index in selectedAvatarList) {
+				invitaions[i] = selectedAvatarList[index].id;
 				selectedAvatarListCount++;
+				i++;
 			}
 		}
 
 		let mentoring = this.state.mentoring;
-		mentoring.members = selectedAvatarList;
+		mentoring.invitaions = invitaions;
+		console.log(mentoring);
 		let selectMemberLabel;
 		if (selectedAvatarListCount !== 0) {
 			selectMemberLabel = selectedAvatarListCount + '名を招待しようとしています';

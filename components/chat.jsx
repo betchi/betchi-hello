@@ -24,8 +24,8 @@ import FlatButton from 'material-ui/FlatButton';
 var ws;
 var self;
 var userId;
-var roomId;
-var roomName;
+var mentoringId;
+var mentoringName;
 var name;
 var isDoneFirstShow = false;
 var styleUl = {
@@ -85,12 +85,12 @@ export class ChatPage extends React.Component {
 
 	componentWillMount() {
 		userId = sessionStorage.user.id;
-		roomId = this.props.location.query.roomId;
-		roomName = this.props.location.query.roomName;
+		mentoringId = this.props.params.mentoringId;
+		mentoringName = this.props.params.mentoringName;
 		name = sessionStorage.user.username;
 		isDoneFirstShow = false;
 
-		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + roomId + "/user/" + userId);
+		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + mentoringId + "/user/" + userId);
 
 		ws.onopen = function(e) {
 			console.log("onopen");
@@ -101,7 +101,7 @@ export class ChatPage extends React.Component {
 				var wsSendMessage;
 
 				// send Room Name
-				wsSendMessage = "{\"room_name\":\""+roomName+"\"}";
+				wsSendMessage = "{\"room_name\":\""+mentoringName+"\"}";
 				console.log(wsSendMessage);
 				ws.send(wsSendMessage);
 
@@ -363,11 +363,10 @@ export class ChatPage extends React.Component {
 					style={styles.headroom}
 				>
 					<AppBar
-						title={roomName}
+						title={mentoringName}
 						titleStyle={styles.title}
 						iconElementLeft={
 							<IconButton
-								style={styles.backIcon}
 								onTouchTap={this.onBack}
 							>
 								<NavigationArrowBack />

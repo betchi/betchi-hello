@@ -381,3 +381,6 @@ console.log(myContactList);
 		);
 	}
 };
+ContactList.contextTypes = {
+	router: React.PropTypes.object.isRequired
+}

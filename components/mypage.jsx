@@ -25,14 +25,10 @@ export class Profile extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.onCreateMentoring = this.onCreateMentoring.bind(this);
-		this.onCreateMentorGroup = this.onCreateMentorGroup.bind(this);
 	}
 
 	onCreateMentoring() {
 		this.context.router.push('/mentoring/0/edit');
-	}
-
-	onCreateMentorGroup() {
 	}
 
 	render() {
@@ -46,6 +42,17 @@ export class Profile extends React.Component {
 			},
 			cover: {
 				width: '100%',
+			},
+			username: {
+				fontSize: '1rem',
+				color: 'white',
+				fontWeight: 'bolder',
+				textShadow: '1px 1px 1px rgba(0,0,0,1)',
+				position: 'absolute',
+				top: '12rem',
+				left: 0,
+				right: 0,
+				textAlign: 'center',
 			},
 			avatar: {
 				position: 'absolute',
@@ -68,6 +75,7 @@ export class Profile extends React.Component {
 				fontSize: '1rem',
 				fontWeight: 'bolder',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
+				textAlign: 'center',
 			},
 			starBox: {
 				display: 'flex',
@@ -109,6 +117,7 @@ export class Profile extends React.Component {
 				<div style={styles.coverRoot}>
 					<img style={styles.cover} src={this.props.cover} />
 					<img style={styles.avatar} src={this.props.avatar} />
+					<div style={styles.username}>{this.props.username}</div>
 					<div style={styles.offer}>メッセージ・オファー&nbsp;{this.props.countOffer}件</div>
 				</div>
 				<div style={styles.starBox}>
@@ -117,8 +126,8 @@ export class Profile extends React.Component {
 						star={this.props.star}
 					/>
 					<div style={styles.summuryRoot}>
-						メンター{this.props.countMentor}人&nbsp;
-						フォロー{this.props.countFollower}人&nbsp;
+						フォロー{this.props.countMentor}人&nbsp;
+						フォロワー{this.props.countFollower}人&nbsp;
 					</div>
 				</div>
 				<div style={styles.actionRoot}>
@@ -136,14 +145,6 @@ export class Profile extends React.Component {
 							labelStyle={styles.actionLabel}
 							icon={<LiveTv />}
 							onTouchTap={this.onCreateMentoring}
-						/>
-					</div>
-					<div style={styles.action}>
-						<FlatButton
-							label={'メンターグループをする'}
-							labelStyle={styles.actionLabel}
-							icon={<PeopleOutline />}
-							onTouchTap={this.onCreateMentorGroup}
 						/>
 					</div>
 				</div>
@@ -369,6 +370,7 @@ export class MyPage extends React.Component {
 				<Profile
 					cover={this.state.pageUser.cover}
 					avatar={this.state.pageUser.avatar}
+					username={this.state.pageUser.username}
 					countOffer={3}
 					star={this.state.pageUser.star}
 					countMentor={this.state.pageUser.mentors.length}
