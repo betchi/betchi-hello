@@ -25,7 +25,8 @@ var ws;
 var self;
 var userId;
 var mentoringId;
-var mentoringName;
+var offerUserId;
+var mentoringTitle;
 var name;
 var isDoneFirstShow = false;
 var styleUl = {
@@ -84,13 +85,13 @@ export class ChatPage extends React.Component {
 	}
 
 	componentWillMount() {
-		userId = sessionStorage.user.id;
+		offerUserId = this.props.params.offerUserId;
 		mentoringId = this.props.params.mentoringId;
-		mentoringName = this.props.params.mentoringName;
+		mentoringTitle = this.props.params.mentoringTitle;
 		name = sessionStorage.user.username;
 		isDoneFirstShow = false;
 
-		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + mentoringId + "/user/" + userId);
+		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + mentoringId + "/user/" + sessionStorage.user.id + "/code/" + mentoringId + "-" + offerUserId);
 
 		ws.onopen = function(e) {
 			console.log("onopen");
@@ -101,7 +102,7 @@ export class ChatPage extends React.Component {
 				var wsSendMessage;
 
 				// send Room Name
-				wsSendMessage = "{\"room_name\":\""+mentoringName+"\"}";
+				wsSendMessage = "{\"room_name\":\""+mentoringTitle+"\"}";
 				console.log(wsSendMessage);
 				ws.send(wsSendMessage);
 
@@ -147,7 +148,8 @@ export class ChatPage extends React.Component {
 
 		ws.onmessage = function(e) {
 			var model = JSON.parse(e.data);
-			var date = new Date( model.registerd_at * 1000 );
+			console.log(model);
+			var date = new Date(model.registerd_at);
 			var mmdd = (date.getMonth() + 1) + "/" + date.getDate();
 			var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 
@@ -235,9 +237,15 @@ export class ChatPage extends React.Component {
 		*/
 		if (ws.readyState == 1) {
 			isDoneFirstShow = true;
-			let wsSendMessage = "{\"user_id\":"+userId+",\"name\":\""+name+"\",\"message\":\""+encodeURI(this.state.textValue)+"\"}";
-			console.log(wsSendMessage);
-			ws.send(wsSendMessage);
+			let wsSendMessage = {
+				user_id: sessionStorage.user.id,
+				username: name,
+				type:1,
+				message: encodeURI(this.state.textValue),
+			}
+			var wsSendJsonData = JSON.stringify(wsSendMessage);
+			console.log(wsSendJsonData);
+			ws.send(wsSendJsonData);
 		} else {
 			this.setState({
 				snack: {
@@ -363,7 +371,7 @@ export class ChatPage extends React.Component {
 					style={styles.headroom}
 				>
 					<AppBar
-						title={mentoringName}
+						title={mentoringTitle}
 						titleStyle={styles.title}
 						iconElementLeft={
 							<IconButton
@@ -396,7 +404,7 @@ export class ChatPage extends React.Component {
 									indents.push(<li key={messages[i].registerd_mmdd} style={styles.dateLi}><p style={styles.date}>{messages[i].registerd_mmdd}</p><div style={styles.hr} /><p style={styles.clearBalloon}></p></li>)
 								}
 								workmmdd = messages[i].registerd_mmdd;
-								if (messages[i].user_id == userId) {
+								if (messages[i].user_id == sessionStorage.user.id) {
 									indents.push(<li key={i}><p style={styles.rightBalloon}>{message}</p><div style={styles.timeRight}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);
 								} else {
 									indents.push(<li key={i}><Avatar style={styles.avatar} src={messages[i].avatar} /><p style={styles.senderName}>{messages[i].username}</p><div style={styles.leftBalloon}>{message}</div><div style={styles.timeLeft}>{messages[i].registerd_hhmm}</div><p style={styles.clearBalloon}></p></li>);

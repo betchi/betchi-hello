@@ -86,7 +86,7 @@ export class MentoringPage extends React.Component {
 	}
 
 	onOffer(e) {
-		this.context.router.push({pathname: '/chat/' + this.state.mentoring.id + '/' + this.state.mentoring.title});
+		this.context.router.push({pathname: '/chat/' + this.state.mentoring.id + '/' + sessionStorage.user.id + '/' + this.state.mentoring.title});
 	}
 
 	onOfferList(e) {

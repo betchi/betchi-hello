@@ -85,11 +85,11 @@ ReactDOM.render(
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
 			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
-			<Route path="/chat/:mentoringId/:mentoringName" component={ChatPage} onEnter={requireAuth} />
+			<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
 			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
-			<Route path="/offers/:mentoringId/:mentoringName" component={OffersPage} onEnter={requireAuth} />
+			<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
 		</Router>
 	</MuiThemeProvider>
 	,document.getElementById("content")
