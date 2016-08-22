@@ -139,7 +139,8 @@ export class OffersPage extends React.Component {
 				transition: 'all .3s ease-in-out',
 			},
 			title: {
-				fontSize: '1.2rem',
+				fontSize: '1rem',
+				color: window.textColor1,
 			},
 			time: {
 				fontSize: '0.6em',

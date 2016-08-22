@@ -21,6 +21,7 @@ import {Tabbar} from './Tabbar.jsx';
 import {MenuIcon} from './MenuIcon.jsx';
 import {NumberChip} from './NumberChip.jsx';
 import {PhotoEditChip} from './PhotoEditChip.jsx';
+import {LiveMark} from './LiveMark.jsx';
 
 export class MyPage extends React.Component {
 	constructor(props, context) {
@@ -215,22 +216,6 @@ export class MyPage extends React.Component {
 			tab: {
 				fontWeight: 'normal',
 			},
-			mentoringLabelLive: {
-				backgroundColor: '#E65100',
-				borderRadius: '1rem',
-				fontWeight: 'bold',
-				display: 'inline-block',
-				position: 'absolute',
-				top: '75%',
-				left: '2.5%',
-				fontSize: '0.5rem',
-				padding: '0 0.1rem',
-				color: 'white',
-				width: '3.3rem',
-				textAlign: 'center',
-				border: '1px solid',
-				borderColor: window.textColor1,
-			},
 			mentoringLabelOffer: {
 				backgroundColor: '#009688',
 				borderRadius: '1rem',
@@ -298,9 +283,6 @@ export class MyPage extends React.Component {
 					countFollower={2}
 				/>
 				<MenuIcon />
-
-
-
 				<Tabs
 					inkBarStyle={{backgroundColor:window.borderColor1}}
 				>
@@ -322,7 +304,10 @@ export class MyPage extends React.Component {
 									</p>
 								}
 								secondaryTextLines={2}
-							/>
+							>
+								<div style={styles.mentoringLabelOffer}>オファー中</div>
+								<LiveMark />
+							</ListItem>
 							<ListItem
 								innerDivStyle={styles.listItem}
 								leftAvatar={<Avatar src="/avatar.jpg" />}
@@ -335,7 +320,7 @@ export class MyPage extends React.Component {
 								}
 								secondaryTextLines={2}
 							>
-								<div style={styles.mentoringLabelLive}>LIVE</div>
+								<div style={styles.mentoringLabelClose}>終了</div>
 							</ListItem>
 						</List>
 					</Tab>
@@ -445,6 +430,7 @@ export class Profile extends React.Component {
 		this.onFollow = this.onFollow.bind(this);
 		this.onFollower = this.onFollower.bind(this);
 		this.onThanx = this.onThanx.bind(this);
+		this.onStar = this.onStar.bind(this);
 		this.onProfilePhotoEdit = this.onProfilePhotoEdit.bind(this);
 		this.onCoverPhotoEdit= this.onCoverPhotoEdit.bind(this);
 	}
@@ -463,6 +449,10 @@ export class Profile extends React.Component {
 
 	onThanx() {
 		console.log("onThanx");
+	}
+
+	onStar() {
+		console.log("onStar");
 	}
 
 	onProfilePhotoEdit() {
@@ -610,8 +600,6 @@ export class Profile extends React.Component {
 
 		return (
 			<div style={styles.root}>
-
-
 				<div style={styles.coverRoot}>
 					<div style={styles.profilePhotoEditChipWrap}>
 						<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onProfilePhotoEdit} rippleColor={window.bgColor1} />
@@ -645,10 +633,11 @@ export class Profile extends React.Component {
 					</div>
 					<div style={styles.numberChip1Wrap}>
 						<NumberChip name={"フォロワー"} color={window.textColor1} number={123} onTouchTap={this.onFollower} rippleColor={window.bgColor1} />
-						<NumberChip name={"フォロー"} color={window.textColor1} number={123} onTouchTap={this.onFollow} rippleColor={window.bgColor1} />
+						<NumberChip name={"フォロー中"} color={window.textColor1} number={123} onTouchTap={this.onFollow} rippleColor={window.bgColor1} />
 					</div>
 					<div style={styles.numberChip2Wrap}>
 						<NumberChip name={"お礼メッセージ"} color={window.textColor1} number={123} onTouchTap={this.onThanx} rippleColor={window.bgColor1} />
+						<NumberChip name={"スター"} color={window.textColor1} number={12345} onTouchTap={this.onStar} rippleColor={window.bgColor1} />
 					</div>
 				</div>
 			</div>

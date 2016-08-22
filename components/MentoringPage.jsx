@@ -16,10 +16,15 @@ import IconButton from 'material-ui/IconButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import PersonAdd from 'material-ui/svg-icons/social/person-add';
+import BookmarkBorderIcon from 'material-ui/svg-icons/action/bookmark-border.js';
+import BookmarkIcon from 'material-ui/svg-icons/action/bookmark.js';
+import ContentCreateIcon from 'material-ui/svg-icons/content/create.js';
+import CardGiftcardIcon from 'material-ui/svg-icons/action/card-giftcard.js';
+import QuestionAnswerIcon from 'material-ui/svg-icons/action/question-answer.js';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 import SupervisorAccountButton from 'material-ui/svg-icons/action/supervisor-account';
+import {List, ListItem} from 'material-ui/List';
 
 import {MentoringCoverSwipe, MentoringDigest, SelectableCover} from './content.jsx';
 import {ThxMessageList} from './ThxMessageList.jsx';
@@ -228,8 +233,22 @@ export class MentoringPage extends React.Component {
 				left: 0,
 				textAlign: 'center',
 			},
-			offer: {
-				width: '100%',
+			button: {
+				width: '46%',
+				margin: '2%',
+				boxShadow: '4px 4px 4px rgba(1,1,1,0.5)',
+				backgroundColor: window.buttonColor1,
+				border: '1px solid white',
+				borderRadius: '0.5rem',
+				height: '3rem',
+				color: 'white',
+			},
+			buttonLabel: {
+				color: 'white',
+				paddingRight: 0,
+			},
+			buttonIcon: {
+				marginLeft: 0,
 			},
 			backIcon: {
 				position: 'fixed',
@@ -241,7 +260,31 @@ export class MentoringPage extends React.Component {
 				borderRadius: '50%',
 				padding: '5px',
 			},
+			title: {
+				fontSize: '1rem',
+				fontWeight: 'normal',
+				width: '100%',
+				backgroundColor: window.bgColor2,
+				color: window.textColor1,
+				textAlign: 'center',
+				letterSpacing: '0.2rem',
+				margin: '1rem 0 0 0',
+			},
+			list: {
+			},
+			listItem: {
+				backgroundColor: window.bgColor2,
+				color: window.textColor1,
+				border: '1px solid',
+				borderColor: window.bgColor1,
+			},
+			secondaryText: {
+				color: window.textColor1,
+				float: 'right',
+				marginTop: '-1rem',
+			},
 		}
+		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
 
 		return (
 			<section style={styles.root}>
@@ -255,14 +298,19 @@ export class MentoringPage extends React.Component {
 				<MentoringCoverSwipe
 					covers={this.state.mentoring.covers}
 					title={this.state.mentoring.title}
-					duration={this.state.mentoring.duration}
-					price={this.state.mentoring.price}
 				/>
 				<MentoringDigest
 					avatar={this.state.mentoring.avatar}
       				countThx={this.state.mentoring.count_thx ? this.state.mentoring.count_thx : 0}
       				countFollower={this.state.mentoring.count_follower ? this.state.mentoring.count_follower: 0}
 				/>
+				<List style={styles.list}>
+					<ListItem style={styles.listItem} primaryText="概要" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.digest}</p>} />
+					<ListItem style={styles.listItem} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.day}</p>} />
+					<ListItem style={styles.listItem} primaryText="いいね値段" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
+					<ListItem style={styles.listItem} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>10 人</p>} />
+					<ListItem style={styles.listItem} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>12 人</p>} />
+				</List>
 				<ThxMessageList
 					key={'thx-message_' + this.props.params.id}
 					messages={this.state.messages}
@@ -286,9 +334,10 @@ export class MentoringPage extends React.Component {
 				/>
 				{(() => {
 					if (this.state.mentoring.user_id == sessionStorage.user.id) {
-						return <div style={styles.buttons}><RaisedButton style={styles.offer} primary={true} label="オファーを確認する" onTouchTap={this.onOfferList} /></div>
+						return <div style={styles.buttons}><FlatButton style={styles.button} primary={true} label="オファーを確認する" onTouchTap={this.onOfferList} /></div>
 					} else {
-						return <div style={styles.buttons}><RaisedButton style={styles.offer} primary={true} label="オファーする" onTouchTap={this.onOffer} /></div>
+						return <div style={styles.buttons}><FlatButton style={styles.button} icon={<QuestionAnswerIcon style={styles.buttonIcon} />} label="オファー" labelStyle={styles.buttonLabel} onTouchTap={this.onOffer} /><FlatButton style={styles.button} icon={<BookmarkBorderIcon style={styles.buttonIcon} />} label="ブックマークする" labelStyle={styles.buttonLabel} onTouchTap={this.onOffer} /></div>
+						
 					}
 				})()}
 			</section>
@@ -676,8 +725,6 @@ export class EditMentoringPage extends React.Component {
 				<MentoringCoverSwipe
 					covers={this.state.mentoring.covers}
 					title={this.state.mentoring.title}
-					duration={this.state.mentoring.duration}
-					price={this.state.mentoring.price}
 				/>
 				<SelectableCover
 					images={this.state.covers}

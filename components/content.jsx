@@ -10,9 +10,11 @@ import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import Avatar from 'material-ui/Avatar';
 import PersonIcon from 'material-ui/svg-icons/social/person';
 import StarIcon from 'material-ui/svg-icons/toggle/star';
+import CardGiftcardIcon from 'material-ui/svg-icons/action/card-giftcard.js';
 import FlatButton from 'material-ui/FlatButton';
 
 import {Pagination,PaginationDot} from './pagination.jsx';
+import {LiveMark} from './LiveMark.jsx';
 
 export class MentoringCover extends React.Component {
 	constructor(props, context) {
@@ -48,6 +50,7 @@ export class MentoringCover extends React.Component {
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
 				display: 'block',
 				width: '90%',
+
 			},
 			avatar: {
 				position: 'absolute',
@@ -59,13 +62,14 @@ export class MentoringCover extends React.Component {
 			},
 			price: {
 				position: 'absolute',
-				right: '0px',
-				bottom: '20px',
+				bottom: '6px',
 				fontSize: '0.9rem',
 				lineHeight: '1.5rem',
-				backgroundColor: 'rgba(0,0,0,0.75)',
+				backgroundColor: 'rgba(0,0,0,0.5)',
 				color: 'white',
-				padding: '0.25rem 0.5rem',
+				width: '96%',
+				padding: '2%',
+				opacity: 0.7,
 			},
 		};
 
@@ -74,10 +78,13 @@ export class MentoringCover extends React.Component {
 				<img style={styles.cover} src={this.props.cover} />
 				<div style={styles.title}>{this.props.title}</div>
 				<div style={styles.digest}>{this.props.digest}</div>
-				<div style={styles.price}>{this.props.duration}分間&nbsp;
+				<div style={styles.price}>
+					{this.props.datetime}({this.props.duration}分間)<br />
+					現在のオファー{this.props.offerCount}名(募集人数{this.props.limitUserCount}名)<br />
 					{(() => {
-						return this.props.price ? '&yen;' + String(this.props.price) : 'いいね値段'
+						return this.props.price ? String.fromCharCode(165) + this.props.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段'
 					})()}
+					<LiveMark />
 				</div>
 			</div>
 		);
@@ -92,6 +99,9 @@ MentoringCover.propTypes = {
 	digest: React.PropTypes.string.isRequired,
 	duration: React.PropTypes.number.isRequired,
 	price: React.PropTypes.number.isRequired,
+	datetime: React.PropTypes.string.isRequired,
+	limitUserCount: React.PropTypes.number.isRequired,
+	offerCount: React.PropTypes.number.isRequired,
 }
 
 export class MentoringCoverSwipe extends MentoringCover {
@@ -164,11 +174,6 @@ export class MentoringCoverSwipe extends MentoringCover {
 					onChangeIndex={this.onChangeIndex}
 				/>
 				<div style={styles.title}>{this.props.title}</div>
-				<div style={styles.price}>{this.props.duration}分間&nbsp;
-					{(() => {
-						return this.props.price ? '&yen;' + String(this.props.price) : 'いいね値段'
-					})()}
-				</div>
 			</div>
 		);
 	}
@@ -178,8 +183,6 @@ MentoringCoverSwipe.contextTypes = {
 }
 MentoringCoverSwipe.propTypes = {
 	title: React.PropTypes.string.isRequired,
-	price: React.PropTypes.number.isRequired,
-	duration: React.PropTypes.number.isRequired,
 	covers: React.PropTypes.array.isRequired,
 }
 
@@ -287,7 +290,7 @@ export class ThxSummury extends React.Component {
 	render() {
 		return (
 			<div style={this.props.rootStyle}>
-				お礼{this.props.countThx}件&nbsp;
+				お礼{this.props.countThanx}件&nbsp;
 				フォロー{this.props.countFollower}人&nbsp;
 			</div>
 		);
@@ -298,14 +301,14 @@ ThxSummury.contextTypes = {
 }
 ThxSummury.propTypes = {
 	rootStyle: React.PropTypes.object,
-	countThx: React.PropTypes.number.isRequired,
+	countThanx: React.PropTypes.number.isRequired,
 	countMentor: React.PropTypes.number.isRequired,
 	countFollower: React.PropTypes.number.isRequired,
 }
 ThxSummury.defaultProps = {
 	rootStyle: {
 	},
-	countThx: 0,
+	countThanx: 0,
 	countMentor: 0,
 	countFollower: 0,
 }
@@ -320,9 +323,8 @@ export class MentoringDigest extends React.Component {
 			root: {
 				width: '98%',
 				padding: '0 1%',
-				height: '1rem',
+				height: '40px',
 				lineHeight: '1rem',
-				marginTop: '-5px',
 			},
 			digest: {
 				width: '100%',
@@ -342,9 +344,6 @@ export class MentoringDigest extends React.Component {
 			username: {
 				float: 'left',
 				fontSize: '0.8rem',
-				height: '1rem',
-				lineHeight: '1rem',
-				paddingTop: '0.2rem',
 				marginLeft: '0.5rem',
 				textOverflow: 'ellipsis',
 				overflow: 'hidden',
@@ -353,13 +352,22 @@ export class MentoringDigest extends React.Component {
 			},
 			avatar: {
 				float: 'left',
-				margin: '5px',
+				margin: '0 0 5px 5px',
 			},
-			chip: {
+			button: {
 				float: 'right',
 				fontSize: '0.8rem',
 				color: window.textColor1,
-				top: '5px',
+				minWidth: 'auto',
+			},
+			buttonIcon: {
+				width:'18px',
+				height:'18px',
+				margin: '0 5px',
+			},
+			buttonLabel: {
+				padding: 0,
+				fontSize: '16px',
 			},
 		};
 
@@ -367,18 +375,42 @@ export class MentoringDigest extends React.Component {
 			<div style={styles.root}>
 				<Avatar style={styles.avatar} src={this.props.avatar} />
 				<p style={styles.username}>{sessionStorage.user.username}</p>
-				<FlatButton
-					style={styles.chip}
-      				label={this.props.countThx ? this.props.countThx : '0'}
-      				icon={<StarIcon />}
-					disabled={true}
-				/>
-				<FlatButton
-					style={styles.chip}
-      				label={this.props.countFollower ? this.props.countFollower: '0'}
-      				icon={<PersonIcon />}
-					disabled={true}
-				/>
+				{(() => {
+					if (this.props.countStar != 0) {
+						return
+							<FlatButton
+								style={styles.button}
+								label={this.props.countStar ? this.props.countThanx : '0'}
+								icon={<StarIcon style={styles.buttonIcon} />}
+								disabled={true}
+								labelStyle={styles.buttonLabel}
+							/>
+					}
+				})()}
+				{(() => {
+					if (this.props.countThanx != 0) {
+						return
+							<FlatButton
+								style={styles.button}
+								label={this.props.countThanx ? this.props.countThanx : '0'}
+								icon={<CardGiftcardIcon style={styles.buttonIcon} />}
+								disabled={true}
+								labelStyle={styles.buttonLabel}
+							/>
+					}
+				})()}
+				{(() => {
+					if (this.props.countFollower != 0) {
+						return
+							<FlatButton
+								style={styles.button}
+								label={this.props.countFollower ? this.props.countFollower: '0'}
+								icon={<PersonIcon style={styles.buttonIcon} />}
+								disabled={true}
+								labelStyle={styles.buttonLabel}
+							/>
+					}
+				})()}
 			</div>
 		);
 	}
@@ -388,7 +420,8 @@ MentoringDigest.contextTypes = {
 }
 MentoringDigest.propTypes = {
 	avatar: React.PropTypes.string.isRequired,
-	countThx: React.PropTypes.number.isRequired,
+	star: React.PropTypes.number.isRequired,
+	countThanx: React.PropTypes.number.isRequired,
 	countFollower: React.PropTypes.number.isRequired,
 }
 
@@ -460,7 +493,7 @@ export class MentoringDigestWithAvatar extends React.Component {
 					<div style={styles.digest}>{this.props.digest}</div>
 					<ThxSummury
 						rootStyle={styles.thxRoot}
-						countThx={this.props.countThx}
+						countThanx={this.props.countThanx}
 						countMentor={this.props.countMentor}
 						countFollower={this.props.countFollower}
 					/>
@@ -477,7 +510,7 @@ MentoringDigestWithAvatar.propTypes = {
 	avatar: React.PropTypes.string.isRequired,
 	star: React.PropTypes.number.isRequired,
 	digest: React.PropTypes.string.isRequired,
-	countThx: React.PropTypes.number.isRequired,
+	countThanx: React.PropTypes.number.isRequired,
 	countMentor: React.PropTypes.number.isRequired,
 	countFollower: React.PropTypes.number.isRequired,
 }
@@ -516,10 +549,14 @@ export class MentoringCard extends React.Component {
 					digest={this.props.digest}
 					duration={this.props.duration}
 					price={this.props.price}
+					datetime={this.props.datetime}
+					limitUserCount={this.props.limitUserCount}
+					offerCount={this.props.offerCount}
 				/>
 				<MentoringDigest
 					avatar={this.props.avatar}
-					countThx={this.props.countThx}
+					countThanx={this.props.countThanx}
+					countStar={this.props.countStar}
 					countFollower={this.props.countFollower}
 				/>
 			</Card>
@@ -536,8 +573,11 @@ MentoringCard.propTypes = {
 	digest: React.PropTypes.string.isRequired,
 	duration: React.PropTypes.number.isRequired,
 	price: React.PropTypes.number.isRequired,
+	datetime: React.PropTypes.string.isRequired,
+	limitUserCount: React.PropTypes.number.isRequired,
+	offerCount: React.PropTypes.number.isRequired,
 	avatar: React.PropTypes.string.isRequired,
-	countThx: React.PropTypes.number.isRequired,
+	countThanx: React.PropTypes.number.isRequired,
 	countFollower: React.PropTypes.number.isRequired,
 }
 
@@ -561,7 +601,7 @@ export class MentoringList extends React.Component {
 			<section style={styles.root}>
 				{this.props.mentorings.map((mentoring, index) => {
 					const key = "mentoring_list_" + index;
-					return <MentoringCard key={key} id={mentoring.id} cover={mentoring.cover} title={mentoring.title} digest={mentoring.digest} price={mentoring.price} duration={mentoring.duration} avatar={mentoring.avatar} countThx={mentoring.count_thx} countFollower={mentoring.count_follower} />
+					return <MentoringCard key={key} id={mentoring.id} cover={mentoring.cover} title={mentoring.title} digest={mentoring.digest} price={mentoring.price} duration={mentoring.duration} datetime={mentoring.day} limitUserCount={10} offerCount={10} avatar={mentoring.avatar} countThanx={mentoring.count_thx} countStar={mentoring.star} countFollower={mentoring.count_follower} />
 				})}
 			</section>
 		);
