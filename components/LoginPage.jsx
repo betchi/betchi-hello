@@ -110,6 +110,7 @@ export class LoginForm extends React.Component {
 				});
 				return;
 			}
+console.log(data);
 			this.context.router.push('/');
 		}
 		xhr.send(JSON.stringify({email:this.state.email, password:this.state.password}));

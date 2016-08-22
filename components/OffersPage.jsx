@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import HeadRoom from 'react-headroom';
+
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Snackbar from 'material-ui/Snackbar';
@@ -7,7 +10,6 @@ import Avatar from 'material-ui/Avatar';
 import AppBar from 'material-ui/AppBar';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import IconButton from 'material-ui/IconButton';
-import HeadRoom from 'react-headroom';
 
 var self;
 var searchContactList = null;
@@ -138,10 +140,15 @@ export class OffersPage extends React.Component {
 			},
 			title: {
 				fontSize: '1.2rem',
-				fontWeight: 'bold',
 			},
 			time: {
 				fontSize: '0.6em',
+			},
+			listItem: {
+				color: window.textColor1,
+			},
+			secondoryText: {
+				color: window.textColor1,
 			},
 		};
 		return (
@@ -161,22 +168,20 @@ export class OffersPage extends React.Component {
 						}
 					/>
 				</HeadRoom>
-				<div>
-					<List>
-					{(() => {
-						if (Array.isArray(this.state.contactList)) {
-							let contactList = [];
-							for (var i = 0; i < this.state.contactList.length; i++) {
-								var date = new Date( this.state.contactList[i].last_modified_at);
-								var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
-								var message = decodeURI(this.state.contactList[i].last_message);
-								contactList.push(<ListItem key={i} primaryText={this.state.contactList[i].username} secondaryText={message} leftAvatar={<Avatar src={this.state.contactList[i].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)} secondaryTextLines={2} rightIcon={<p style={styles.time}>{hhmm}</p>} />);
-							}
-							return contactList;
+				<List>
+				{(() => {
+					if (Array.isArray(this.state.contactList)) {
+						let contactList = [];
+						for (var i = 0; i < this.state.contactList.length; i++) {
+							var date = new Date( this.state.contactList[i].last_modified_at);
+							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
+							var message = decodeURI(this.state.contactList[i].last_message);
+							contactList.push(<ListItem style={styles.listItem} key={i} primaryText={this.state.contactList[i].username} secondaryText={<span style={styles.secondoryText}>message</span>} leftAvatar={<Avatar src={this.state.contactList[i].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)} secondaryTextLines={2} rightIcon={<p style={styles.time}>{hhmm}</p>} />);
 						}
-					})()}
-					</List>
-				</div>
+						return contactList;
+					}
+				})()}
+				</List>
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}

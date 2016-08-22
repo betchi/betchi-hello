@@ -286,7 +286,6 @@ export class ChatPage extends React.Component {
 		},
 		title: {
 			fontSize: '1.2rem',
-			fontWeight: 'bold',
 		},
 		avatar: {
 			marginLeft: '10px',

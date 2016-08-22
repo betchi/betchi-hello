@@ -12,9 +12,9 @@ import {LoginPage} from './components/LoginPage.jsx';
 import {RegisterPage} from './components/RegisterPage.jsx';
 import {MentoringPage,EditMentoringPage} from './components/MentoringPage.jsx';
 import {ChatPage} from './components/ChatPage.jsx';
-//import {SearchPage} from './components/SearchPage.jsx';
+import {SearchPage} from './components/SearchPage.jsx';
 import {MyPage} from './components/MyPage.jsx';
-//import {OffersPage} from './components/OffersPage.jsx';
+import {OffersPage} from './components/OffersPage.jsx';
 
 Object.defineProperty(String.prototype, 'isValidEmail', {
 	writable: false,
@@ -75,11 +75,6 @@ function requireAuth(next, replace) {
 	};
 	xhr.send();
 }
-/*
-			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
-			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
-			<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
-			*/
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -88,9 +83,12 @@ ReactDOM.render(
 			<Route path="/top" component={TopPage} onEnter={requireAuth} />
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
+			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
+			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
 			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
 			<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
+			<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
 		</Router>
 	</MuiThemeProvider>
 	,document.getElementById("content")

@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import HeadRoom from 'react-headroom';
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
+import SwipeableViews from 'react-swipeable-views';
+
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import {Card} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
@@ -15,11 +19,8 @@ import RefreshIndicator from 'material-ui/RefreshIndicator';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 
-import SwipeableViews from 'react-swipeable-views';
-import HeadRoom from 'react-headroom';
-
 import {MentoringList} from './content.jsx';
-import {Tabbar} from './tabbar.jsx';
+import {Tabbar} from './Tabbar.jsx';
 
 export class SearchPage extends React.Component {
 	constructor(props, context) {
