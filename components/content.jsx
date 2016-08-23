@@ -10,7 +10,7 @@ import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import Avatar from 'material-ui/Avatar';
 import PersonIcon from 'material-ui/svg-icons/social/person';
 import StarIcon from 'material-ui/svg-icons/toggle/star';
-import CardGiftcardIcon from 'material-ui/svg-icons/action/card-giftcard.js';
+import CommunicationEmailIcon from 'material-ui/svg-icons/communication/email.js';
 import FlatButton from 'material-ui/FlatButton';
 
 import {Pagination,PaginationDot} from './pagination.jsx';
@@ -26,6 +26,7 @@ export class MentoringCover extends React.Component {
 			root: {
 				position: 'relative',
 				width: '100%',
+				backgroundColor: window.bgColor1,
 			},
 			cover: {
 				width: '100%',
@@ -33,24 +34,17 @@ export class MentoringCover extends React.Component {
 			title: {
 				position: 'absolute',
 				left: '5%',
-				top: '10%',
+				top: '5%',
 				color: 'white',
 				fontSize: '1.5rem',
 				fontWeight: 'bold',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
 				display: 'block',
 				width: '90%',
-			},
-			digest: {
-				position: 'absolute',
-				left: '5%',
-				top: '30%',
-				color: 'white',
-				fontSize: '1rem',
-				textShadow: '1px 1px 1px rgba(0,0,0,1)',
-				display: 'block',
-				width: '90%',
-
+				height: '4.5rem',
+				overflow: 'hidden',
+				opacity: 0.9,
+				textOverflow: 'ellipsis',
 			},
 			avatar: {
 				position: 'absolute',
@@ -63,7 +57,7 @@ export class MentoringCover extends React.Component {
 			price: {
 				position: 'absolute',
 				bottom: '6px',
-				fontSize: '0.9rem',
+				fontSize: '0.7rem',
 				lineHeight: '1.5rem',
 				backgroundColor: 'rgba(0,0,0,0.5)',
 				color: 'white',
@@ -77,14 +71,17 @@ export class MentoringCover extends React.Component {
 			<div style={styles.root}>
 				<img style={styles.cover} src={this.props.cover} />
 				<div style={styles.title}>{this.props.title}</div>
-				<div style={styles.digest}>{this.props.digest}</div>
 				<div style={styles.price}>
 					{this.props.datetime}({this.props.duration}分間)<br />
 					現在のオファー{this.props.offerCount}名(募集人数{this.props.limitUserCount}名)<br />
 					{(() => {
 						return this.props.price ? String.fromCharCode(165) + this.props.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段'
 					})()}
-					<LiveMark />
+					{(() => {
+						if (this.props.kind == 1) {
+							return <LiveMark />
+						}
+					})()}
 				</div>
 			</div>
 		);
@@ -96,7 +93,6 @@ MentoringCover.contextTypes = {
 MentoringCover.propTypes = {
 	cover: React.PropTypes.string.isRequired,
 	title: React.PropTypes.string.isRequired,
-	digest: React.PropTypes.string.isRequired,
 	duration: React.PropTypes.number.isRequired,
 	price: React.PropTypes.number.isRequired,
 	datetime: React.PropTypes.string.isRequired,
@@ -130,12 +126,15 @@ export class MentoringCoverSwipe extends MentoringCover {
 			},
 			title: {
 				position: 'absolute',
-				left: '5%',
-				top: '20%',
-				color: 'white',
-				fontSize: '2rem',
+				left: 0,
+				top: 0,
+				color: window.textColor1,
+				fontSize: '1.4rem',
 				fontWeight: 'bolder',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
+				height: '7rem',
+				overflow: 'hidden',
+				padding: '3.5rem 0.8rem',
 			},
 			avatar: {
 				position: 'absolute',
@@ -321,15 +320,10 @@ export class MentoringDigest extends React.Component {
 	render() {
 		const styles = {
 			root: {
-				width: '98%',
-				padding: '0 1%',
-				height: '40px',
-				lineHeight: '1rem',
-			},
-			digest: {
 				width: '100%',
-				fontSize: '0.9rem',
-				fontWeight: 'bold',
+				height: '25px',
+				lineHeight: '25px',
+				backgroundColor: window.bgColor1,
 			},
 			starBox: {
 				display: 'flex',
@@ -343,74 +337,89 @@ export class MentoringDigest extends React.Component {
 			},
 			username: {
 				float: 'left',
-				fontSize: '0.8rem',
-				marginLeft: '0.5rem',
+				fontSize: '14px',
+				margin: '0 0.5rem',
 				textOverflow: 'ellipsis',
 				overflow: 'hidden',
 				width: '30%',
 				color: window.textColor1,
+				opacity: 0.7,
+				height: '20px',
+				lineHeight: '20px',
 			},
 			avatar: {
 				float: 'left',
 				margin: '0 0 5px 5px',
+				width: '20px',
+				height: '20px',
 			},
 			button: {
 				float: 'right',
 				fontSize: '0.8rem',
 				color: window.textColor1,
 				minWidth: 'auto',
+				height: '18px',
+				lineHeight: '18px',
 			},
 			buttonIcon: {
-				width:'18px',
-				height:'18px',
+				width:'14px',
+				height:'14px',
 				margin: '0 5px',
+				opacity: 0.7,
 			},
 			buttonLabel: {
 				padding: 0,
-				fontSize: '16px',
+				fontSize: '12px',
+				opacity: 0.7,
+			},
+			digest: {
+				float: 'left',
+				background: window.bgColor1,
+				fontSize: '0.7rem',
+				width: '96%',
+				margin: 0,
+				padding: '0 2%',
 			},
 		};
 
 		return (
 			<div style={styles.root}>
 				<Avatar style={styles.avatar} src={this.props.avatar} />
-				<p style={styles.username}>{sessionStorage.user.username}</p>
+				<p style={styles.username}>{this.props.username}</p>
 				{(() => {
 					if (this.props.countStar != 0) {
-						return
-							<FlatButton
-								style={styles.button}
-								label={this.props.countStar ? this.props.countThanx : '0'}
-								icon={<StarIcon style={styles.buttonIcon} />}
-								disabled={true}
-								labelStyle={styles.buttonLabel}
-							/>
+						return <FlatButton
+							style={styles.button}
+							label={this.props.countStar}
+							icon={<StarIcon style={styles.buttonIcon} />}
+							disabled={true}
+							labelStyle={styles.buttonLabel}
+						/>
 					}
 				})()}
 				{(() => {
 					if (this.props.countThanx != 0) {
-						return
-							<FlatButton
-								style={styles.button}
-								label={this.props.countThanx ? this.props.countThanx : '0'}
-								icon={<CardGiftcardIcon style={styles.buttonIcon} />}
-								disabled={true}
-								labelStyle={styles.buttonLabel}
-							/>
+						return <FlatButton
+							style={styles.button}
+							label={this.props.countThanx}
+							icon={<CommunicationEmailIcon style={styles.buttonIcon} />}
+							disabled={true}
+							labelStyle={styles.buttonLabel}
+						/>
 					}
 				})()}
 				{(() => {
 					if (this.props.countFollower != 0) {
-						return
-							<FlatButton
-								style={styles.button}
-								label={this.props.countFollower ? this.props.countFollower: '0'}
-								icon={<PersonIcon style={styles.buttonIcon} />}
-								disabled={true}
-								labelStyle={styles.buttonLabel}
-							/>
+						return <FlatButton
+							style={styles.button}
+							label={this.props.countFollower}
+							icon={<PersonIcon style={styles.buttonIcon} />}
+							disabled={true}
+							labelStyle={styles.buttonLabel}
+						/>
 					}
 				})()}
+				<div style={styles.digest}>{this.props.digest}</div>
 			</div>
 		);
 	}
@@ -420,6 +429,8 @@ MentoringDigest.contextTypes = {
 }
 MentoringDigest.propTypes = {
 	avatar: React.PropTypes.string.isRequired,
+	username: React.PropTypes.string.isRequired,
+	digest: React.PropTypes.string.isRequired,
 	star: React.PropTypes.number.isRequired,
 	countThanx: React.PropTypes.number.isRequired,
 	countFollower: React.PropTypes.number.isRequired,
@@ -546,15 +557,17 @@ export class MentoringCard extends React.Component {
 				<MentoringCover
 					cover={this.props.cover}
 					title={this.props.title}
-					digest={this.props.digest}
 					duration={this.props.duration}
 					price={this.props.price}
 					datetime={this.props.datetime}
 					limitUserCount={this.props.limitUserCount}
 					offerCount={this.props.offerCount}
+					kind={this.props.kind}
 				/>
 				<MentoringDigest
 					avatar={this.props.avatar}
+					username={this.props.username}
+					digest={this.props.digest}
 					countThanx={this.props.countThanx}
 					countStar={this.props.countStar}
 					countFollower={this.props.countFollower}
@@ -597,11 +610,30 @@ export class MentoringList extends React.Component {
 				marginBottom: '3rem',
 			},
 		};
+		/*
+						*/
 		return (
 			<section style={styles.root}>
 				{this.props.mentorings.map((mentoring, index) => {
 					const key = "mentoring_list_" + index;
-					return <MentoringCard key={key} id={mentoring.id} cover={mentoring.cover} title={mentoring.title} digest={mentoring.digest} price={mentoring.price} duration={mentoring.duration} datetime={mentoring.day} limitUserCount={10} offerCount={10} avatar={mentoring.avatar} countThanx={mentoring.count_thx} countStar={mentoring.star} countFollower={mentoring.count_follower} />
+					return <MentoringCard
+						key={key}
+						id={mentoring.id}
+						cover={mentoring.cover}
+						title={mentoring.title}
+						digest={mentoring.digest}
+						price={mentoring.price}
+						duration={mentoring.duration}
+						datetime={mentoring.day}
+						limitUserCount={10}
+						offerCount={10}
+						avatar={mentoring.avatar}
+						username="ヤマダ太郎"
+						kind={1}
+						countThanx={sessionStorage.user.count_thanx}
+						countStar={sessionStorage.user.count_star}
+						countFollower={sessionStorage.count_follower}
+					/>
 				})}
 			</section>
 		);

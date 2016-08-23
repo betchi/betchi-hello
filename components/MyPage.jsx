@@ -9,6 +9,8 @@ import Snackbar from 'material-ui/Snackbar';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import SettingsIcon from 'material-ui/svg-icons/action/settings.js';
 import EditorModeIcon from 'material-ui/svg-icons/editor/mode-edit.js';
+import StarIcon from 'material-ui/svg-icons/toggle/star';
+import CommunicationEmailIcon from 'material-ui/svg-icons/communication/email.js';
 import FlatButton from 'material-ui/FlatButton';
 import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
@@ -203,15 +205,24 @@ export class MyPage extends React.Component {
 				paddingBottom:0
 			},
 			listItem: {
+				fontWeight: 'normal',
+			},
+			listItemDiv: {
 				backgroundColor: window.bgColor2,
+				backgroundImage: "url('/cover.jpg')",
+				backgroundRepeat: 'no-repeat',
+				backgroundSize: 'contain',
 				border: '1px solid',
 				borderColor: window.bgColor1,
 				color: window.textColor1,
-				fontWeight: 'bold',
+				paddingLeft: '130px',
 			},
 			listItemSecondary: {
 				color:window.textColor1,
 				fontWeight: 'normal',
+			},
+			listItemAvatar: {
+				marginLeft: '25px',
 			},
 			tab: {
 				fontWeight: 'normal',
@@ -231,6 +242,7 @@ export class MyPage extends React.Component {
 				textAlign: 'center',
 				border: '1px solid',
 				borderColor: window.textColor1,
+				marginLeft: '23px',
 			},
 			mentoringLabelDecision: {
 				backgroundColor: '#558B2F',
@@ -247,6 +259,7 @@ export class MyPage extends React.Component {
 				textAlign: 'center',
 				border: '1px solid',
 				borderColor: window.textColor1,
+				marginLeft: '23px',
 			},
 			mentoringLabelClose: {
 				backgroundColor: '#616161',
@@ -263,6 +276,7 @@ export class MyPage extends React.Component {
 				textAlign: 'center',
 				border: '1px solid',
 				borderColor: window.textColor1,
+				marginLeft: '23px',
 			},
 			addButton: {
 				position: 'fixed',
@@ -294,8 +308,9 @@ export class MyPage extends React.Component {
 							style={styles.list}
 						>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="/avatar.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="/avatar.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -309,8 +324,9 @@ export class MyPage extends React.Component {
 								<LiveMark />
 							</ListItem>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="/avatar.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="/avatar.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -332,8 +348,9 @@ export class MyPage extends React.Component {
 							style={styles.list}
 						>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -346,8 +363,9 @@ export class MyPage extends React.Component {
 								<div style={styles.mentoringLabelOffer}>オファー中</div>
 							</ListItem>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -360,8 +378,9 @@ export class MyPage extends React.Component {
 								<div style={styles.mentoringLabelDecision}>9/2</div>
 							</ListItem>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -374,8 +393,9 @@ export class MyPage extends React.Component {
 								<div style={styles.mentoringLabelClose}>終了</div>
 							</ListItem>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -388,8 +408,9 @@ export class MyPage extends React.Component {
 								<div style={styles.mentoringLabelClose}>終了</div>
 							</ListItem>
 							<ListItem
-								innerDivStyle={styles.listItem}
-								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" />}
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
 								primaryText="メンタリング名"
 								secondaryText={
 									<p style={styles.listItemSecondary}>
@@ -480,6 +501,7 @@ export class Profile extends React.Component {
 			},
 			cover: {
 				width: '100%',
+				opacity: 0.9,
 			},
 			username: {
 				fontSize: '1.5rem',
@@ -571,12 +593,28 @@ export class Profile extends React.Component {
 				width: '1rem',
 				height: '1rem',
 			},
-			numberChip1Wrap: {
+			followWrap: {
 				position: 'absolute',
-				bottom: '18%',
+				bottom: '25%',
 				left: 0,
 				width: '100%',
 				textAlign: 'center',
+			},
+			follower: {
+				fontSize: '0.8rem',
+				color: window.textColor1,
+				width: '48%',
+				float: 'left',
+				marginRight: '2%',
+				textAlign: 'right',
+			},
+			follow: {
+				fontSize: '0.8rem',
+				color: window.textColor1,
+				width: '48%',
+				float: 'left',
+				marginLeft: '2%',
+				textAlign: 'left',
 			},
 			numberChip2Wrap: {
 				position: 'absolute',
@@ -595,6 +633,24 @@ export class Profile extends React.Component {
 				position: 'absolute',
 				top: '0.5rem',
 				left: '0.5rem',
+			},
+			starThanx: {
+				backgroundColor: window.textColor1,
+				margin: '0.5rem',
+				minWidth: 'auto',
+				width: '25%',
+				borderRadius: '5px',
+				opacity: 0.9,
+			},
+			starThanxIcon: {
+				color: window.textColor2,
+				opacity: 0.8,
+				marginLeft: 0,
+			},
+			starThanxLabel: {
+				color: window.textColor2,
+				opacity: 0.8,
+				padding: 0,
 			},
 		};
 
@@ -631,13 +687,27 @@ export class Profile extends React.Component {
 							/>
 						</div>
 					</div>
-					<div style={styles.numberChip1Wrap}>
-						<NumberChip name={"フォロワー"} color={window.textColor1} number={123} onTouchTap={this.onFollower} rippleColor={window.bgColor1} />
-						<NumberChip name={"フォロー中"} color={window.textColor1} number={123} onTouchTap={this.onFollow} rippleColor={window.bgColor1} />
+					<div style={styles.followWrap}>
+						<div style={styles.follower} onTouchTap={this.onFollower}>フォロワー 124,722</div>
+						<div style={styles.follow} onTouchTap={this.onFollow}>フォロー中 133</div>
 					</div>
 					<div style={styles.numberChip2Wrap}>
-						<NumberChip name={"お礼メッセージ"} color={window.textColor1} number={123} onTouchTap={this.onThanx} rippleColor={window.bgColor1} />
-						<NumberChip name={"スター"} color={window.textColor1} number={12345} onTouchTap={this.onStar} rippleColor={window.bgColor1} />
+						<FlatButton
+							style={styles.starThanx}
+							label={234}
+							icon={<CommunicationEmailIcon style={styles.starThanxIcon} />}
+							onTouchTap={this.onThanx}
+							rippleColor={window.bgColor1}
+							labelStyle={styles.starThanxLabel}
+						/>
+						<FlatButton
+							style={styles.starThanx}
+							label="213,234"
+							icon={<StarIcon style={styles.starThanxIcon} />}
+							onTouchTap={this.onStar}
+							rippleColor={window.bgColor1}
+							labelStyle={styles.starThanxLabel}
+						/>
 					</div>
 				</div>
 			</div>

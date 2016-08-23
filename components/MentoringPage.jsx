@@ -21,6 +21,7 @@ import BookmarkIcon from 'material-ui/svg-icons/action/bookmark.js';
 import ContentCreateIcon from 'material-ui/svg-icons/content/create.js';
 import CardGiftcardIcon from 'material-ui/svg-icons/action/card-giftcard.js';
 import QuestionAnswerIcon from 'material-ui/svg-icons/action/question-answer.js';
+import EditorModeIcon from 'material-ui/svg-icons/editor/mode-edit.js';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 import SupervisorAccountButton from 'material-ui/svg-icons/action/supervisor-account';
@@ -66,7 +67,10 @@ export class MentoringPage extends React.Component {
 		this.onBack = this.onBack.bind(this);
 		this.onFollow = this.onFollow.bind(this);
 		this.onOffer = this.onOffer.bind(this);
-		this.onOfferList = this.onOfferList.bind(this);
+		this.onOfferConfirm = this.onOfferConfirm.bind(this);
+		this.onBookmark = this.onBookmark.bind(this);
+		this.onBookmarkCancel = this.onBookmarkCancel.bind(this);
+		this.onMentoringEdit = this.onMentoringEdit.bind(this);
 	}
 
 	componentDidMount() {
@@ -95,8 +99,21 @@ export class MentoringPage extends React.Component {
 		this.context.router.push({pathname: '/chat/' + this.state.mentoring.id + '/' + sessionStorage.user.id + '/' + this.state.mentoring.title});
 	}
 
-	onOfferList(e) {
+	onOfferConfirm(e) {
 		this.context.router.push({pathname: '/offers/' + this.state.mentoring.id + '/' + this.state.mentoring.title});
+	}
+
+	onBookmark(e) {
+		console.log("bookmark");
+	}
+
+	onBookmarkCancel(e) {
+		console.log("bookmark cancel");
+	}
+
+	onMentoringEdit(e) {
+		console.log("mentoring edit");
+		this.context.router.push({pathname: '/mentoring/' + this.state.mentoring.id + '/edit'});
 	}
 
 	onSnackClose(e) {
@@ -215,6 +232,14 @@ export class MentoringPage extends React.Component {
 				fontSize: '1.2rem',
 				fontWeight: 'bold',
 			},
+			digest: {
+				background: window.bgColor1,
+				fontSize: '0.8rem',
+				width: '96%',
+				margin: 0,
+				padding: '0 2% 2% 2%',
+				color: window.textColor1,
+			},
 			refreshBox: {
 				position: 'relative',
 				margin: '16px 0',
@@ -267,21 +292,23 @@ export class MentoringPage extends React.Component {
 				backgroundColor: window.bgColor2,
 				color: window.textColor1,
 				textAlign: 'center',
-				letterSpacing: '0.2rem',
 				margin: '1rem 0 0 0',
 			},
 			list: {
+				paddingTop: 0,
 			},
 			listItem: {
 				backgroundColor: window.bgColor2,
 				color: window.textColor1,
 				border: '1px solid',
 				borderColor: window.bgColor1,
+				fontSize: '0.8rem',
 			},
 			secondaryText: {
 				color: window.textColor1,
 				float: 'right',
 				marginTop: '-1rem',
+				fontSize: '0.8rem',
 			},
 		}
 		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
@@ -301,15 +328,16 @@ export class MentoringPage extends React.Component {
 				/>
 				<MentoringDigest
 					avatar={this.state.mentoring.avatar}
-      				countThx={this.state.mentoring.count_thx ? this.state.mentoring.count_thx : 0}
-      				countFollower={this.state.mentoring.count_follower ? this.state.mentoring.count_follower: 0}
+					countThanx={sessionStorage.user.count_thanx}
+					countStar={sessionStorage.user.count_star}
+					countFollower={sessionStorage.user.count_follower}
 				/>
+				<p style={styles.digest}>{this.state.mentoring.digest}</p>
 				<List style={styles.list}>
-					<ListItem style={styles.listItem} primaryText="概要" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.digest}</p>} />
-					<ListItem style={styles.listItem} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.day}</p>} />
-					<ListItem style={styles.listItem} primaryText="いいね値段" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
-					<ListItem style={styles.listItem} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>10 人</p>} />
-					<ListItem style={styles.listItem} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>12 人</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.day}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="いいね値段" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>10 人</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>12 人</p>} />
 				</List>
 				<ThxMessageList
 					key={'thx-message_' + this.props.params.id}
@@ -332,14 +360,56 @@ export class MentoringPage extends React.Component {
 					autoHideDuration={4000}
 					onRequestClose={this.onSnackClose}
 				/>
+				<div style={styles.buttons}>
 				{(() => {
 					if (this.state.mentoring.user_id == sessionStorage.user.id) {
-						return <div style={styles.buttons}><FlatButton style={styles.button} primary={true} label="オファーを確認する" onTouchTap={this.onOfferList} /></div>
+						return <FlatButton
+							style={styles.button}
+							icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
+							label="オファーを確認"
+							labelStyle={styles.buttonLabel}
+							onTouchTap={this.onOfferConfirm}
+						/>
 					} else {
-						return <div style={styles.buttons}><FlatButton style={styles.button} icon={<QuestionAnswerIcon style={styles.buttonIcon} />} label="オファー" labelStyle={styles.buttonLabel} onTouchTap={this.onOffer} /><FlatButton style={styles.button} icon={<BookmarkBorderIcon style={styles.buttonIcon} />} label="ブックマークする" labelStyle={styles.buttonLabel} onTouchTap={this.onOffer} /></div>
-						
+						return <FlatButton
+							style={styles.button}
+							icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
+							label="オファー"
+							labelStyle={styles.buttonLabel}
+							onTouchTap={this.onOffer}
+						/>
 					}
 				})()}
+				{(() => {
+					if (this.state.mentoring.user_id == sessionStorage.user.id) {
+						return <FlatButton
+							style={styles.button}
+							icon={<EditorModeIcon style={styles.buttonIcon} />}
+							label="編集"
+							labelStyle={styles.buttonLabel}
+							onTouchTap={this.onMentoringEdit}
+						/>
+					} else {
+						if (false) {
+							return <FlatButton
+								style={styles.button}
+								icon={<BookmarkIcon style={styles.buttonIcon} />}
+								label="ブックマーク解除"
+								labelStyle={styles.buttonLabel}
+								onTouchTap={this.onBookmarkCancel}
+							/>
+						} else {
+							return <FlatButton
+								style={styles.button}
+								icon={<BookmarkBorderIcon style={styles.buttonIcon} />}
+								label="ブックマーク"
+								labelStyle={styles.buttonLabel}
+								onTouchTap={this.onBookmark}
+							/>
+						}
+					}
+				})()}
+				</div>
 			</section>
 		);
 	}
