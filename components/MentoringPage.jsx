@@ -327,10 +327,13 @@ export class MentoringPage extends React.Component {
 					title={this.state.mentoring.title}
 				/>
 				<MentoringDigest
+					userId={101}
 					avatar={this.state.mentoring.avatar}
+					username="ヤマダ太郎"
 					countThanx={sessionStorage.user.count_thanx}
 					countStar={sessionStorage.user.count_star}
 					countFollower={sessionStorage.user.count_follower}
+					onTouchTap={this.onOpenProfile}
 				/>
 				<p style={styles.digest}>{this.state.mentoring.digest}</p>
 				<List style={styles.list}>

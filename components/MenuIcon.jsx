@@ -6,6 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FlashOnIcon from 'material-ui/svg-icons/image/flash-on.js';
 import PeopleIcon from 'material-ui/svg-icons/social/people';
+import AddCircleIcon from 'material-ui/svg-icons/content/add-circle.js';
 
 export class MenuIcon extends React.Component {
 	constructor(props, context) {
@@ -58,24 +59,51 @@ export class MenuIcon extends React.Component {
 
 		return (
 			<div style={styles.actionBlock}>
-				<FlatButton
-					icon={<IconButton style={{margin:'0'}} iconStyle={styles.largeIcon}><PeopleIcon style={{margin:'0'}} color={window.textColor1} /></IconButton>}
-					style={styles.actionBlockItem}
-					value={1}
-					ref="tab1"
-					label={'メンタリングをする'}
-					labelStyle={styles.actionBlockLabelStyle}
-					onTouchTap={this.onCreateMentoring}
-				/>
-				<FlatButton
-					icon={<IconButton iconStyle={styles.largeIcon}><FlashOnIcon color={window.textColor1} /></IconButton>}
-					style={styles.actionBlockItem}
-					value={1}
-					ref="tab1"
-					label={'メンターライブをする'}
-					labelStyle={styles.actionBlockLabelStyle}
-					onTouchTap={this.onCreateMentoring}
-				/>
+					{(() => {
+						if (this.props.userId == sessionStorage.user.id) {
+							return (
+								<FlatButton
+									icon={<IconButton style={{margin:'0'}} iconStyle={styles.largeIcon}><PeopleIcon style={{margin:'0'}} color={window.textColor1} /></IconButton>}
+									style={styles.actionBlockItem}
+									value={1}
+									ref="tab1"
+									label={'メンタリングをする'}
+									labelStyle={styles.actionBlockLabelStyle}
+									onTouchTap={this.onCreateMentoring}
+								/>
+							);
+						}
+					})()}
+					{(() => {
+						if (this.props.userId == sessionStorage.user.id) {
+							return (
+								<FlatButton
+									icon={<IconButton iconStyle={styles.largeIcon}><FlashOnIcon color={window.textColor1} /></IconButton>}
+									style={styles.actionBlockItem}
+									value={1}
+									ref="tab1"
+									label={'メンターライブをする'}
+									labelStyle={styles.actionBlockLabelStyle}
+									onTouchTap={this.onCreateMentoring}
+								/>
+							);
+						}
+					})()}
+					{(() => {
+						if (this.props.userId != sessionStorage.user.id) {
+							return (
+								<FlatButton
+									icon={<IconButton iconStyle={styles.largeIcon}><AddCircleIcon color={window.textColor1} /></IconButton>}
+									style={styles.actionBlockItem}
+									value={1}
+									ref="tab1"
+									label={'フォローする'}
+									labelStyle={styles.actionBlockLabelStyle}
+									onTouchTap={this.onCreateMentoring}
+								/>
+							);
+						}
+					})()}
 			</div>
 		);
 	}

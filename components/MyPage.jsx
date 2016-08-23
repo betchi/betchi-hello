@@ -226,6 +226,7 @@ export class MyPage extends React.Component {
 			},
 			tab: {
 				fontWeight: 'normal',
+				fontSize: '0.8rem',
 			},
 			mentoringLabelOffer: {
 				backgroundColor: '#009688',
@@ -289,6 +290,7 @@ export class MyPage extends React.Component {
 		return (
 			<section style={styles.root}>
 				<Profile
+					userId={this.props.params.id}
 					cover={this.state.pageUser.cover}
 					avatar={this.state.pageUser.avatar}
 					username={this.state.pageUser.username}
@@ -296,12 +298,12 @@ export class MyPage extends React.Component {
 					countMentor={1}
 					countFollower={2}
 				/>
-				<MenuIcon />
+				<MenuIcon userId={this.props.params.id} />
 				<Tabs
 					inkBarStyle={{backgroundColor:window.borderColor1}}
 				>
 					<Tab
-						label="自分がメンター (2)"
+						label="作成したもの (2)"
 						style={styles.tab}
 					>
 						<List
@@ -341,7 +343,7 @@ export class MyPage extends React.Component {
 						</List>
 					</Tab>
 					<Tab
-						label="他の人がメンター (5)"
+						label="参加するもの (5)"
 						style={styles.tab}
 					>
 						<List
@@ -424,6 +426,46 @@ export class MyPage extends React.Component {
 							</ListItem>
 						</List>
 				    </Tab>
+					<Tab
+						label="ブックーマーク (2)"
+						style={styles.tab}
+					>
+						<List
+							style={styles.list}
+						>
+							<ListItem
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
+								primaryText="メンタリング名"
+								secondaryText={
+									<p style={styles.listItemSecondary}>
+										<span>Brunch this weekend?</span><br />
+										I&apos;ll be in your neighborhood doing errands this weekend. Do you want to grab brunch?
+									</p>
+								}
+								secondaryTextLines={2}
+							>
+								<div style={styles.mentoringLabelOffer}>オファー中</div>
+								<LiveMark />
+							</ListItem>
+							<ListItem
+								style={styles.listItem}
+								innerDivStyle={styles.listItemDiv}
+								leftAvatar={<Avatar src="http://www.material-ui.com/images/jsa-128.jpg" style={styles.listItemAvatar} />}
+								primaryText="メンタリング名"
+								secondaryText={
+									<p style={styles.listItemSecondary}>
+										<span>Brunch this weekend?</span><br />
+										I&apos;ll be in your neighborhood doing errands this weekend. Do you want to grab brunch?
+									</p>
+								}
+								secondaryTextLines={2}
+							>
+								<div style={styles.mentoringLabelClose}>終了</div>
+							</ListItem>
+						</List>
+					</Tab>
 				</Tabs>
 
 				<Snackbar
@@ -432,7 +474,11 @@ export class MyPage extends React.Component {
 					autoHideDuration={4000}
 					onRequestClose={this.onSnackClose}
 				/>
-				<Tabbar value="mypage" />
+				{(() => {
+					if (this.props.params.id == sessionStorage.user.id) {
+						return <Tabbar value="mypage" />
+					}
+				})()}
 			</section>
 		);
 	}
@@ -657,36 +703,54 @@ export class Profile extends React.Component {
 		return (
 			<div style={styles.root}>
 				<div style={styles.coverRoot}>
-					<div style={styles.profilePhotoEditChipWrap}>
-						<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onProfilePhotoEdit} rippleColor={window.bgColor1} />
-						<input
-							ref="profilePhotoFileEdit"
-							type="file" 
-							style={{"display": "none"}}
-							onChange={this.onProfilePhotoEditChange}
-						/>
-					</div>
-					<div style={styles.coverPhotoEditChipWrap}>
-						<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onCoverPhotoEdit} rippleColor={window.bgColor1} />
-						<input
-							ref="coverPhotoFileEdit"
-							type="file" 
-							style={{"display": "none"}}
-							onChange={this.onCoverPhotoEditChange}
-						/>
+					{(() => {
+						if (this.props.userId == sessionStorage.user.id) {
+							return (
+								<div style={styles.profilePhotoEditChipWrap}>
+									<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onProfilePhotoEdit} rippleColor={window.bgColor1} />
+									<input
+										ref="profilePhotoFileEdit"
+										type="file" 
+										style={{"display": "none"}}
+										onChange={this.onProfilePhotoEditChange}
+									/>
+								</div>
+							);
+						}
+					})()}
+					{(() => {
+						if (this.props.userId == sessionStorage.user.id) {
+							return (
+								<div style={styles.coverPhotoEditChipWrap}>
+									<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onCoverPhotoEdit} rippleColor={window.bgColor1} />
+									<input
+										ref="coverPhotoFileEdit"
+										type="file" 
+										style={{"display": "none"}}
+										onChange={this.onCoverPhotoEditChange}
+									/>
+								</div>
+							);
+						}
+					})()}
+					<div style={styles.username}>{this.props.username}
+					{(() => {
+						if (this.props.userId == sessionStorage.user.id) {
+							return (
+								<div style={styles.profileEditButtonWrap}>
+									<FlatButton
+										style={styles.profileEditButton}
+										icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
+										onTouchTap={this.onProfileEdit}
+										rippleColor={window.bgColor1}
+									/>
+								</div>
+							);
+						}
+					})()}
 					</div>
 					<img style={styles.cover} src={this.props.cover} />
 					<img style={styles.avatar} src={this.props.avatar} />
-					<div style={styles.username}>{this.props.username}
-						<div style={styles.profileEditButtonWrap}>
-							<FlatButton
-								style={styles.profileEditButton}
-								icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
-								onTouchTap={this.onProfileEdit}
-								rippleColor={window.bgColor1}
-							/>
-						</div>
-					</div>
 					<div style={styles.followWrap}>
 						<div style={styles.follower} onTouchTap={this.onFollower}>フォロワー 124,722</div>
 						<div style={styles.follow} onTouchTap={this.onFollow}>フォロー中 133</div>

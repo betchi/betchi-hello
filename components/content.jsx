@@ -315,6 +315,12 @@ ThxSummury.defaultProps = {
 export class MentoringDigest extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.onOpenProfile = this.onOpenProfile.bind(this);
+	}
+
+	onOpenProfile() {
+		console.log("open profile");
+		this.context.router.push('/mypage/' + this.props.userId);
 	}
 
 	render() {
@@ -383,7 +389,10 @@ export class MentoringDigest extends React.Component {
 		};
 
 		return (
-			<div style={styles.root}>
+			<div
+				style={styles.root}
+				onTouchTap={this.onOpenProfile}
+			>
 				<Avatar style={styles.avatar} src={this.props.avatar} />
 				<p style={styles.username}>{this.props.username}</p>
 				{(() => {
@@ -428,6 +437,7 @@ MentoringDigest.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 MentoringDigest.propTypes = {
+	//	userId: React.PropTypes.number.isRequired,
 	avatar: React.PropTypes.string.isRequired,
 	username: React.PropTypes.string.isRequired,
 	digest: React.PropTypes.string.isRequired,
