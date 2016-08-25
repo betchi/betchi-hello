@@ -55,6 +55,7 @@ export class OffersPage extends React.Component {
 			}
 			myContactList = [];
 			let data = JSON.parse(xhr.responseText);
+			console.log(data.offers);
 			this.setState({
 				contactList: data.offers,
 			});
@@ -177,7 +178,7 @@ export class OffersPage extends React.Component {
 							var date = new Date( this.state.contactList[i].last_modified_at);
 							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 							var message = decodeURI(this.state.contactList[i].last_message);
-							contactList.push(<ListItem style={styles.listItem} key={i} primaryText={this.state.contactList[i].username} secondaryText={<span style={styles.secondoryText}>message</span>} leftAvatar={<Avatar src={this.state.contactList[i].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)} secondaryTextLines={2} rightIcon={<p style={styles.time}>{hhmm}</p>} />);
+							contactList.push(<ListItem style={styles.listItem} key={i} primaryText={this.state.contactList[i].username} secondaryText={<span style={styles.secondoryText}>{message}</span>} leftAvatar={<Avatar src={this.state.contactList[i].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)} secondaryTextLines={2} rightIcon={<p style={styles.time}>{hhmm}</p>} />);
 						}
 						return contactList;
 					}

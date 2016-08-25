@@ -39,8 +39,6 @@ import {MentoringCoverSwipe, MentoringDigest, SelectableCover} from './content.j
 import {ThxMessageList} from './ThxMessageList.jsx';
 import {ContactList} from './ContactList.jsx';
 
-import Intl from 'intl/dist/Intl.min.js';
-
 export class MentoringPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
