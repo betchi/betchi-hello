@@ -7,15 +7,14 @@ import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import {LoginPage} from './components/login.jsx';
-import {RegisterPage} from './components/register.jsx';
-import {TopPage} from './components/top.jsx';
-import {ChatPage} from './components/chat.jsx';
-import {SearchPage} from './components/search.jsx';
-import {MentoringPage,EditMentoringPage} from './components/mentoring.jsx';
-import {MyPage} from './components/mypage.jsx';
-import {OffersPage} from './components/offers.jsx';
-//import {MessageList} from './components/messageList.js';
+import {TopPage} from './components/TopPage.jsx';
+import {LoginPage} from './components/LoginPage.jsx';
+import {RegisterPage} from './components/RegisterPage.jsx';
+import {MentoringPage,EditMentoringPage} from './components/MentoringPage.jsx';
+import {ChatPage} from './components/ChatPage.jsx';
+import {SearchPage} from './components/SearchPage.jsx';
+import {MyPage} from './components/MyPage.jsx';
+import {OffersPage} from './components/OffersPage.jsx';
 
 Object.defineProperty(String.prototype, 'isValidEmail', {
 	writable: false,
@@ -75,20 +74,21 @@ function requireAuth(next, replace) {
 		sessionStorage.user = data.user;
 	};
 	xhr.send();
-	console.log(sessionStorage.user);
 }
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={getMuiTheme()}>
 		<Router history={hashHistory}>
 			<Route path="/" component={TopPage} onEnter={requireAuth} />
+			<Route path="/top" component={TopPage} onEnter={requireAuth} />
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
 			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
-			<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
+			<Route path="/mentoring/new" component={EditMentoringPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
 			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
+			<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
 			<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
 		</Router>
 	</MuiThemeProvider>

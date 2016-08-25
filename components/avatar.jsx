@@ -17,7 +17,7 @@ import LiveTv from 'material-ui/svg-icons/notification/live-tv';
 
 import HeadRoom from 'react-headroom';
 
-import {ThxMessageList} from './message.jsx';
+import {ThxMessageList} from './ThxMessageList.jsx';
 import {RatingStar} from './content.jsx';
 
 export class Avatar extends React.Component {
