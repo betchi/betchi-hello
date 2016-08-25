@@ -764,23 +764,24 @@ export class Profile extends React.Component {
 							);
 						}
 					})()}
-					{(() => {
-						if (this.props.userId == sessionStorage.user.id) {
-							return (
-								<div style={styles.profileEditButtonWrap}>
-									<FlatButton
-										style={styles.profileEditButton}
-										icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
-										onTouchTap={this.onProfileEdit}
-										rippleColor={window.bgColor1}
-									/>
-								</div>
-							);
-						}
-					})()}
 					<img style={styles.cover} src={this.props.cover} />
 					<img style={styles.avatar} src={this.props.avatar} />
-					<div style={styles.username}>{this.props.username}</div>
+					<div style={styles.username}>{this.props.username}
+						{(() => {
+							if (this.props.userId == sessionStorage.user.id) {
+								return (
+									<div style={styles.profileEditButtonWrap}>
+										<FlatButton
+											style={styles.profileEditButton}
+											icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
+											onTouchTap={this.onProfileEdit}
+											rippleColor={window.bgColor1}
+										/>
+									</div>
+								);
+							}
+						})()}
+					</div>
 					<div style={styles.followWrap}>
 						<div style={styles.follower} onTouchTap={this.onFollower}>フォロワー {this.props.countFollowers}</div>
 						<div style={styles.follow} onTouchTap={this.onFollow}>フォロー中 {this.props.countFollows}</div>

@@ -277,7 +277,7 @@ export class MentoringPage extends React.Component {
 			button: {
 				width: '46%',
 				margin: '2%',
-				boxShadow: '4px 4px 4px rgba(1,1,1,0.5)',
+				boxShadow: '2px 2px 2px rgba(1,1,1,0.5)',
 				backgroundColor: window.buttonColor1,
 				border: '1px solid white',
 				borderRadius: '0.5rem',
@@ -361,8 +361,8 @@ export class MentoringPage extends React.Component {
 					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{datetimeString}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリング時間" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.duration} 分</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="金額" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
-					<ListItem style={styles.listItem} disabled={true} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>10 人</p>} />
-					<ListItem style={styles.listItem} disabled={true} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>12 人</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.max_user_num} 人</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.count_offers} 人</p>} />
 				</List>
 				{(() => {
 					if (this.state.messages.length != 0) {
@@ -394,13 +394,15 @@ export class MentoringPage extends React.Component {
 				<div style={styles.buttons}>
 				{(() => {
 					if (this.state.mentoring.user_id == sessionStorage.user.id) {
-						return <FlatButton
-							style={styles.button}
-							icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
-							label="オファーを確認"
-							labelStyle={styles.buttonLabel}
-							onTouchTap={this.onOfferConfirm}
-						/>
+						if (this.state.mentoring.count_offers != 0) {
+							return <FlatButton
+								style={styles.button}
+								icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
+								label="オファーを確認"
+								labelStyle={styles.buttonLabel}
+								onTouchTap={this.onOfferConfirm}
+							/>
+						}
 					} else {
 						return <FlatButton
 							style={styles.button}
@@ -500,11 +502,12 @@ export class EditMentoringPage extends React.Component {
 		this.onChangeCategory = this.onChangeCategory.bind(this);
 		this.onChangeKind = this.onChangeKind.bind(this);
 		self = this;
-		console.log(this.props.location.query.category);
 	}
 
 	componentDidMount() {
-		this.loadContents(this.props.params.id);
+		if (this.props.params.id != undefined) {
+			this.loadContents(this.props.params.id);
+		}
 		this.loadCovers();
 	}
 
@@ -712,7 +715,6 @@ export class EditMentoringPage extends React.Component {
 			}
 			let data = JSON.parse(xhr.responseText);
 console.log(data.mentoring);
-			
 			this.setState({
 				mentoring: data.mentoring,
 				date: new Date(data.mentoring.datetime),

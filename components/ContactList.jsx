@@ -105,6 +105,9 @@ console.log(myContactList);
 
 	onItemTap(index, contact) {
 		let selectedAvatarList = this.state.selectedAvatarList;
+		console.log(selectedAvatarList);
+		console.log(index);
+		console.log(contact);
 		if (index in this.state.selectedAvatarList) {
 			delete selectedAvatarList[index];
 		} else {
@@ -282,7 +285,7 @@ console.log(myContactList);
 			},
 			avatar: {
 				marginTop: '-0.2rem',
-				marginLeft: '1rem',
+				marginLeft: '0.5rem',
 				display: 'inline-block',
 				whiteSpace: 'normal',
 				verticalAlign: 'top',
@@ -291,8 +294,8 @@ console.log(myContactList);
 				color: 'white',
 				fontSize: '0.5em',
 				position: 'relative',
-				top: '-1.3rem',
-				left: '-0.4rem',
+				top: '-0.8rem',
+				left: '-0.2rem',
 				overflow: 'hidden',
 				textOverflow: 'ellipsis',
 				width: '3rem',
@@ -302,8 +305,8 @@ console.log(myContactList);
 				backgroundColor: 'white',
 				borderRadius: '50%',
 				position: 'relative',
-				top: '-0.6rem',
-				left: '1.1rem',
+				top: '-1.5rem',
+				left: '-0.5rem',
 			},
 			textClearButton: {
 				position: 'relative',
@@ -370,8 +373,23 @@ console.log(myContactList);
 							if (Array.isArray(this.state.selectedAvatarList)) {
 								let selectedAvatarList = [];
 								for (var index in this.state.selectedAvatarList) {
-									selectedAvatarList.push(<Avatar key={index} style={styles.avatar} src={this.state.selectedAvatarList[index].avatar}><CancelButton style={styles.avatarCancel} onTouchTap={this.onCancelTap.bind(this, index)} /><p style={styles.avatarName}>{this.state.selectedAvatarList[index].username}</p></Avatar>);
+									selectedAvatarList.push(
+										<div
+											style={styles.avatar}
+										>
+											<Avatar
+												key={index}
+												src={this.state.selectedAvatarList[index].avatar}
+											/>
+											<CancelButton
+												style={styles.avatarCancel}
+												onTouchTap={this.onCancelTap.bind(this, index)}
+											/>
+											<p style={styles.avatarName}>{this.state.selectedAvatarList[index].username}</p>
+										</div>
+									);
 								}
+								console.log(selectedAvatarList);
 								return selectedAvatarList;
 							}
 						})()}

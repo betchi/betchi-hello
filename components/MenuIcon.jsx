@@ -67,7 +67,7 @@ export class MenuIcon extends React.Component {
 									style={styles.actionBlockItem}
 									value={1}
 									ref="tab1"
-									label={'メンタリングをする'}
+									label={'メンタリングを登録'}
 									labelStyle={styles.actionBlockLabelStyle}
 									onTouchTap={this.onCreateMentoring}
 								/>

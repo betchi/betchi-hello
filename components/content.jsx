@@ -110,7 +110,7 @@ export class MentoringCover extends React.Component {
 					{datetimeString} ( {this.props.duration}分間 )<br />
 					{price}
 					{(() => {
-						if (this.props.kind == 1) {
+						if (this.props.kind == 2) {
 							return <LiveMark />
 						}
 					})()}
@@ -426,10 +426,9 @@ export class MentoringDigest extends React.Component {
 		return (
 			<div
 				style={styles.root}
-				onTouchTap={this.onOpenProfile}
 			>
-				<Avatar style={styles.avatar} src={this.props.avatar} />
-				<p style={styles.username}>{this.props.username}</p>
+				<Avatar style={styles.avatar} src={this.props.avatar} onTouchTap={this.onOpenProfile} />
+				<p style={styles.username} onTouchTap={this.onOpenProfile}>{this.props.username}</p>
 				{(() => {
 					if (this.props.countStar != 0) {
 						return <FlatButton
