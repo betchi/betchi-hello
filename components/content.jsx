@@ -19,6 +19,11 @@ import {LiveMark} from './LiveMark.jsx';
 export class MentoringCover extends React.Component {
 	constructor(props, context) {
 		super(props, context);
+		this.onTouchTap = this.onTouchTap.bind(this);
+	}
+
+	onTouchTap() {
+		this.props.onTouchTap();
 	}
 
 	render() {
@@ -89,7 +94,10 @@ export class MentoringCover extends React.Component {
 		}
 
 		return (
-			<div style={styles.root}>
+			<div
+				style={styles.root}
+				onTouchTap={this.onTouchTap}
+			>
 				<img style={styles.cover} src={this.props.cover} />
 				<div style={styles.title}>{this.props.title}</div>
 				<div style={styles.price}>
@@ -345,7 +353,9 @@ export class MentoringDigest extends React.Component {
 
 	onOpenProfile() {
 		console.log("open profile");
-		this.context.router.push('/mypage/' + this.props.userId);
+		if (this.props.userId != sessionStorage.user.id) {
+			this.context.router.push('/mypage/' + this.props.userId);
+		}
 	}
 
 	render() {
@@ -587,7 +597,6 @@ export class MentoringCard extends React.Component {
 		return (
 			<Card
 				style={styles.card}
-				onTouchTap={this.onTap}
 			>
 				<MentoringCover
 					title={this.props.title}
@@ -598,6 +607,7 @@ export class MentoringCard extends React.Component {
 					maxUserNum={this.props.maxUserNum}
 					countOffers={this.props.countOffers}
 					kind={this.props.kind}
+					onTouchTap={this.onTap}
 				/>
 				<MentoringDigest
 					userId={this.props.userId}

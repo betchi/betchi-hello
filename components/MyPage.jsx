@@ -15,6 +15,8 @@ import FlatButton from 'material-ui/FlatButton';
 import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
+import IconButton from 'material-ui/IconButton';
 
 import {ThxMessageList} from './ThxMessageList.jsx';
 import {RatingStar} from './content.jsx';
@@ -32,7 +34,7 @@ export class MyPage extends React.Component {
 			messages: [],
 			followers: [],
 			pageUser: {
-				cover: '',
+				cover: '/assets/img/defaultCover.png',
 				avatar: '',
 				star: 0,
 				mentors: [],
@@ -501,6 +503,7 @@ export class Profile extends React.Component {
 		this.onStar = this.onStar.bind(this);
 		this.onProfilePhotoEdit = this.onProfilePhotoEdit.bind(this);
 		this.onCoverPhotoEdit= this.onCoverPhotoEdit.bind(this);
+		this.onBack = this.onBack.bind(this);
 	}
 
 	onProfileEdit() {
@@ -535,6 +538,10 @@ export class Profile extends React.Component {
 	}
 	onCoverPhotoEditChange(e) {
 		console.log("onCoverPhotoEditChange");
+	}
+
+	onBack(e) {
+		this.context.router.goBack();
 	}
 
 	render() {
@@ -699,11 +706,34 @@ export class Profile extends React.Component {
 				opacity: 0.8,
 				padding: 0,
 			},
+			backIcon: {
+				position: 'fixed',
+				zIndex: '200',
+			},
+			backIcon2: {
+				color: 'white',
+				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
+				borderRadius: '50%',
+				padding: '5px',
+			},
 		};
 
 		return (
 			<div style={styles.root}>
 				<div style={styles.coverRoot}>
+					{(() => {
+						if (this.props.userId != sessionStorage.user.id) {
+							return (
+								<IconButton
+									style={styles.backIcon}
+									iconStyle={styles.backIcon2}
+									onTouchTap={this.onBack}
+								>
+									<NavigationArrowBack />
+								</IconButton>
+							);
+						}
+					})()}
 					{(() => {
 						if (this.props.userId == sessionStorage.user.id) {
 							return (
@@ -734,7 +764,6 @@ export class Profile extends React.Component {
 							);
 						}
 					})()}
-					<div style={styles.username}>{this.props.username}
 					{(() => {
 						if (this.props.userId == sessionStorage.user.id) {
 							return (
@@ -749,9 +778,9 @@ export class Profile extends React.Component {
 							);
 						}
 					})()}
-					</div>
 					<img style={styles.cover} src={this.props.cover} />
 					<img style={styles.avatar} src={this.props.avatar} />
+					<div style={styles.username}>{this.props.username}</div>
 					<div style={styles.followWrap}>
 						<div style={styles.follower} onTouchTap={this.onFollower}>フォロワー {this.props.countFollowers}</div>
 						<div style={styles.follow} onTouchTap={this.onFollow}>フォロー中 {this.props.countFollows}</div>
