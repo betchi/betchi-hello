@@ -22,7 +22,7 @@ export class LiveMark extends React.Component {
 			liveIcon: {
 				position: 'absolute',
 				right: 0,
-				top: '0.8rem',
+				top: "0.8rem",
 				color: window.textColor1,
 				width: '4.5rem',
 				height: '4.5rem',
@@ -31,7 +31,7 @@ export class LiveMark extends React.Component {
 				position: 'absolute',
 				fontSize: '2rem',
 				right: '3rem',
-				top: '1.6rem',
+				top: "1.6rem",
 			},
 		}
 
@@ -46,9 +46,3 @@ export class LiveMark extends React.Component {
 		);
 	}
 };
-/*
-LiveMark.propTypes = {
-	name: React.PropTypes.string.isRequired,
-	number: React.PropTypes.number.isRequired,
-}
-*/

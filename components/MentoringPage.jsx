@@ -328,7 +328,6 @@ export class MentoringPage extends React.Component {
 			},
 		}
 		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
-		//var datetime = this.state.mentoring.datetime;
 		var datetime = new Date(this.state.mentoring.datetime);
 		var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
 		var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);

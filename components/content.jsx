@@ -67,16 +67,40 @@ export class MentoringCover extends React.Component {
 			},
 		};
 
+		var price = this.props.price ? String.fromCharCode(165) + this.props.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
+
+		var datetime = new Date(this.props.datetime);
+		var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
+		var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);
+		var datetimeString = yyyymmdd + " " + hhmm;
+
+		var brFlg = false;
+
+		var offersString = "";
+		if (this.props.countOffers != 0) {
+			offersString = "現在" + this.props.countOffers + "名の方がオファー中";
+			brFlg = true;
+		}
+
+		var maxUserNumString = "";
+		if (this.props.maxUserNum != 0) {
+			maxUserNumString = "(募集人数は" + this.props.maxUserNum + "名です)";
+			brFlg = true;
+		}
+
 		return (
 			<div style={styles.root}>
 				<img style={styles.cover} src={this.props.cover} />
 				<div style={styles.title}>{this.props.title}</div>
 				<div style={styles.price}>
-					{this.props.datetime}({this.props.duration}分間)<br />
-					現在のオファー{this.props.countOffers}名(募集人数{this.props.maxUserNum}名)<br />
+					{offersString} {maxUserNumString}
 					{(() => {
-						return this.props.price ? String.fromCharCode(165) + this.props.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段'
+						if (brFlg) {
+							return <br />
+						}
 					})()}
+					{datetimeString} ( {this.props.duration}分間 )<br />
+					{price}
 					{(() => {
 						if (this.props.kind == 1) {
 							return <LiveMark />
@@ -98,6 +122,7 @@ MentoringCover.propTypes = {
 	price: React.PropTypes.number.isRequired,
 	maxUserNum: React.PropTypes.number.isRequired,
 	countOffers: React.PropTypes.number.isRequired,
+	kind: React.PropTypes.number.isRequired,
 }
 
 export class MentoringCoverSwipe extends MentoringCover {
