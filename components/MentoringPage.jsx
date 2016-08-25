@@ -277,10 +277,11 @@ export class MentoringPage extends React.Component {
 			button: {
 				width: '46%',
 				margin: '2%',
-				boxShadow: '2px 2px 2px rgba(1,1,1,0.5)',
+				boxShadow: '2px 2px 2px rgba(1, 1, 1, 0.5)',
 				backgroundColor: window.buttonColor1,
-				border: '1px solid white',
-				borderRadius: '0.5rem',
+				border: '1px solid',
+				borderColor: window.bgColor1,
+				borderRadius: '0.2rem',
 				height: '3rem',
 				color: 'white',
 			},
@@ -312,6 +313,7 @@ export class MentoringPage extends React.Component {
 			},
 			list: {
 				paddingTop: 0,
+				clear: 'both',
 			},
 			listItem: {
 				backgroundColor: window.bgColor2,
@@ -355,6 +357,7 @@ export class MentoringPage extends React.Component {
 					countStar={this.state.mentoring.user.count_star}
 					countFollowers={this.state.mentoring.user.count_followers}
 					onTouchTap={this.onOpenProfile}
+					digestFontSize="1rem"
 				/>
 				<List style={styles.list}>
 					<ListItem style={styles.listItem} disabled={true} primaryText="カテゴリ" secondaryText={<p style={styles.secondaryText}>{this.props.location.query.category}</p>} />

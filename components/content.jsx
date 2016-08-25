@@ -416,10 +416,11 @@ export class MentoringDigest extends React.Component {
 			digest: {
 				float: 'left',
 				background: window.bgColor1,
-				fontSize: '0.7rem',
+				fontSize: this.props.digestFontSize,
 				width: '96%',
 				margin: 0,
 				padding: '0 2%',
+				color: window.textColor1,
 			},
 		};
 
@@ -478,6 +479,7 @@ MentoringDigest.propTypes = {
 	countThanx: React.PropTypes.number.isRequired,
 	countStar: React.PropTypes.number.isRequired,
 	countFollowers: React.PropTypes.number.isRequired,
+	digestFontSize: React.PropTypes.string.isRequired,
 }
 
 export class MentoringDigestWithAvatar extends React.Component {
@@ -616,6 +618,7 @@ export class MentoringCard extends React.Component {
 					countThanx={this.props.countThanx}
 					countStar={this.props.countStar}
 					countFollowers={this.props.countFollowers}
+					digestFontSize="0.7rem"
 				/>
 			</Card>
 		);
