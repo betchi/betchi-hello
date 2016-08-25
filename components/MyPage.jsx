@@ -294,9 +294,10 @@ export class MyPage extends React.Component {
 					cover={this.state.pageUser.cover}
 					avatar={this.state.pageUser.avatar}
 					username={this.state.pageUser.username}
-					countOffer={3}
-					countMentor={1}
-					countFollower={2}
+					countFollowers={this.state.pageUser.count_followers}
+					countFollows={this.state.pageUser.count_follows}
+					countThanx={this.state.pageUser.count_thanx}
+					countStar={this.state.pageUser.count_star}
 				/>
 				<MenuIcon userId={this.props.params.id} />
 				<Tabs
@@ -752,13 +753,13 @@ export class Profile extends React.Component {
 					<img style={styles.cover} src={this.props.cover} />
 					<img style={styles.avatar} src={this.props.avatar} />
 					<div style={styles.followWrap}>
-						<div style={styles.follower} onTouchTap={this.onFollower}>フォロワー 124,722</div>
-						<div style={styles.follow} onTouchTap={this.onFollow}>フォロー中 133</div>
+						<div style={styles.follower} onTouchTap={this.onFollower}>フォロワー {this.props.countFollowers}</div>
+						<div style={styles.follow} onTouchTap={this.onFollow}>フォロー中 {this.props.countFollows}</div>
 					</div>
 					<div style={styles.numberChip2Wrap}>
 						<FlatButton
 							style={styles.starThanx}
-							label={234}
+							label={this.props.countStar}
 							icon={<CommunicationEmailIcon style={styles.starThanxIcon} />}
 							onTouchTap={this.onThanx}
 							rippleColor={window.bgColor1}
@@ -766,7 +767,7 @@ export class Profile extends React.Component {
 						/>
 						<FlatButton
 							style={styles.starThanx}
-							label="213,234"
+							label={this.props.countThanx}
 							icon={<StarIcon style={styles.starThanxIcon} />}
 							onTouchTap={this.onStar}
 							rippleColor={window.bgColor1}
@@ -784,7 +785,8 @@ Profile.contextTypes = {
 Profile.propTypes = {
 	cover: React.PropTypes.string.isRequired,
 	avatar: React.PropTypes.string.isRequired,
-	countOffer: React.PropTypes.number.isRequired,
-	countMentor: React.PropTypes.number.isRequired,
-	countFollower: React.PropTypes.number.isRequired,
+	countFollowers: React.PropTypes.number.isRequired,
+	countFollows: React.PropTypes.number.isRequired,
+	countThanx: React.PropTypes.number.isRequired,
+	countStar: React.PropTypes.number.isRequired,
 }

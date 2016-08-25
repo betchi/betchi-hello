@@ -84,6 +84,7 @@ ReactDOM.render(
 			<Route path="/login" component={LoginPage} />
 			<Route path="/register" component={RegisterPage} />
 			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
+			<Route path="/mentoring/new" component={EditMentoringPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
 			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
 			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />

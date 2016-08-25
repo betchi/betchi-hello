@@ -73,7 +73,7 @@ export class MentoringCover extends React.Component {
 				<div style={styles.title}>{this.props.title}</div>
 				<div style={styles.price}>
 					{this.props.datetime}({this.props.duration}分間)<br />
-					現在のオファー{this.props.offerCount}名(募集人数{this.props.limitUserCount}名)<br />
+					現在のオファー{this.props.countOffers}名(募集人数{this.props.maxUserNum}名)<br />
 					{(() => {
 						return this.props.price ? String.fromCharCode(165) + this.props.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段'
 					})()}
@@ -91,13 +91,13 @@ MentoringCover.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 MentoringCover.propTypes = {
-	cover: React.PropTypes.string.isRequired,
 	title: React.PropTypes.string.isRequired,
 	duration: React.PropTypes.number.isRequired,
-	price: React.PropTypes.number.isRequired,
 	datetime: React.PropTypes.string.isRequired,
-	limitUserCount: React.PropTypes.number.isRequired,
-	offerCount: React.PropTypes.number.isRequired,
+	cover: React.PropTypes.string.isRequired,
+	price: React.PropTypes.number.isRequired,
+	maxUserNum: React.PropTypes.number.isRequired,
+	countOffers: React.PropTypes.number.isRequired,
 }
 
 export class MentoringCoverSwipe extends MentoringCover {
@@ -418,10 +418,10 @@ export class MentoringDigest extends React.Component {
 					}
 				})()}
 				{(() => {
-					if (this.props.countFollower != 0) {
+					if (this.props.countFollowers != 0) {
 						return <FlatButton
 							style={styles.button}
-							label={this.props.countFollower}
+							label={this.props.countFollowers}
 							icon={<PersonIcon style={styles.buttonIcon} />}
 							disabled={true}
 							labelStyle={styles.buttonLabel}
@@ -437,13 +437,13 @@ MentoringDigest.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 MentoringDigest.propTypes = {
-	//	userId: React.PropTypes.number.isRequired,
-	avatar: React.PropTypes.string.isRequired,
+	userId: React.PropTypes.number.isRequired,
 	username: React.PropTypes.string.isRequired,
+	avatar: React.PropTypes.string.isRequired,
 	digest: React.PropTypes.string.isRequired,
-	star: React.PropTypes.number.isRequired,
 	countThanx: React.PropTypes.number.isRequired,
-	countFollower: React.PropTypes.number.isRequired,
+	countStar: React.PropTypes.number.isRequired,
+	countFollowers: React.PropTypes.number.isRequired,
 }
 
 export class MentoringDigestWithAvatar extends React.Component {
@@ -543,7 +543,7 @@ export class MentoringCard extends React.Component {
 	}
 
 	onTap(e) {
-		this.context.router.push('/mentoring/' + this.props.id);
+		this.context.router.push({pathname: '/mentoring/' + this.props.id, query: {category:this.props.category}});
 	}
 
 	render() {
@@ -565,22 +565,23 @@ export class MentoringCard extends React.Component {
 				onTouchTap={this.onTap}
 			>
 				<MentoringCover
-					cover={this.props.cover}
 					title={this.props.title}
 					duration={this.props.duration}
-					price={this.props.price}
 					datetime={this.props.datetime}
-					limitUserCount={this.props.limitUserCount}
-					offerCount={this.props.offerCount}
+					cover={this.props.cover}
+					price={this.props.price}
+					maxUserNum={this.props.maxUserNum}
+					countOffers={this.props.countOffers}
 					kind={this.props.kind}
 				/>
 				<MentoringDigest
-					avatar={this.props.avatar}
+					userId={this.props.userId}
 					username={this.props.username}
+					avatar={this.props.avatar}
 					digest={this.props.digest}
 					countThanx={this.props.countThanx}
 					countStar={this.props.countStar}
-					countFollower={this.props.countFollower}
+					countFollowers={this.props.countFollowers}
 				/>
 			</Card>
 		);
@@ -591,17 +592,31 @@ MentoringCard.contextTypes = {
 }
 MentoringCard.propTypes = {
 	id: React.PropTypes.number.isRequired,
-	cover: React.PropTypes.string.isRequired,
 	title: React.PropTypes.string.isRequired,
 	digest: React.PropTypes.string.isRequired,
-	duration: React.PropTypes.number.isRequired,
-	price: React.PropTypes.number.isRequired,
 	datetime: React.PropTypes.string.isRequired,
-	limitUserCount: React.PropTypes.number.isRequired,
-	offerCount: React.PropTypes.number.isRequired,
-	avatar: React.PropTypes.string.isRequired,
+	duration: React.PropTypes.number.isRequired,
+	cover: React.PropTypes.string.isRequired,
+	kind: React.PropTypes.number.isRequired,
+	price: React.PropTypes.number.isRequired,
+	maxUserNum: React.PropTypes.number.isRequired,
+	countInvitations: React.PropTypes.number.isRequired,
+	countOffers: React.PropTypes.number.isRequired,
+	countDeterminations: React.PropTypes.number.isRequired,
+	countHandclap: React.PropTypes.number.isRequired,
+	countStar: React.PropTypes.number.isRequired,
 	countThanx: React.PropTypes.number.isRequired,
-	countFollower: React.PropTypes.number.isRequired,
+	createdAt: React.PropTypes.string.isRequired,
+	modifiedAt: React.PropTypes.string.isRequired,
+
+	userId: React.PropTypes.number.isRequired,
+	username: React.PropTypes.string.isRequired,
+	avatar: React.PropTypes.string.isRequired,
+	countFollowers: React.PropTypes.number.isRequired,
+	countThanx: React.PropTypes.number.isRequired,
+	countStar: React.PropTypes.number.isRequired,
+
+	category: React.PropTypes.string.isRequired,
 }
 
 export class MentoringList extends React.Component {
@@ -626,24 +641,35 @@ export class MentoringList extends React.Component {
 			<section style={styles.root}>
 				{this.props.mentorings.map((mentoring, index) => {
 					const key = "mentoring_list_" + index;
-					return <MentoringCard
-						key={key}
-						id={mentoring.id}
-						cover={mentoring.cover}
-						title={mentoring.title}
-						digest={mentoring.digest}
-						price={mentoring.price}
-						duration={mentoring.duration}
-						datetime={mentoring.day}
-						limitUserCount={10}
-						offerCount={10}
-						avatar={mentoring.avatar}
-						username="ヤマダ太郎"
-						kind={1}
-						countThanx={sessionStorage.user.count_thanx}
-						countStar={sessionStorage.user.count_star}
-						countFollower={sessionStorage.count_follower}
-					/>
+					return (
+						<MentoringCard
+							key={key}
+							id={mentoring.id}
+							userId={mentoring.user_id}
+							title={mentoring.title}
+							digest={mentoring.digest}
+							datetime={mentoring.datetime}
+							duration={mentoring.duration}
+							cover={mentoring.cover}
+							kind={mentoring.kind}
+							price={mentoring.price}
+							maxUserNum={mentoring.max_user_num}
+							countInvitations={mentoring.count_invitations}
+							countOffers={mentoring.count_offers}
+							countDeterminations={mentoring.count_determinations}
+							countHandclap={mentoring.count_handclap}
+							countStar={mentoring.count_star}
+							countThanx={mentoring.count_thanx_messages}
+							createdAt={mentoring.created_at}
+							modifiedAt={mentoring.modified_at}
+							username={mentoring.user.username}
+							avatar={mentoring.user.avatar}
+							countFollowers={mentoring.user.count_followers}
+							countThanx={mentoring.user.count_thanx}
+							countStar={mentoring.user.count_star}
+							category={this.props.category}
+						/>
+					);
 				})}
 			</section>
 		);
@@ -654,5 +680,6 @@ MentoringList.contextTypes = {
 }
 MentoringList.propTypes = {
 	mentorings: React.PropTypes.array.isRequired,
+	category: React.PropTypes.string.isRequired,
 }
 

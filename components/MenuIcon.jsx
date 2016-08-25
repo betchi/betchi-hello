@@ -15,7 +15,7 @@ export class MenuIcon extends React.Component {
 	}
 
 	onCreateMentoring() {
-		this.context.router.push('/mentoring/0/edit');
+		this.context.router.push('/mentoring/new');
 	}
 
 	render() {
@@ -75,6 +75,7 @@ export class MenuIcon extends React.Component {
 						}
 					})()}
 					{(() => {
+						/*
 						if (this.props.userId == sessionStorage.user.id) {
 							return (
 								<FlatButton
@@ -88,6 +89,7 @@ export class MenuIcon extends React.Component {
 								/>
 							);
 						}
+						*/
 					})()}
 					{(() => {
 						if (this.props.userId != sessionStorage.user.id) {

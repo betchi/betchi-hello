@@ -195,6 +195,7 @@ export class TopPage extends React.Component {
 				</HeadRoom>
 				<MentoringList
 					mentorings={this.state.mentorings}
+					category={this.state.category}
 				/>
 				<div style={styles.refreshBox}>
 					<div style={styles.refreshMargin}>

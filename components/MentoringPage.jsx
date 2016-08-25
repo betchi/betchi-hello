@@ -27,9 +27,19 @@ import TimePicker from 'material-ui/TimePicker';
 import SupervisorAccountButton from 'material-ui/svg-icons/action/supervisor-account';
 import {List, ListItem} from 'material-ui/List';
 
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+import ActionFavorite from 'material-ui/svg-icons/action/favorite';
+import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
+import Toggle from 'material-ui/Toggle';
+
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+
 import {MentoringCoverSwipe, MentoringDigest, SelectableCover} from './content.jsx';
 import {ThxMessageList} from './ThxMessageList.jsx';
 import {ContactList} from './ContactList.jsx';
+
+import Intl from 'intl/dist/Intl.min.js';
 
 export class MentoringPage extends React.Component {
 	constructor(props, context) {
@@ -49,6 +59,13 @@ export class MentoringPage extends React.Component {
 				star: 0,
 				digest: '',
 				countThx: 0,
+				user: {
+					username: '',
+					avatar: '',
+					count_thanx: 0,
+					count_star: 0,
+					count_followers: 0,
+				},
 			},
 			snack: {
 				open: false,
@@ -113,7 +130,8 @@ export class MentoringPage extends React.Component {
 
 	onMentoringEdit(e) {
 		console.log("mentoring edit");
-		this.context.router.push({pathname: '/mentoring/' + this.state.mentoring.id + '/edit'});
+		console.log(this.props.location.query.category)
+		this.context.router.push({pathname: '/mentoring/' + this.state.mentoring.id + '/edit', query:{category: this.props.location.query.category}});
 	}
 
 	onSnackClose(e) {
@@ -153,6 +171,7 @@ export class MentoringPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
+			console.log(data.mentoring)
 			this.setState({
 				mentoring: data.mentoring,
 			});
@@ -327,17 +346,18 @@ export class MentoringPage extends React.Component {
 					title={this.state.mentoring.title}
 				/>
 				<MentoringDigest
-					userId={101}
-					avatar={this.state.mentoring.avatar}
-					username="ヤマダ太郎"
-					countThanx={sessionStorage.user.count_thanx}
-					countStar={sessionStorage.user.count_star}
-					countFollower={sessionStorage.user.count_follower}
+					userId={this.state.mentoring.user_id}
+					username={this.state.mentoring.user.username}
+					avatar={this.state.mentoring.user.avatar}
+					digest={this.state.mentoring.digest}
+					countThanx={this.state.mentoring.user.count_thanx}
+					countStar={this.state.mentoring.user.count_star}
+					countFollowers={this.state.mentoring.user.count_followers}
 					onTouchTap={this.onOpenProfile}
 				/>
-				<p style={styles.digest}>{this.state.mentoring.digest}</p>
 				<List style={styles.list}>
-					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.day}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.datetime}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリング時間" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.duration} 分</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="いいね値段" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>10 人</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>12 人</p>} />
@@ -435,18 +455,16 @@ export class EditMentoringPage extends React.Component {
 			mentoring: {
 				id: Number(this.props.params.id),
 				user_id: sessionStorage.user.id,
+				title: '',
+				digest: '',
+				datetime: null,
 				cover: '',
 				covers: [],
-				avatar: '',
-				title: '',
-				duration: 0,
-				price: 0,
-				star: 0,
-				digest: '',
-				day: '',
-				time: '',
 				invitaions: [],
 			},
+			date: null,
+			time: null,
+			category: this.props.location.query.category,
 			covers: [],
 			snack: {
 				open: false,
@@ -466,12 +484,15 @@ export class EditMentoringPage extends React.Component {
 		this.onInputTitle = this.onInputTitle.bind(this);
 		this.onInputDuration = this.onInputDuration.bind(this);
 		this.onInputDigest = this.onInputDigest.bind(this);
-		this.onChangeDay = this.onChangeDay.bind(this);
+		this.onChangeDate = this.onChangeDate.bind(this);
 		this.onChangeTime = this.onChangeTime.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onOpenModal = this.onOpenModal.bind(this);
 		this.onCloseModal = this.onCloseModal.bind(this);
+		this.onChangeCategory = this.onChangeCategory.bind(this);
+		this.onChangeKind = this.onChangeKind.bind(this);
 		self = this;
+		console.log(this.props.location.query.category);
 	}
 
 	componentDidMount() {
@@ -541,17 +562,27 @@ export class EditMentoringPage extends React.Component {
 		})
 	}
 
-	onChangeDay(e, day) {
-		const mentoring = this.state.mentoring;
-		mentoring.day = day;
+	onChangeDate(e, date) {
 		this.setState({
-			mentoring: mentoring,
+			date: date,
 		})
 	}
 
 	onChangeTime(e, time) {
+		this.setState({
+			time: time,
+		})
+	}
+
+	onChangeCategory(event, index, value) {
+		this.setState({
+			category: value,
+		})
+	}
+
+	onChangeKind(event, index, value) {
 		const mentoring = this.state.mentoring;
-		mentoring.time = time;
+		mentoring.kind = value;
 		this.setState({
 			mentoring: mentoring,
 		})
@@ -588,9 +619,25 @@ export class EditMentoringPage extends React.Component {
 			}
 			this.context.router.push('/');
 		}
-		console.log(this.state.mentoring);
-		const json = JSON.stringify({mentoring: this.state.mentoring});
-		console.log(json);
+		var yyyymmdd = this.state.date.getFullYear() + "-" + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-" + this.state.date.getDate();
+		var hhmm = ('0' + this.state.time.getHours()).slice(-2) + ":" + ('0' + this.state.time.getMinutes()).slice(-2);
+		var datetimeString = yyyymmdd + " " + hhmm + ":00";
+		var timestamp = Date.parse(datetimeString);
+		var datetime = new Date(timestamp);
+		var mentoring = {
+			id: this.state.mentoring.id,
+			user_id: this.state.mentoring.user_id,
+			title: this.state.mentoring.title,
+			digest: this.state.mentoring.digest,
+			duration: this.state.mentoring.duration,
+			cover: this.state.mentoring.cover,
+			covers: this.state.mentoring.covers,
+			kind: this.state.mentoring.kind,
+			price: this.state.mentoring.price,
+			datetime: datetime,
+		}
+		console.log(mentoring);
+		const json = JSON.stringify({mentoring: mentoring, category: this.state.category});
 		xhr.send(json);
 		return
 	}
@@ -656,8 +703,12 @@ export class EditMentoringPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
+console.log(data.mentoring);
+			
 			this.setState({
 				mentoring: data.mentoring,
+				date: new Date(data.mentoring.datetime),
+				time: new Date(data.mentoring.datetime),
 			});
 		}
 		xhr.send();
@@ -777,13 +828,21 @@ export class EditMentoringPage extends React.Component {
 				overflowX: 'hidden',
 			}
 		}
+
+		var appBarTitle;
+		if (this.props.params.id == undefined) {
+			appBarTitle = "メンタリング登録";
+		} else {
+			appBarTitle = "メンタリング編集";
+		}
+
 		return (
 			<section style={styles.root}>
 				<HeadRoom
 					style={styles.headroom}
 				>
 					<AppBar
-						title='応援し合う世界へ'
+						title={appBarTitle}
 						titleStyle={styles.title}
 						iconElementLeft={
 							<IconButton
@@ -807,6 +866,8 @@ export class EditMentoringPage extends React.Component {
 					<TextField
 						style={styles.titleText}
 						hintText='教えたいこと（40文字）'
+      					floatingLabelText="教えたいこと（40文字）"
+						floatingLabelFixed={true}
 						errorText={this.state.errorTitle}
 						value={this.state.mentoring.title}
 						onChange={this.onInputTitle}
@@ -814,31 +875,97 @@ export class EditMentoringPage extends React.Component {
 					/>
 					<div style={styles.dateRoot}>
 						<DatePicker
-							hintText="開催日"
+      						floatingLabelText="開催日"
+							floatingLabelFixed={true}
+							hintText="選択"
 							textFieldStyle={styles.dateText}
-							value={this.state.mentoring.day}
-							onChange={this.onChangeDay}
+							value={this.state.date}
+							minDate={new Date()}
+							onChange={this.onChangeDate}
 						/>
 						<TimePicker
-							hintText="開催時刻"
+      						floatingLabelText="開催時刻"
+							floatingLabelFixed={true}
+							hintText="選択"
 							textFieldStyle={styles.dateText}
 							format="24hr"
-							value={this.state.mentoring.time}
+							value={this.state.time}
 							onChange={this.onChangeTime}
 						/>
 						<TextField
 							style={styles.dateText}
-							hintText='何分間'
+      						floatingLabelText="メンタリング時間(分)"
+							floatingLabelFixed={true}
+							hintText=""
 							errorText={this.state.errorDuration}
-							value={this.state.mentoring.Duration}
+							value={this.state.mentoring.duration}
 							type="number"
 							onChange={this.onInputDuration}
 							ref='durationTextField'
 						/>
 					</div>
+					<div style={styles.dateRoot}>
+						<TextField
+							style={styles.dateText}
+      						floatingLabelText="金額"
+							floatingLabelFixed={true}
+							hintText=""
+							errorText={this.state.errorPrice}
+							value={this.state.mentoring.price}
+							type="number"
+							onChange={this.onInputPrice}
+							ref='priceTextField'
+						/>
+						<TextField
+							style={styles.dateText}
+      						floatingLabelText="募集人数"
+							floatingLabelFixed={true}
+							hintText=''
+							errorText={this.state.errorMaxUserNum}
+							value={this.state.mentoring.max_user_num}
+							type="number"
+							onChange={this.onInputMaxUserNum}
+							ref='maxUserNumTextField'
+						/>
+					</div>
+					<div style={styles.dateRoot}>
+						<SelectField
+							value={this.state.category}
+							onChange={this.onChangeCategory}
+							floatingLabelText="カテゴリ"
+							floatingLabelFixed={true}
+							hintText="選択"
+							fullWidth={true}
+						>
+							<MenuItem value="business" primaryText="ビジネス" />
+							<MenuItem value="design" primaryText="デザイン" />
+							<MenuItem value="programming" primaryText="プログラム" />
+							<MenuItem value="language" primaryText="言語" />
+							<MenuItem value="sports" primaryText="スポーツ" />
+							<MenuItem value="life" primaryText="ライフ" />
+							<MenuItem value="education" primaryText="教育" />
+							<MenuItem value="university" primaryText="大学" />
+							<MenuItem value="music" primaryText="音楽" />
+						</SelectField>
+					</div>
+					<div style={styles.dateRoot}>
+						<SelectField
+							value={this.state.mentoring.kind}
+							onChange={this.onChangeKind}
+							floatingLabelText="メンタリングタイプ"
+							floatingLabelFixed={true}
+							hintText="選択"
+							fullWidth={true}
+						>
+							<MenuItem key={1} value={1} primaryText="通常" />
+							<MenuItem key={2} value={2} primaryText="ライブ配信" />
+						</SelectField>
+					</div>
 					<TextField
 						style={styles.digestText}
-						hintText='事前メッセージ・告知'
+						hintText=""
+      					floatingLabelText="事前メッセージ・告知"
+						floatingLabelFixed={true}
 						errorText={this.state.errorDigest}
 						value={this.state.mentoring.digest}
 						onChange={this.onInputDigest}
