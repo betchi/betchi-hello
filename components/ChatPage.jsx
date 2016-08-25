@@ -148,7 +148,6 @@ export class ChatPage extends React.Component {
 
 		ws.onmessage = function(e) {
 			var model = JSON.parse(e.data);
-console.log(model.registerd_at);
 			var date = new Date(model.registerd_at);
 			var mmdd = (date.getMonth() + 1) + "/" + date.getDate();
 			var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );

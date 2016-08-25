@@ -128,7 +128,6 @@ export class MentoringPage extends React.Component {
 
 	onMentoringEdit(e) {
 		console.log("mentoring edit");
-		console.log(this.props.location.query.category)
 		this.context.router.push({pathname: '/mentoring/' + this.state.mentoring.id + '/edit', query:{category: this.props.location.query.category}});
 	}
 
@@ -329,6 +328,11 @@ export class MentoringPage extends React.Component {
 			},
 		}
 		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
+		//var datetime = this.state.mentoring.datetime;
+		var datetime = new Date(this.state.mentoring.datetime);
+		var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
+		var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);
+		var datetimeString = yyyymmdd + " " + hhmm;
 
 		return (
 			<section style={styles.root}>
@@ -354,16 +358,23 @@ export class MentoringPage extends React.Component {
 					onTouchTap={this.onOpenProfile}
 				/>
 				<List style={styles.list}>
-					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.datetime}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="カテゴリ" secondaryText={<p style={styles.secondaryText}>{this.props.location.query.category}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{datetimeString}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリング時間" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.duration} 分</p>} />
-					<ListItem style={styles.listItem} disabled={true} primaryText="いいね値段" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="金額" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>10 人</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>12 人</p>} />
 				</List>
-				<ThxMessageList
-					key={'thx-message_' + this.props.params.id}
-					messages={this.state.messages}
-				/>
+				{(() => {
+					if (this.state.messages.length != 0) {
+						return (
+							<ThxMessageList
+								key={'thx-message_' + this.props.params.id}
+								messages={this.state.messages}
+							/>
+						);
+					}
+				})()}
 				<div style={styles.refreshBox}>
 					<div style={styles.refreshMargin}>
 						<RefreshIndicator
