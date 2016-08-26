@@ -92,8 +92,11 @@ export class ChatPage extends React.Component {
 		mentoringTitle = this.props.params.mentoringTitle;
 		name = sessionStorage.user.username;
 		isDoneFirstShow = false;
-
-		ws = new WebSocket("wss://ws-mentor.fairway.ne.jp/room/" + mentoringId + "/user/" + sessionStorage.user.id + "/code/" + mentoringId + "-" + offerUserId);
+		var wsDomain = "ws-mentor.fairway.ne.jp";
+		if (process.env.NODE_ENV == "staging") {
+			wsDomain = "minobe-ws-mentor.fairway.ne.jp";
+		}
+		ws = new WebSocket("wss://" + wsDomain + "/room/" + mentoringId + "/user/" + sessionStorage.user.id + "/code/" + mentoringId + "-" + offerUserId);
 
 		ws.onopen = function(e) {
 			console.log("onopen");
