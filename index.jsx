@@ -76,22 +76,41 @@ function requireAuth(next, replace) {
 	xhr.send();
 }
 
+var Parent = React.createClass({
+    childContextTypes: {
+        categories: React.PropTypes.array,
+    },
+
+    getChildContext: function () {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/categories.json', false);
+		xhr.send();
+		let data = JSON.parse(xhr.responseText);
+		return data;
+    },
+
+    render: function () {
+        return (
+			<MuiThemeProvider muiTheme={getMuiTheme()}>
+				<Router history={hashHistory}>
+					<Route path="/" component={TopPage} onEnter={requireAuth} />
+					<Route path="/top" component={TopPage} onEnter={requireAuth} />
+					<Route path="/login" component={LoginPage} />
+					<Route path="/register" component={RegisterPage} />
+					<Route path="/search" component={SearchPage} onEnter={requireAuth} />
+					<Route path="/mentoring/new" component={EditMentoringPage} onEnter={requireAuth} />
+					<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
+					<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
+					<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
+					<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
+					<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
+				</Router>
+			</MuiThemeProvider>
+		);
+    }
+});
+
 ReactDOM.render(
-	<MuiThemeProvider muiTheme={getMuiTheme()}>
-		<Router history={hashHistory}>
-			<Route path="/" component={TopPage} onEnter={requireAuth} />
-			<Route path="/top" component={TopPage} onEnter={requireAuth} />
-			<Route path="/login" component={LoginPage} />
-			<Route path="/register" component={RegisterPage} />
-			<Route path="/search" component={SearchPage} onEnter={requireAuth} />
-			<Route path="/mentoring/new" component={EditMentoringPage} onEnter={requireAuth} />
-			<Route path="/mentoring/:id" component={MentoringPage} onEnter={requireAuth} />
-			<Route path="/mentoring/:id/edit" component={EditMentoringPage} onEnter={requireAuth} />
-			<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
-			<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
-			<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
-		</Router>
-	</MuiThemeProvider>
-	,document.getElementById("content")
+	<Parent />, document.getElementById("content")
 );
 

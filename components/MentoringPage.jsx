@@ -950,15 +950,15 @@ console.log(data.mentoring);
 							hintText="選択"
 							fullWidth={true}
 						>
-							<MenuItem value="business" primaryText="ビジネス" />
-							<MenuItem value="design" primaryText="デザイン" />
-							<MenuItem value="programming" primaryText="プログラム" />
-							<MenuItem value="language" primaryText="言語" />
-							<MenuItem value="sports" primaryText="スポーツ" />
-							<MenuItem value="life" primaryText="ライフ" />
-							<MenuItem value="education" primaryText="教育" />
-							<MenuItem value="university" primaryText="大学" />
-							<MenuItem value="music" primaryText="音楽" />
+							{(() => {
+								if (Array.isArray(this.context.categories)) {
+									var menuItems = [];
+									for (var i = 0; i < this.context.categories.length; i++) {
+										menuItems.push(<MenuItem key={i} value={this.context.categories[i].value} primaryText={this.context.categories[i].label} />)
+									}
+									return menuItems;
+								}
+							})()}
 						</SelectField>
 					</div>
 					<div style={styles.dateRoot}>
@@ -1022,7 +1022,8 @@ console.log(data.mentoring);
 	}
 }
 EditMentoringPage.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	categories: React.PropTypes.array.isRequired,
 }
 EditMentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired

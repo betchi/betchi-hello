@@ -228,17 +228,7 @@ export class TopTab extends React.Component {
 		super(props, context);
 		this.state = {
 			tab: 0,
-			categories: [
-				{label: 'ビジネス', value: 'business'},
-				{label: 'デザイン', value: 'design'},
-				{label: 'プログラム', value: 'programming'},
-				{label: '言語', value: 'language'},
-				{label: 'スポーツ', value: 'sports'},
-				{label: 'ライフ', value: 'life'},
-				{label: '教育', value: 'education'},
-				{label: '大学', value: 'university'},
-				{label: '音楽', value: 'music'},
-			],
+			categories: this.context.categories,
 		};
 		this.onChangeTab = this.onChangeTab.bind(this);
 	}
@@ -333,7 +323,8 @@ export class TopTab extends React.Component {
 	}
 }
 TopTab.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	categories: React.PropTypes.array.isRequired,
 }
 
 TopTab.propTypes = {
