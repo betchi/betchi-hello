@@ -635,7 +635,7 @@ export class EditMentoringPage extends React.Component {
 		}
 		var yyyymmdd = this.state.date.getFullYear() + "-" + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-" + this.state.date.getDate();
 		var hhmm = ('0' + this.state.time.getHours()).slice(-2) + ":" + ('0' + this.state.time.getMinutes()).slice(-2);
-		var datetimeString = yyyymmdd + " " + hhmm + ":00";
+		var datetimeString = yyyymmdd + "T" + hhmm + ":00+09:00"; // Date.parse()のためISO8601形式に変換
 		var timestamp = Date.parse(datetimeString);
 		var datetime = new Date(timestamp);
 		var mentoring = {
@@ -912,7 +912,7 @@ console.log(data.mentoring);
 							hintText=""
 							errorText={this.state.errorDuration}
 							value={this.state.mentoring.duration}
-							type="number"
+							type="text"
 							onChange={this.onInputDuration}
 							ref='durationTextField'
 						/>
@@ -922,10 +922,11 @@ console.log(data.mentoring);
 							style={styles.dateText}
       						floatingLabelText="金額"
 							floatingLabelFixed={true}
-							hintText=""
+							hintText="いいね価格"
 							errorText={this.state.errorPrice}
 							value={this.state.mentoring.price}
-							type="number"
+							type="text"
+							disabled={true}
 							onChange={this.onInputPrice}
 							ref='priceTextField'
 						/>
@@ -936,7 +937,7 @@ console.log(data.mentoring);
 							hintText=''
 							errorText={this.state.errorMaxUserNum}
 							value={this.state.mentoring.max_user_num}
-							type="number"
+							type="text"
 							onChange={this.onInputMaxUserNum}
 							ref='maxUserNumTextField'
 						/>
