@@ -11,12 +11,15 @@ import SettingsIcon from 'material-ui/svg-icons/action/settings.js';
 import EditorModeIcon from 'material-ui/svg-icons/editor/mode-edit.js';
 import StarIcon from 'material-ui/svg-icons/toggle/star';
 import CommunicationEmailIcon from 'material-ui/svg-icons/communication/email.js';
+import ExitToAppIcon from 'material-ui/svg-icons/action/exit-to-app.js';
 import FlatButton from 'material-ui/FlatButton';
 import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
 
 import {ThxMessageList} from './ThxMessageList.jsx';
 import {RatingStar} from './content.jsx';
@@ -496,7 +499,16 @@ MyPage.propTypes = {
 export class Profile extends React.Component {
 	constructor(props, context) {
 		super(props, context);
-		this.onProfileEdit = this.onProfileEdit.bind(this);
+		this.state = {
+			profileEditDialog: {
+				open: false,
+			},
+			user: {
+				username: this.props.username,
+			},
+		};
+		this.onProfileEditOpen = this.onProfileEditOpen.bind(this);
+		this.onProfileEditClose = this.onProfileEditClose.bind(this);
 		this.onFollow = this.onFollow.bind(this);
 		this.onFollower = this.onFollower.bind(this);
 		this.onThanx = this.onThanx.bind(this);
@@ -504,10 +516,47 @@ export class Profile extends React.Component {
 		this.onProfilePhotoEdit = this.onProfilePhotoEdit.bind(this);
 		this.onCoverPhotoEdit= this.onCoverPhotoEdit.bind(this);
 		this.onBack = this.onBack.bind(this);
+		this.onLogout = this.onLogout.bind(this);
 	}
 
-	onProfileEdit() {
-		console.log("onProfileEdit");
+	componentDidMount() {
+	}
+
+	onProfileEditOpen() {
+		console.log("onProfileEditOpen");
+			/*
+		this.state = {
+			profileEditDialog: {
+				open: true,
+			}
+		};
+			 */
+	}
+
+	onProfileEditClose() {
+		console.log("onProfileEditClose");
+			/*
+		this.state = {
+			profileEditDialog: {
+				open: false,
+			}
+		};
+			 */
+	}
+
+	onLogout(e) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/logout', false); // synchronous
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				return;
+			}   
+			const data = JSON.parse(xhr.responseText);
+			if (!data.ok) {
+			}   
+		};  
+		xhr.send();
+		this.context.router.push('/login');
 	}
 
 	onFollow() {
@@ -640,7 +689,6 @@ export class Profile extends React.Component {
 				lineHeight: '1rem',
 				minWidth: 'auto',
 				width: '90%',
-				zIndex: 10000,
 				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
 			},
 			profileEditButtonIconStyle: {
@@ -716,11 +764,27 @@ export class Profile extends React.Component {
 				borderRadius: '50%',
 				padding: '5px',
 			},
+			exitButton: {
+				position: 'absolute',
+				top: '1%',
+				right: '1%',
+				zIndex: '200',
+			},
+			exitIcon: {
+				color: window.textColor1,
+			},
 		};
 
 		return (
 			<div style={styles.root}>
 				<div style={styles.coverRoot}>
+					<IconButton
+						style={styles.exitButton}
+						iconStyle={styles.exitIcon}
+						onTouchTap={this.onLogout}
+					>
+						<ExitToAppIcon />
+					</IconButton>
 					{(() => {
 						if (this.props.userId != sessionStorage.user.id) {
 							return (
@@ -768,15 +832,33 @@ export class Profile extends React.Component {
 					<img style={styles.avatar} src={this.props.avatar} />
 					<div style={styles.username}>{this.props.username}
 						{(() => {
+							console.log(this.state);
 							if (this.props.userId == sessionStorage.user.id) {
 								return (
 									<div style={styles.profileEditButtonWrap}>
 										<FlatButton
 											style={styles.profileEditButton}
 											icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
-											onTouchTap={this.onProfileEdit}
+											onTouchTap={this.onProfileEditOpen}
 											rippleColor={window.bgColor1}
 										/>
+<Dialog
+	title="名前を変更"
+	actions={<FlatButton
+		label="Ok"
+		primary={true}
+		keyboardFocused={true}
+		onTouchTap={this.onProfileEditClose}
+	/>}
+	modal={false}
+	open={this.state.profileEditDialog.open}
+	onRequestClose={this.onProfileEditClose}
+>
+	<TextField
+          id="text-field-controlled"
+          value={this.state.user.username}
+	/>
+</Dialog>
 									</div>
 								);
 							}
@@ -813,8 +895,10 @@ Profile.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 Profile.propTypes = {
+	userId: React.PropTypes.number.isRequired,
 	cover: React.PropTypes.string.isRequired,
 	avatar: React.PropTypes.string.isRequired,
+	username: React.PropTypes.string.isRequired,
 	countFollowers: React.PropTypes.number.isRequired,
 	countFollows: React.PropTypes.number.isRequired,
 	countThanx: React.PropTypes.number.isRequired,
