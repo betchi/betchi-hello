@@ -213,21 +213,19 @@ export class MyPage extends React.Component {
 				fontWeight: 'normal',
 			},
 			listItemDiv: {
-				backgroundColor: window.bgColor2,
 				backgroundImage: "url('/cover.jpg')",
 				backgroundRepeat: 'no-repeat',
 				backgroundSize: 'contain',
-				border: '1px solid',
-				borderColor: window.bgColor1,
-				color: window.textColor1,
+				borderBottom: '1px solid ' + this.context.colors.lightGrey,
 				paddingLeft: '130px',
 			},
 			listItemSecondary: {
-				color:window.textColor1,
 				fontWeight: 'normal',
 			},
 			listItemAvatar: {
 				marginLeft: '25px',
+			},
+			tabs: {
 			},
 			tab: {
 				fontWeight: 'normal',
@@ -243,12 +241,11 @@ export class MyPage extends React.Component {
 				left: '2.5%',
 				fontSize: '0.5rem',
 				padding: '0 0.1rem',
-				color: 'white',
+				color: this.context.colors.white,
 				width: '3.3rem',
 				textAlign: 'center',
-				border: '1px solid',
-				borderColor: window.textColor1,
 				marginLeft: '23px',
+				border: '1px solid ' + this.context.colors.white,
 			},
 			mentoringLabelDecision: {
 				backgroundColor: '#558B2F',
@@ -260,12 +257,11 @@ export class MyPage extends React.Component {
 				left: '2.5%',
 				fontSize: '0.5rem',
 				padding: '0 0.1rem',
-				color: 'white',
+				color: this.context.colors.white,
 				width: '3.3rem',
 				textAlign: 'center',
-				border: '1px solid',
-				borderColor: window.textColor1,
 				marginLeft: '23px',
+				border: '1px solid ' + this.context.colors.white,
 			},
 			mentoringLabelClose: {
 				backgroundColor: '#616161',
@@ -277,12 +273,11 @@ export class MyPage extends React.Component {
 				left: '2.5%',
 				fontSize: '0.5rem',
 				padding: '0 0.1rem',
-				color: 'white',
+				color: this.context.colors.white,
 				width: '3.3rem',
 				textAlign: 'center',
-				border: '1px solid',
-				borderColor: window.textColor1,
 				marginLeft: '23px',
+				border: '1px solid ' + this.context.colors.white,
 			},
 			addButton: {
 				position: 'fixed',
@@ -306,7 +301,8 @@ export class MyPage extends React.Component {
 				/>
 				<MenuIcon userId={this.props.params.id} />
 				<Tabs
-					inkBarStyle={{backgroundColor:window.borderColor1}}
+					inkBarStyle={{backgroundColor:this.context.colors.fluorescent1}}
+					style={styles.tabs}
 				>
 					<Tab
 						label="作成したもの (2)"
@@ -490,7 +486,8 @@ export class MyPage extends React.Component {
 	}
 }
 MyPage.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 MyPage.propTypes = {
 	params: React.PropTypes.object.isRequired
@@ -608,7 +605,7 @@ export class Profile extends React.Component {
 			},
 			username: {
 				fontSize: '1.5rem',
-				color: 'white',
+				color: this.context.colors.white,
 				fontWeight: 'bolder',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
 				position: 'absolute',
@@ -625,7 +622,9 @@ export class Profile extends React.Component {
 				bottom: 0,
 				margin: 'auto',
 				borderRadius: '50%',
-				width: '35%'
+				width: '35%',
+				border: '1px solid ' + this.context.colors.grey,
+				boxShadow: '1px 1px 1px rgba(200,200,200,1)',
 			},
 			starBox: {
 				display: 'flex',
@@ -678,12 +677,11 @@ export class Profile extends React.Component {
 			},
 			profileEditButton: {
 				border: '1px solid',
-				borderColor: window.textColor1,
+				borderColor: this.context.colors.white,
 				display: 'inline-block',
 				borderRadius: '1rem',
-				color: this.props.color,
 				margin: '5px',
-				backgroundColor: 'white',
+				backgroundColor: this.context.colors.white,
 				opacity: 0.6,
 				height: '1.5rem',
 				lineHeight: '1rem',
@@ -703,16 +701,14 @@ export class Profile extends React.Component {
 				textAlign: 'center',
 			},
 			follower: {
-				fontSize: '0.8rem',
-				color: window.textColor1,
+				color: this.context.colors.white,
 				width: '48%',
 				float: 'left',
 				marginRight: '2%',
 				textAlign: 'right',
 			},
 			follow: {
-				fontSize: '0.8rem',
-				color: window.textColor1,
+				color: this.context.colors.white,
 				width: '48%',
 				float: 'left',
 				marginLeft: '2%',
@@ -737,7 +733,7 @@ export class Profile extends React.Component {
 				left: '0.5rem',
 			},
 			starThanx: {
-				backgroundColor: window.textColor1,
+				backgroundColor: this.context.colors.white,
 				margin: '0.5rem',
 				minWidth: 'auto',
 				width: '25%',
@@ -745,12 +741,10 @@ export class Profile extends React.Component {
 				opacity: 0.9,
 			},
 			starThanxIcon: {
-				color: window.textColor2,
 				opacity: 0.8,
 				marginLeft: 0,
 			},
 			starThanxLabel: {
-				color: window.textColor2,
 				opacity: 0.8,
 				padding: 0,
 			},
@@ -759,32 +753,76 @@ export class Profile extends React.Component {
 				zIndex: '200',
 			},
 			backIcon2: {
-				color: 'white',
+				backgroundColor: this.context.colors.white,
 				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
 				borderRadius: '50%',
 				padding: '5px',
 			},
+			/*
 			exitButton: {
+				backgroundColor: this.context.colors.white,
+				opacity: 0.6,
+				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
+				borderRadius: '1rem',
+				border: '1px solid ' + this.context.colors.grey,
 				position: 'absolute',
 				top: '1%',
 				right: '1%',
 				zIndex: '200',
 			},
 			exitIcon: {
-				color: window.textColor1,
+				color: this.context.colors.grey,
+			},
+			*/
+			exitButtonWrap: {
+				position: 'absolute',
+				top: '0.5rem',
+				right: '0.5rem',
+			},
+			exitButton: {
+				border: '1px solid ' + this.context.colors.grey,
+				display: 'inline-block',
+				borderRadius: '1rem',
+				color: this.props.color,
+				margin: '5px',
+				backgroundColor: this.context.colors.white,
+				opacity: 0.6,
+				height: '2rem',
+				lineHeight: '1rem',
+				minWidth: 'auto',
+				zIndex: 2,
+				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
+			},
+			exitButtonIconStyle: {
+				width: '1rem',
+				height: '1rem',
+				margin: '0.2rem 0.5rem',
+			},
+			exitButtonLabelStyle: {
+				fontSize:'0.7rem',
+				padding:'0 0.2rem',
 			},
 		};
 
 		return (
 			<div style={styles.root}>
 				<div style={styles.coverRoot}>
-					<IconButton
-						style={styles.exitButton}
-						iconStyle={styles.exitIcon}
-						onTouchTap={this.onLogout}
-					>
-						<ExitToAppIcon />
-					</IconButton>
+					{(() => {
+						if (this.props.userId == sessionStorage.user.id) {
+							return (
+								<div style={styles.exitButtonWrap}>
+									<FlatButton
+										style={styles.exitButton}
+										label={this.props.name}
+										icon={<ExitToAppIcon style={styles.exitButtonIconStyle} />}
+										onTouchTap={this.onLogout}
+										rippleColor={this.props.rippleColor}
+										labelStyle={styles.exitButtonLabelStyle}
+									/>
+								</div>
+							);
+						}
+					})()}
 					{(() => {
 						if (this.props.userId != sessionStorage.user.id) {
 							return (
@@ -802,7 +840,7 @@ export class Profile extends React.Component {
 						if (this.props.userId == sessionStorage.user.id) {
 							return (
 								<div style={styles.profilePhotoEditChipWrap}>
-									<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onProfilePhotoEdit} rippleColor={window.bgColor1} />
+									<PhotoEditChip name={"編集"} color={this.context.colors.text1} backgroundColor={this.context.colors.white} onTouchTap={this.onProfilePhotoEdit} />
 									<input
 										ref="profilePhotoFileEdit"
 										type="file" 
@@ -817,7 +855,7 @@ export class Profile extends React.Component {
 						if (this.props.userId == sessionStorage.user.id) {
 							return (
 								<div style={styles.coverPhotoEditChipWrap}>
-									<PhotoEditChip name={"編集"} color={window.textColor2} backgroundColor="white" onTouchTap={this.onCoverPhotoEdit} rippleColor={window.bgColor1} />
+									<PhotoEditChip name={"編集"} color={this.context.colors.text1} backgroundColor={this.context.colors.white} onTouchTap={this.onCoverPhotoEdit} />
 									<input
 										ref="coverPhotoFileEdit"
 										type="file" 
@@ -840,7 +878,6 @@ export class Profile extends React.Component {
 											style={styles.profileEditButton}
 											icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
 											onTouchTap={this.onProfileEditOpen}
-											rippleColor={window.bgColor1}
 										/>
 <Dialog
 	title="名前を変更"
@@ -874,7 +911,6 @@ export class Profile extends React.Component {
 							label={this.props.countStar}
 							icon={<CommunicationEmailIcon style={styles.starThanxIcon} />}
 							onTouchTap={this.onThanx}
-							rippleColor={window.bgColor1}
 							labelStyle={styles.starThanxLabel}
 						/>
 						<FlatButton
@@ -882,7 +918,6 @@ export class Profile extends React.Component {
 							label={this.props.countThanx}
 							icon={<StarIcon style={styles.starThanxIcon} />}
 							onTouchTap={this.onStar}
-							rippleColor={window.bgColor1}
 							labelStyle={styles.starThanxLabel}
 						/>
 					</div>
@@ -892,7 +927,8 @@ export class Profile extends React.Component {
 	}
 };
 Profile.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 Profile.propTypes = {
 	userId: React.PropTypes.number.isRequired,

@@ -167,8 +167,7 @@ export class TopPage extends React.Component {
 				textAlign: 'center',
 				letterSpacing: '5px',
 				fontWeight: 'bold',
-				backgroundColor : window.bgColor1,
-				color: window.textColor1,
+				fontSize: '1.1rem',
 				zIndex: '10001',
 			},  
 			title: {
@@ -220,7 +219,8 @@ export class TopPage extends React.Component {
 	}
 }
 TopPage.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 
 export class TopTab extends React.Component {
@@ -228,7 +228,6 @@ export class TopTab extends React.Component {
 		super(props, context);
 		this.state = {
 			tab: 0,
-			categories: this.context.categories,
 		};
 		this.onChangeTab = this.onChangeTab.bind(this);
 	}
@@ -237,7 +236,7 @@ export class TopTab extends React.Component {
 		this.setState({
 			tab: tab,
 		});
-		let category = this.state.categories[tab];
+		let category = this.context.categories[tab];
 		this.props.loadContents(category.value);
 
 		// scroll tab
@@ -292,14 +291,14 @@ export class TopTab extends React.Component {
 				WebkitTransform: 'translateZ(0px)',
 			},
 			tabs: {
-				width: '210%',
-				backgroundColor: window.bgColor1,
-				color: window.textColor1,
+				width: '260%',
 			},
 			tab: {
 				letterSpacing: '2px',
-				backgroundColor: window.bgColor1,
-				color: window.textColor1,
+				backgroundColor: this.context.colors.bg1,
+				fontSize: '1.1rem',
+				fontWeight: 'bold',
+				color: this.context.colors.text1,
 			},
 		};
 		return (
@@ -309,9 +308,9 @@ export class TopTab extends React.Component {
 						value={this.state.tab}
 						onChange={this.onChangeTab}
 						style={styles.tabs}
-						inkBarStyle={{backgroundColor:window.borderColor1}}
+						inkBarStyle={{backgroundColor:this.context.colors.fluorescent1}}
 					>
-						{this.state.categories.map(function(row, index) {
+						{this.context.categories.map(function(row, index) {
 							return (
 								<Tab style={styles.tab} key={row.value} label={row.label} value={index} />
 							);
@@ -325,6 +324,7 @@ export class TopTab extends React.Component {
 TopTab.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	categories: React.PropTypes.array.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 
 TopTab.propTypes = {

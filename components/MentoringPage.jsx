@@ -168,7 +168,6 @@ export class MentoringPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
-			console.log(data.mentoring)
 			this.setState({
 				mentoring: data.mentoring,
 			});
@@ -236,7 +235,6 @@ export class MentoringPage extends React.Component {
 	render() {
 		const styles = {
 			root: {
-				backgroundColor: window.bgColor1,
 			},
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
@@ -249,12 +247,10 @@ export class MentoringPage extends React.Component {
 				fontWeight: 'bold',
 			},
 			digest: {
-				background: window.bgColor1,
 				fontSize: '0.8rem',
 				width: '96%',
 				margin: 0,
 				padding: '0 2% 2% 2%',
-				color: window.textColor1,
 			},
 			refreshBox: {
 				position: 'relative',
@@ -278,15 +274,13 @@ export class MentoringPage extends React.Component {
 				width: '46%',
 				margin: '2%',
 				boxShadow: '2px 2px 2px rgba(1, 1, 1, 0.5)',
-				backgroundColor: window.buttonColor1,
-				border: '1px solid',
-				borderColor: window.bgColor1,
+				backgroundColor: this.context.colors.bg3,
 				borderRadius: '0.2rem',
 				height: '3rem',
-				color: 'white',
+				color: this.context.colors.white,
 			},
 			buttonLabel: {
-				color: 'white',
+				color: this.context.colors.white,
 				paddingRight: 0,
 			},
 			buttonIcon: {
@@ -297,7 +291,7 @@ export class MentoringPage extends React.Component {
 				zIndex: '200',
 			},
 			backIcon2: {
-				color: 'white',
+				color: this.context.colors.white,
 				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
 				borderRadius: '50%',
 				padding: '5px',
@@ -306,27 +300,22 @@ export class MentoringPage extends React.Component {
 				fontSize: '1rem',
 				fontWeight: 'normal',
 				width: '100%',
-				backgroundColor: window.bgColor2,
-				color: window.textColor1,
+				color: this.context.colors.white,
 				textAlign: 'center',
 				margin: '1rem 0 0 0',
 			},
 			list: {
-				paddingTop: 0,
 				clear: 'both',
+				fontWeight: 'bold',
+				borderTop: '1px solid ' + this.context.colors.grey,
 			},
 			listItem: {
-				backgroundColor: window.bgColor2,
-				color: window.textColor1,
-				border: '1px solid',
-				borderColor: window.bgColor1,
-				fontSize: '0.8rem',
 			},
 			secondaryText: {
-				color: window.textColor1,
 				float: 'right',
 				marginTop: '-1rem',
-				fontSize: '0.8rem',
+				fontSize: '1.1rem',
+				color: this.context.colors.text1,
 			},
 		}
 		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
@@ -451,7 +440,8 @@ export class MentoringPage extends React.Component {
 	}
 }
 MentoringPage.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 MentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired
@@ -478,18 +468,16 @@ export class EditMentoringPage extends React.Component {
 			date: null,
 			time: null,
 			category: this.props.location.query.category,
-			covers: [],
 			snack: {
 				open: false,
 				message: '',
 			},
-			page: 1,
 			selectMemberLabel: defaultSelectMemberLabel,
 			modalIsOpen: false,
+			coverIndex: 0,
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.loadContents = this.loadContents.bind(this);
-		this.loadCovers = this.loadCovers.bind(this);
 		this.onScroll = this.onScroll.bind(this);
 		this.onBack = this.onBack.bind(this);
 		this.onFollow = this.onFollow.bind(this);
@@ -511,7 +499,6 @@ export class EditMentoringPage extends React.Component {
 		if (this.props.params.id != undefined) {
 			this.loadContents(this.props.params.id);
 		}
-		this.loadCovers();
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -540,15 +527,16 @@ export class EditMentoringPage extends React.Component {
 		})
 	}
 
-	onCoverSelected(img) {
+	onCoverSelected(cover, index) {
 		const mentoring = this.state.mentoring;
 		if (mentoring.cover == '') {
 			mentoring.covers.shift();
 		}
-		mentoring.covers.push(img);
+		mentoring.covers.push(cover.url);
 		mentoring.cover = mentoring.covers[0];
 		this.setState({
 			mentoring: mentoring,
+			coverIndex: mentoring.covers.length,
 		});
 	}
 
@@ -650,8 +638,11 @@ export class EditMentoringPage extends React.Component {
 			price: this.state.mentoring.price,
 			datetime: datetime,
 		}
-		console.log(mentoring);
-		const json = JSON.stringify({mentoring: mentoring, category: this.state.category});
+		const json = JSON.stringify({
+			mentoring: mentoring,
+			before_category: this.props.location.query.category,
+			after_category: this.state.category,
+		});
 		xhr.send(json);
 		return
 	}
@@ -676,7 +667,6 @@ export class EditMentoringPage extends React.Component {
 
 		let mentoring = this.state.mentoring;
 		mentoring.invitaions = invitaions;
-		console.log(mentoring);
 		let selectMemberLabel;
 		if (selectedAvatarListCount !== 0) {
 			selectMemberLabel = selectedAvatarListCount + '名を招待しようとしています';
@@ -717,54 +707,11 @@ export class EditMentoringPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
-console.log(data.mentoring);
 			this.setState({
 				mentoring: data.mentoring,
 				date: new Date(data.mentoring.datetime),
 				time: new Date(data.mentoring.datetime),
 			});
-		}
-		xhr.send();
-	}
-
-	loadCovers(category = 'all', page = 1) {
-		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/api/cover_mentoring/' + category + '/' + page);
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '通信に失敗しました。',
-					},
-				});
-				return;
-			}
-			let covers = [];
-			let data = JSON.parse(xhr.responseText);
-			if (page === 1) {
-				covers = data.images;
-			} else {
-				covers = this.state.covers.slice();
-				for (var ii in data.images) {
-					covers.push(data.images[ii]);
-				}
-			}
-			this.setState({
-				covers: covers,
-			});
-			this.state.page = page;
-
-			if (covers.length == 0) {
-				this.setState({
-					snack: {
-						open: true,
-						message: 'カバー画像が見つかりません。',
-					},
-				});
-				return;
-			}
-			//window.addEventListener('scroll', this.onScroll);
 		}
 		xhr.send();
 	}
@@ -793,12 +740,6 @@ console.log(data.mentoring);
 			offer: {
 				width: '100%',
 			},
-			titleText: {
-				fontSize: '0.8rem',
-				width: '90%',
-				margin: '0 5%',
-				lineHeight: '1.5rem',
-			},
 			dateRoot: {
 				display: 'flex',
 				flexFlow: 'row nowrap',
@@ -807,15 +748,14 @@ console.log(data.mentoring);
 			},
 			dateText: {
 				width: '100%',
-				fontSize: '0.8rem',
 				lineHeight: '1.5rem',
 				flexGrow: 1,
+				fontSize: '1.5rem',
+				color: this.context.colors.grey,
 			},
-			digestText: {
-				width: '90%',
-				margin: '0 5%',
-				fontSize: '0.8rem',
-				lineHeight: '1.5rem',
+			selectCoverTitle: {
+				fontSize: '1.1rem',
+				color: this.context.colors.grey,
 			},
 		}
 		const modalStyles = {
@@ -839,7 +779,7 @@ console.log(data.mentoring);
 				backgroundColor: "white",
 				borderRadius: '5px',
 				overflowX: 'hidden',
-			}
+			},
 		}
 
 		var appBarTitle;
@@ -867,30 +807,37 @@ console.log(data.mentoring);
 						}
 					/>
 				</HeadRoom>
-				<MentoringCoverSwipe
-					covers={this.state.mentoring.covers}
-					title={this.state.mentoring.title}
-				/>
-				<SelectableCover
-					images={this.state.covers}
-					onTap={this.onCoverSelected}
-				/>
 				<form onSubmit={this.onSubmit}>
-					<TextField
-						style={styles.titleText}
-						hintText='教えたいこと（40文字）'
-      					floatingLabelText="教えたいこと（40文字）"
-						floatingLabelFixed={true}
-						errorText={this.state.errorTitle}
-						value={this.state.mentoring.title}
-						onChange={this.onInputTitle}
-						ref='titleTextField'
+					<div style={styles.dateRoot}>
+						<TextField
+							style={styles.dateText}
+							floatingLabelText="教えたいこと（40文字）"
+							floatingLabelFixed={true}
+							errorText={this.state.errorTitle}
+							value={this.state.mentoring.title}
+							onChange={this.onInputTitle}
+							ref='titleTextField'
+							multiLine={true}
+							rows={1}
+							rowsMax={5}
+						/>
+					</div>
+					<div style={styles.dateRoot}>
+						<p style={styles.selectCoverTitle}>以下より画像を選択して下さい</p>
+					</div>
+					<MentoringCoverSwipe
+						covers={this.state.mentoring.covers}
+						title={this.state.mentoring.title}
+						index={this.state.coverIndex}
+					/>
+					<SelectableCover
+						onTap={this.onCoverSelected}
+						mentoringCovers={this.state.mentoring.covers}
 					/>
 					<div style={styles.dateRoot}>
 						<DatePicker
       						floatingLabelText="開催日"
 							floatingLabelFixed={true}
-							hintText="選択"
 							textFieldStyle={styles.dateText}
 							value={this.state.date}
 							minDate={new Date()}
@@ -899,12 +846,13 @@ console.log(data.mentoring);
 						<TimePicker
       						floatingLabelText="開催時刻"
 							floatingLabelFixed={true}
-							hintText="選択"
 							textFieldStyle={styles.dateText}
 							format="24hr"
 							value={this.state.time}
 							onChange={this.onChangeTime}
 						/>
+					</div>
+					<div style={styles.dateRoot}>
 						<TextField
 							style={styles.dateText}
       						floatingLabelText="メンタリング時間(分)"
@@ -922,11 +870,9 @@ console.log(data.mentoring);
 							style={styles.dateText}
       						floatingLabelText="金額"
 							floatingLabelFixed={true}
-							hintText="いいね価格"
 							errorText={this.state.errorPrice}
 							value={this.state.mentoring.price}
 							type="text"
-							disabled={true}
 							onChange={this.onInputPrice}
 							ref='priceTextField'
 						/>
@@ -944,11 +890,11 @@ console.log(data.mentoring);
 					</div>
 					<div style={styles.dateRoot}>
 						<SelectField
+							style={styles.dateText}
 							value={this.state.category}
 							onChange={this.onChangeCategory}
 							floatingLabelText="カテゴリ"
 							floatingLabelFixed={true}
-							hintText="選択"
 							fullWidth={true}
 						>
 							{(() => {
@@ -964,29 +910,31 @@ console.log(data.mentoring);
 					</div>
 					<div style={styles.dateRoot}>
 						<SelectField
+							style={styles.dateText}
 							value={this.state.mentoring.kind}
 							onChange={this.onChangeKind}
 							floatingLabelText="メンタリングタイプ"
 							floatingLabelFixed={true}
-							hintText="選択"
 							fullWidth={true}
 						>
 							<MenuItem key={1} value={1} primaryText="通常" />
 							<MenuItem key={2} value={2} primaryText="ライブ配信" />
 						</SelectField>
 					</div>
-					<TextField
-						style={styles.digestText}
-						hintText=""
-      					floatingLabelText="事前メッセージ・告知"
-						floatingLabelFixed={true}
-						errorText={this.state.errorDigest}
-						value={this.state.mentoring.digest}
-						onChange={this.onInputDigest}
-						ref='digestTextField'
-						rows={10}
-						multiLine={true}
-					/>
+					<div style={styles.dateRoot}>
+						<TextField
+							style={styles.dateText}
+							hintText=""
+							floatingLabelText="事前メッセージ・告知"
+							floatingLabelFixed={true}
+							errorText={this.state.errorDigest}
+							value={this.state.mentoring.digest}
+							onChange={this.onInputDigest}
+							ref='digestTextField'
+							rows={10}
+							multiLine={true}
+						/>
+					</div>
 					<div style={styles.buttons}>
 						<RaisedButton
 							style={styles.offer}
@@ -1024,6 +972,7 @@ console.log(data.mentoring);
 }
 EditMentoringPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 	categories: React.PropTypes.array.isRequired,
 }
 EditMentoringPage.propTypes = {

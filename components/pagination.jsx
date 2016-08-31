@@ -1,8 +1,6 @@
 import React from 'react';
 import {Router, Route, hashHistory} from 'react-router';
 
-import SwipeableViews from 'react-swipeable-views';
-
 export class PaginationDot extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -75,12 +73,12 @@ export class Pagination extends React.Component {
 
 	render() {
 		const styles = {
-			root: {
+			wrap: {
 				position: 'absolute',
 				bottom: 8,
-				right: '45%',
+			},
+			root: {
 				display: 'flex',
-				flexDirection: 'row',
 			},
 		};
 
@@ -103,8 +101,10 @@ export class Pagination extends React.Component {
 		}
 
 		return (
-			<div style={styles.root}>
-				{children}
+			<div style={styles.wrap}>
+				<div style={styles.root}>
+					{children}
+				</div>
 			</div>
 		);
 	}

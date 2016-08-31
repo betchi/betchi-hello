@@ -86,7 +86,7 @@ export class ChatPage extends React.Component {
 	}
 
 	componentWillMount() {
-		styleTextFieldWrap.backgroundColor = window.bgColor2;
+		styleTextFieldWrap.backgroundColor = this.context.colors.grey;
 		offerUserId = this.props.params.offerUserId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
@@ -168,7 +168,7 @@ export class ChatPage extends React.Component {
 
 	componentWillUnmount() {
 		styleUl.paddingBottom = '1rem';
-		styleTextFieldWrap.backgroundColor = window.bgColor2;
+		styleTextFieldWrap.backgroundColor = this.context.colors.bg2,
 		styleTextFieldWrap.height = '4.25rem';
 		styleSendButton.bottom = '1.2rem';
 		styleTextField.paddingBottom = '0';
@@ -309,7 +309,7 @@ export class ChatPage extends React.Component {
 			width: 'auto',
 			maxWidth: '70%',
 			wordBreak: 'break-all',
-			color: '#fff',
+			color: this.context.colors.white,
 			position: 'relative',
 			background: '#0084ff',
 			border: '0px solid #777',
@@ -327,27 +327,27 @@ export class ChatPage extends React.Component {
 			marginTop: '-30px',
 			marginLeft: '70px',
 			marginBottom: '-5px',
-			color: window.textColor1,
+			color: this.context.colors.black,
 		},
 		timeRight: {
 			fontSize: '0.6em',
-			color: window.textColor1,
+			color: this.context.colors.black,
 			float: 'right',
 			marginTop: '10px',
 		},
 		timeLeft: {
 			fontSize: '0.6em',
-			color: window.textColor1,
+			color: this.context.colors.black,
 			float: 'left',
 			marginTop: '10px',
 		},
 		date: {
 			fontSize: '0.6em',
-			color: '#efefef',
+			color: this.context.colors.black,
 			width: 'auto',
 			wordBreak: 'break-all',
-			backgroundColor: window.bgColor2,
-			border: '0px solid #777',
+			backgroundColor: this.context.colors.lightGrey,
+			border: '0px solid ' + this.context.colors.lightGrey,
 			borderRadius: '15px',
 			padding: '5px 10px',
 			margin: '-12px 0 20px 43%',
@@ -361,7 +361,7 @@ export class ChatPage extends React.Component {
 		hr: {
 			width: '100%',
 			borderTop: '1px solid',
-			borderColor: window.bgColor2,
+			borderColor: this.context.colors.lightGrey,
 		},
 	};
 	var indents = [];
@@ -432,7 +432,7 @@ export class ChatPage extends React.Component {
 						onChange={this.changeText}
 					/>
 				</div>
-				<FlatButton icon={<ContentSend color={window.textColor1} />} primary={true} style={styleSendButton} onTouchTap={this.sendMessage} />
+				<FlatButton icon={<ContentSend color={this.context.colors.white} />} primary={true} style={styleSendButton} onTouchTap={this.sendMessage} />
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}
@@ -444,6 +444,7 @@ export class ChatPage extends React.Component {
 	}
 }
 ChatPage.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 

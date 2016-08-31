@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import HeadRoom from 'react-headroom';
 
 import {List, ListItem} from 'material-ui/List';
@@ -141,16 +142,15 @@ export class OffersPage extends React.Component {
 			},
 			title: {
 				fontSize: '1rem',
-				color: window.textColor1,
 			},
 			time: {
-				fontSize: '0.6em',
+				width: '2.5rem',
+				textAlign: 'right',
+				fontSize: '0.8em',
 			},
 			listItem: {
-				color: window.textColor1,
 			},
 			secondoryText: {
-				color: window.textColor1,
 			},
 		};
 		return (

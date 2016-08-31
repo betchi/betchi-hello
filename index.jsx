@@ -7,6 +7,7 @@ import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
+import {FirstPage} from './components/FirstPage.jsx';
 import {TopPage} from './components/TopPage.jsx';
 import {LoginPage} from './components/LoginPage.jsx';
 import {RegisterPage} from './components/RegisterPage.jsx';
@@ -15,6 +16,8 @@ import {ChatPage} from './components/ChatPage.jsx';
 import {SearchPage} from './components/SearchPage.jsx';
 import {MyPage} from './components/MyPage.jsx';
 import {OffersPage} from './components/OffersPage.jsx';
+
+var _colorManipulator = require('material-ui/utils/colorManipulator');
 
 Object.defineProperty(String.prototype, 'isValidEmail', {
 	writable: false,
@@ -54,6 +57,7 @@ function requireAuth(next, replace) {
 	const goLogin = () => {
 		sessionStorage.user = null;
 		replace({
+			//pathname: '/first',
 			pathname: '/login',
 			state: {
 				nextPathname: next.location.pathname
@@ -76,9 +80,12 @@ function requireAuth(next, replace) {
 	xhr.send();
 }
 
+var muiTheme = getMuiTheme();
+
 var Parent = React.createClass({
     childContextTypes: {
         categories: React.PropTypes.array,
+        colors: React.PropTypes.object,
     },
 
     getChildContext: function () {
@@ -86,14 +93,48 @@ var Parent = React.createClass({
 		xhr.open('GET', '/categories.json', false);
 		xhr.send();
 		let data = JSON.parse(xhr.responseText);
-		return data;
+
+		let childContext = {
+			categories: data.categories,
+			colors: {
+				/*
+				bg1:"#303f9f",
+				bg2:"#3f51b5",
+				bg3: "#1976d2",
+				text1: "#FAFAFA",
+				text2: "#F5F5F5",
+				black1: "#212121",
+				fluorescent1: "#536dfe",
+				*/
+				bg1:"#FAFAFA",
+				bg2:"#3f51b5",
+				bg3: "#1976d2",
+				text1: "#212121",
+				text2: "#F5F5F5",
+				white: "#F5F5F5",
+				black: "#212121",
+				grey: "#9E9E9E",
+				lightGrey: "#E0E0E0",
+				fluorescent1: "#303f9f",
+			},
+		}
+		muiTheme.textField.focusColor = childContext.colors.grey;
+		muiTheme.textField.textColor = childContext.colors.grey;
+		muiTheme.textField.borderColor = childContext.colors.lightGrey;
+		muiTheme.textField.borderColor = childContext.colors.lightGrey;
+		muiTheme.tabs.backgroundColor = childContext.colors.white;
+		muiTheme.tabs.textColor = (0, _colorManipulator.fade)(childContext.colors.bg2, 0.7);
+		muiTheme.tabs.selectedTextColor = childContext.colors.bg2;
+console.log(muiTheme.tabs);
+		return childContext;
     },
 
     render: function () {
         return (
-			<MuiThemeProvider muiTheme={getMuiTheme()}>
+			<MuiThemeProvider muiTheme={muiTheme}>
 				<Router history={hashHistory}>
 					<Route path="/" component={TopPage} onEnter={requireAuth} />
+					<Route path="/first" component={FirstPage} />
 					<Route path="/top" component={TopPage} onEnter={requireAuth} />
 					<Route path="/login" component={LoginPage} />
 					<Route path="/register" component={RegisterPage} />

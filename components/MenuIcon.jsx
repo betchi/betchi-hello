@@ -36,24 +36,24 @@ export class MenuIcon extends React.Component {
 				height: '5rem',
 				display: 'block',
 				whiteSpace: 'normal',
-				color: window.textColor1,
 				margin: '0',
-				border: '1px solid',
-				borderColor: window.borderColor2,
+				border: 'none',
 			},
 			actionBlockLabelStyle: {
-				fontSize: '0.7rem',
 				display: 'block',
 				padding: 0,
 				margin: 0,
+				color: this.context.colors.bg2,
+				fontSize: '1.1rem',
 			},
 			largeIcon: {
-				width: '2.2rem',
-				height: '2.2rem',
+				width: '2.5rem',
+				height: '2.5rem',
 				position: 'relative',
 				top: '-0.4rem',
 				left: '-0.7rem',
 				margin: '0',
+				fill: this.context.colors.bg2,
 			},
 		}
 
@@ -63,11 +63,11 @@ export class MenuIcon extends React.Component {
 						if (this.props.userId == sessionStorage.user.id) {
 							return (
 								<FlatButton
-									icon={<IconButton style={{margin:'0'}} iconStyle={styles.largeIcon}><PeopleIcon style={{margin:'0'}} color={window.textColor1} /></IconButton>}
+									icon={<IconButton style={{margin:'0'}} iconStyle={styles.largeIcon}><PeopleIcon style={{margin:'0'}} color={this.context.colors.text1} /></IconButton>}
 									style={styles.actionBlockItem}
 									value={1}
 									ref="tab1"
-									label={'メンタリングを登録'}
+									label={'メンタリング登録'}
 									labelStyle={styles.actionBlockLabelStyle}
 									onTouchTap={this.onCreateMentoring}
 								/>
@@ -95,7 +95,7 @@ export class MenuIcon extends React.Component {
 						if (this.props.userId != sessionStorage.user.id) {
 							return (
 								<FlatButton
-									icon={<IconButton iconStyle={styles.largeIcon}><AddCircleIcon color={window.textColor1} /></IconButton>}
+									icon={<IconButton iconStyle={styles.largeIcon}><AddCircleIcon color={this.context.colors.text1} /></IconButton>}
 									style={styles.actionBlockItem}
 									value={1}
 									ref="tab1"
@@ -111,5 +111,6 @@ export class MenuIcon extends React.Component {
 	}
 };
 MenuIcon.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }

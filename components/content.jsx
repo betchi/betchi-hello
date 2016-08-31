@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+
 import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 
 import SwipeableViews from 'react-swipeable-views';
@@ -31,7 +33,6 @@ export class MentoringCover extends React.Component {
 			root: {
 				position: 'relative',
 				width: '100%',
-				backgroundColor: window.bgColor1,
 			},
 			cover: {
 				width: '100%',
@@ -40,7 +41,6 @@ export class MentoringCover extends React.Component {
 				position: 'absolute',
 				left: '5%',
 				top: '5%',
-				color: 'white',
 				fontSize: '1.5rem',
 				fontWeight: 'bold',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
@@ -50,6 +50,7 @@ export class MentoringCover extends React.Component {
 				overflow: 'hidden',
 				opacity: 0.9,
 				textOverflow: 'ellipsis',
+				color: this.context.colors.text2,
 			},
 			avatar: {
 				position: 'absolute',
@@ -62,10 +63,9 @@ export class MentoringCover extends React.Component {
 			price: {
 				position: 'absolute',
 				bottom: '6px',
-				fontSize: '0.7rem',
 				lineHeight: '1.5rem',
 				backgroundColor: 'rgba(0,0,0,0.5)',
-				color: 'white',
+				color: this.context.colors.white,
 				width: '96%',
 				padding: '2%',
 				opacity: 0.7,
@@ -120,7 +120,8 @@ export class MentoringCover extends React.Component {
 	}
 };
 MentoringCover.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 MentoringCover.propTypes = {
 	title: React.PropTypes.string.isRequired,
@@ -137,10 +138,15 @@ export class MentoringCoverSwipe extends MentoringCover {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			index: 0,
+			index: this.props.index,
 		};
 		this.onChangeIndex = this.onChangeIndex.bind(this);
 	}
+    componentWillReceiveProps() {
+		this.state = {
+			index: this.props.index,
+		};
+    }
 
 	onChangeIndex(index) {
 		this.setState({
@@ -161,13 +167,13 @@ export class MentoringCoverSwipe extends MentoringCover {
 				position: 'absolute',
 				left: 0,
 				top: 0,
-				color: window.textColor1,
 				fontSize: '1.4rem',
 				fontWeight: 'bolder',
 				textShadow: '1px 1px 1px rgba(0,0,0,1)',
 				height: '7rem',
 				overflow: 'hidden',
 				padding: '3.5rem 0.8rem',
+				color: this.context.colors.white,
 			},
 			avatar: {
 				position: 'absolute',
@@ -184,7 +190,6 @@ export class MentoringCoverSwipe extends MentoringCover {
 				fontSize: '0.9rem',
 				lineHeight: '1.5rem',
 				backgroundColor: 'rgba(0,0,0,0.75)',
-				color: 'white',
 				padding: '0.25rem 0.5rem',
 			},
 		};
@@ -193,7 +198,6 @@ export class MentoringCoverSwipe extends MentoringCover {
 			<div style={styles.coverBox}>
 				<SwipeableViews
 					index={this.state.index}
-					onChangeIndex={this.onChangeIndex}
 				>
 					{this.props.covers.map((cover, index) => {
 						let key = 'cover_' + index;
@@ -211,24 +215,61 @@ export class MentoringCoverSwipe extends MentoringCover {
 	}
 }
 MentoringCoverSwipe.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 MentoringCoverSwipe.propTypes = {
-	title: React.PropTypes.string.isRequired,
 	covers: React.PropTypes.array.isRequired,
+	title: React.PropTypes.string.isRequired,
+	index: React.PropTypes.number.isRequired,
 }
 
 export class SelectableCover extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
+			page: 1,
+			covers: [],
 		};
 		this.onTap = this.onTap.bind(this);
+		this.loadCovers();
 	}
 
-	onTap(e) {
-		const src = e.target.src;
-		this.props.onTap(src);
+	loadCovers(category = 'all', page = 1) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/cover_mentoring/' + category + '/' + page);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+				});
+				return;
+			}
+			let covers = [];
+			let data = JSON.parse(xhr.responseText);
+			if (page === 1) {
+				covers = data.images;
+			} else {
+				covers = this.state.covers.slice();
+				for (var ii in data.images) {
+					covers.push(data.images[ii]);
+				}
+			}
+			this.setState({
+				covers: covers,
+				page: page,
+			});
+		}
+		xhr.send();
+	}
+
+	onTap(cover, index) {
+		if (this.props.mentoringCovers.indexOf(cover.url) < 0) {
+			this.props.onTap(cover, index);
+		}
 	}
 
 	render() {
@@ -238,7 +279,7 @@ export class SelectableCover extends React.Component {
 				overflow: 'scroll',
 			},
 			covers: {
-				width: '200%',
+				width: '1000%',
 				display: 'flex',
 				flexFlow: 'row nowrap',
 			},
@@ -252,9 +293,9 @@ export class SelectableCover extends React.Component {
 		return (
 			<div style={styles.root}>
 				<div style={styles.covers}>
-					{this.props.images.map((cover, index) => {
+					{this.state.covers.map((cover, index) => {
 						let key = 'cover_' + cover.id;
-						return <div key={key} style={styles.cover}><img style={styles.cover} src={cover.url} onTouchTap={this.onTap} /></div>
+						return <div key={key} style={styles.cover}><img style={styles.cover} src={cover.url} onTouchTap={this.onTap.bind(this, cover, index)} /></div>
 					})}
 				</div>
 			</div>
@@ -265,8 +306,8 @@ SelectableCover.contextTypes = {
 	router: React.PropTypes.object.isRequired
 }
 SelectableCover.propTypes = {
-	images: React.PropTypes.array.isRequired,
 	onTap: React.PropTypes.func.isRequired,
+	mentoringCovers: React.PropTypes.array.isRequired,
 }
 
 export class RatingStar extends React.Component {
@@ -352,7 +393,6 @@ export class MentoringDigest extends React.Component {
 	}
 
 	onOpenProfile() {
-		console.log("open profile");
 		if (this.props.userId != sessionStorage.user.id) {
 			this.context.router.push('/mypage/' + this.props.userId);
 		}
@@ -362,9 +402,7 @@ export class MentoringDigest extends React.Component {
 		const styles = {
 			root: {
 				width: '100%',
-				height: '25px',
-				lineHeight: '25px',
-				backgroundColor: window.bgColor1,
+				height: '2rem',
 			},
 			starBox: {
 				display: 'flex',
@@ -378,49 +416,41 @@ export class MentoringDigest extends React.Component {
 			},
 			username: {
 				float: 'left',
-				fontSize: '14px',
 				margin: '0 0.5rem',
 				textOverflow: 'ellipsis',
 				overflow: 'hidden',
 				width: '30%',
-				color: window.textColor1,
-				opacity: 0.7,
-				height: '20px',
-				lineHeight: '20px',
+				fontSize: '1.1rem',
+				height: '2rem',
 			},
 			avatar: {
 				float: 'left',
-				margin: '0 0 5px 5px',
-				width: '20px',
-				height: '20px',
+				margin: '0 0 0 5px',
+				width: '1.5rem',
+				height: '1.5rem',
 			},
 			button: {
 				float: 'right',
-				fontSize: '0.8rem',
-				color: window.textColor1,
 				minWidth: 'auto',
-				height: '18px',
-				lineHeight: '18px',
+				height: '1.5rem',
+				lineHeight: '1rem',
 			},
 			buttonIcon: {
-				width:'14px',
-				height:'14px',
-				margin: '0 5px',
-				opacity: 0.7,
+				width:'1.5rem',
+				height:'1.5rem',
+				margin: 0,
+				color: this.context.colors.text1,
 			},
 			buttonLabel: {
-				padding: 0,
-				fontSize: '12px',
-				opacity: 0.7,
+				margin: 0,
+				color: this.context.colors.text1,
+				padding: '0 8px',
 			},
 			digest: {
 				float: 'left',
-				background: window.bgColor1,
 				fontSize: this.props.digestFontSize,
 				width: '96%',
-				margin: 0,
-				padding: '0 2%',
-				color: window.textColor1,
+				padding: '2%',
 			},
 		};
 
@@ -436,8 +466,8 @@ export class MentoringDigest extends React.Component {
 							style={styles.button}
 							label={this.props.countStar}
 							icon={<StarIcon style={styles.buttonIcon} />}
-							disabled={true}
 							labelStyle={styles.buttonLabel}
+							onTouchTap={this.onOpenProfile}
 						/>
 					}
 				})()}
@@ -447,8 +477,8 @@ export class MentoringDigest extends React.Component {
 							style={styles.button}
 							label={this.props.countThanx}
 							icon={<CommunicationEmailIcon style={styles.buttonIcon} />}
-							disabled={true}
 							labelStyle={styles.buttonLabel}
+							onTouchTap={this.onOpenProfile}
 						/>
 					}
 				})()}
@@ -458,8 +488,8 @@ export class MentoringDigest extends React.Component {
 							style={styles.button}
 							label={this.props.countFollowers}
 							icon={<PersonIcon style={styles.buttonIcon} />}
-							disabled={true}
 							labelStyle={styles.buttonLabel}
+							onTouchTap={this.onOpenProfile}
 						/>
 					}
 				})()}
@@ -469,7 +499,8 @@ export class MentoringDigest extends React.Component {
 	}
 };
 MentoringDigest.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 MentoringDigest.propTypes = {
 	userId: React.PropTypes.number.isRequired,
@@ -591,8 +622,6 @@ export class MentoringCard extends React.Component {
 				boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.24), 0 -1px 2px rgba(0,0,0,0.12), 0 -1px 1px rgba(0,0,0,0.24)',
 				transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
 				margin: '5px',
-				backgroundColor: window.bgColor2,
-				color: window.textColor1,
 			},
 		};
 		return (
@@ -618,7 +647,7 @@ export class MentoringCard extends React.Component {
 					countThanx={this.props.countThanx}
 					countStar={this.props.countStar}
 					countFollowers={this.props.countFollowers}
-					digestFontSize="0.7rem"
+					digestFontSize="1rem"
 				/>
 			</Card>
 		);
@@ -668,7 +697,6 @@ export class MentoringList extends React.Component {
 				flexFlow: 'row wrap',
 				justifyContent: 'space-between',
 				alignItems: 'flex-start',
-				backgroundColor: window.bgColor1,
 				marginBottom: '3rem',
 			},
 		};

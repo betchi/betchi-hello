@@ -16,8 +16,7 @@ export class PhotoEditChip extends React.Component {
 	render() {
 		const styles = {
 			root: {
-				border: '1px solid',
-				borderColor: window.textColor1,
+				border: '1px solid ' + this.context.colors.grey,
 				display: 'inline-block',
 				borderRadius: '1rem',
 				color: this.props.color,
@@ -27,7 +26,7 @@ export class PhotoEditChip extends React.Component {
 				height: '1.5rem',
 				lineHeight: '1rem',
 				minWidth: 'auto',
-				zIndex: 10000,
+				zIndex: 2,
 				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
 			},
 			iconStyle: {
@@ -53,6 +52,9 @@ export class PhotoEditChip extends React.Component {
 		);
 	}
 };
+PhotoEditChip.contextTypes = {
+	colors: React.PropTypes.object.isRequired,
+}
 PhotoEditChip.propTypes = {
 	name: React.PropTypes.string.isRequired,
 }
