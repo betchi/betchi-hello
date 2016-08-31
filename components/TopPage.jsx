@@ -169,6 +169,7 @@ export class TopPage extends React.Component {
 				fontWeight: 'bold',
 				fontSize: '1.1rem',
 				zIndex: '10001',
+				color: this.context.colors.text1,
 			},  
 			title: {
 				fontSize: '1.2rem',

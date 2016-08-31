@@ -109,7 +109,7 @@ var Parent = React.createClass({
 				bg1:"#FAFAFA",
 				bg2:"#3f51b5",
 				bg3: "#1976d2",
-				text1: "#212121",
+				text1: "#424242",
 				text2: "#F5F5F5",
 				white: "#F5F5F5",
 				black: "#212121",
