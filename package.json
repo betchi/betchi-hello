@@ -9,6 +9,7 @@
     "moment": "^2.14.1",
     "react": "^15.1.3",
     "react-dom": "^15.1.3",
+    "react-facebook-login": "file:///home/minobe/react-facebook-login",
     "react-headroom": "^2.1.0",
     "react-modal": "^1.4.0",
     "react-motion": "^0.4.4",
