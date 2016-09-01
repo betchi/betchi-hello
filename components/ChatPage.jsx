@@ -49,6 +49,7 @@ var styleTextField = {
 	backgroundColor: 'white',
 	border: '0px solid #777',
 	borderRadius: '5px',
+	color: '#212121',
 };
 var styleTextFieldWrap = {
 	position: 'fixed',
@@ -86,7 +87,7 @@ export class ChatPage extends React.Component {
 	}
 
 	componentWillMount() {
-		styleTextFieldWrap.backgroundColor = this.context.colors.grey;
+		styleTextFieldWrap.backgroundColor = this.context.colors.bg2;
 		offerUserId = this.props.params.offerUserId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
