@@ -96,7 +96,7 @@ export class MentoringPage extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		window.removeEventListener('scroll', this.onScroll);
 		this.loadContents(nextProps.params.id);
-		this.loadMessages(nextProps.params.id);
+		//this.loadMessages(nextProps.params.id);
 	}
 
 	componentWillUnmount() {
@@ -319,10 +319,15 @@ export class MentoringPage extends React.Component {
 			},
 		}
 		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
-		var datetime = new Date(this.state.mentoring.datetime);
-		var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
-		var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);
-		var datetimeString = yyyymmdd + " " + hhmm;
+		var datetimeString;
+		if (this.state.mentoring.datetime == "1970-01-01T00:00:00Z") {
+			datetimeString = "開催日時未定";
+		} else {
+			var datetime = new Date(this.state.mentoring.datetime);
+			var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
+			var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);
+			datetimeString = yyyymmdd + " " + hhmm;
+		}
 
 		return (
 			<section style={styles.root}>
@@ -349,7 +354,7 @@ export class MentoringPage extends React.Component {
 					digestFontSize="1rem"
 				/>
 				<List style={styles.list}>
-					<ListItem style={styles.listItem} disabled={true} primaryText="カテゴリ" secondaryText={<p style={styles.secondaryText}>{this.props.location.query.category}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="カテゴリ" secondaryText={<p style={styles.secondaryText}>{this.props.location.query.category_name}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{datetimeString}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリング時間" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.duration} 分</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="金額" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
@@ -456,17 +461,18 @@ export class EditMentoringPage extends React.Component {
 			messages: [],
 			selectedAvatarList: [],
 			mentoring: {
-				id: Number(this.props.params.id),
+				id: this.props.params.id,
 				user_id: sessionStorage.user.id,
 				title: '',
 				digest: '',
 				datetime: null,
+				duration: 0,
+				price: 0,
+				max_user_num: 0,
 				cover: '',
 				covers: [],
 				invitaions: [],
 			},
-			date: null,
-			time: null,
 			category: this.props.location.query.category,
 			snack: {
 				open: false,
@@ -475,6 +481,13 @@ export class EditMentoringPage extends React.Component {
 			selectMemberLabel: defaultSelectMemberLabel,
 			modalIsOpen: false,
 			coverIndex: 0,
+			styles: {
+				errorCover: {
+					display: 'none',
+					fontSize: '12px',
+					color: this.context.colors.error,
+				},
+			},
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.loadContents = this.loadContents.bind(this);
@@ -484,6 +497,8 @@ export class EditMentoringPage extends React.Component {
 		this.onCoverSelected = this.onCoverSelected.bind(this);
 		this.onInputTitle = this.onInputTitle.bind(this);
 		this.onInputDuration = this.onInputDuration.bind(this);
+		this.onInputPrice = this.onInputPrice.bind(this);
+		this.onInputMaxUserNum = this.onInputMaxUserNum.bind(this);
 		this.onInputDigest = this.onInputDigest.bind(this);
 		this.onChangeDate = this.onChangeDate.bind(this);
 		this.onChangeTime = this.onChangeTime.bind(this);
@@ -549,8 +564,37 @@ export class EditMentoringPage extends React.Component {
 	}
 
 	onInputDuration(e) {
+		var numberDuration = Number(e.target.value.trim());
+		if (Number.isNaN(numberDuration)) {
+			return;
+		}
 		const mentoring = this.state.mentoring;
-		mentoring.duration = Number(e.target.value.trim());
+		mentoring.duration = numberDutation;
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onInputPrice(e) {
+		var numberPrice = Number(e.target.value.trim());
+		if (Number.isNaN(numberPrice)) {
+			return;
+		}
+		const mentoring = this.state.mentoring;
+		mentoring.price = numberPrice;
+		this.setState({
+			mentoring: mentoring,
+		})
+	}
+
+	onInputMaxUserNum(e) {
+		var numberMaxUserNum = Number(e.target.value.trim());
+		if (Number.isNaN(numberMaxUserNum)) {
+			return;
+		}
+		console.log(numberMaxUserNum);
+		const mentoring = this.state.mentoring;
+		mentoring.max_user_num = numberMaxUserNum;
 		this.setState({
 			mentoring: mentoring,
 		})
@@ -595,6 +639,82 @@ export class EditMentoringPage extends React.Component {
 		this.refs.titleTextField.blur();
 		this.refs.durationTextField.blur();
 		this.refs.digestTextField.blur();
+		var error = false
+		var styles = this.state.styles;
+
+		if (this.state.mentoring.title == "") {
+			this.setState({
+				errorTitle: 'タイトルを入力してください',
+			});
+			error = true
+		} else {
+			this.setState({
+				errorTitle: null,
+			});
+		}
+
+		if (this.state.mentoring.cover == "") {
+			styles.errorCover.display = 'block';
+			styles.errorCover.fontSize = '12px';
+			this.setState({
+				styles: styles,
+			});
+			error = true
+		} else {
+			styles.errorCover.display = 'none';
+			this.setState({
+				styles: styles,
+			});
+		}
+
+		if (this.state.mentoring.duration === undefined) {
+			this.setState({
+				errorDuration: 'メンタリング時間を入力してください',
+			});
+			error = true
+		} else {
+			this.setState({
+				errorDuration: null,
+			});
+		}
+
+		if (this.state.category === undefined) {
+			this.setState({
+				errorCategory: 'カテゴリを選択してください',
+			});
+			error = true
+		} else {
+			this.setState({
+				errorCategory: null,
+			});
+		}
+
+		if (this.state.mentoring.kind === undefined) {
+			this.setState({
+				errorKind: 'メンタリングタイプを入力してください',
+			});
+			error = true
+		} else {
+			this.setState({
+				errorKind: null,
+			});
+		}
+
+		if (this.state.mentoring.digest == "") {
+			this.setState({
+				errorDigest: '事前メッセージ・告知を入力してください',
+			});
+			error = true
+		} else {
+			this.setState({
+				errorDigest: null,
+			});
+		}
+
+		if (error) {
+			this.refs.titleTextField.focus(); // 一番上に持って行く
+			return;
+		}
 
 		const xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/mentoring', false);
@@ -621,11 +741,14 @@ export class EditMentoringPage extends React.Component {
 			}
 			this.context.router.push('/');
 		}
-		var yyyymmdd = this.state.date.getFullYear() + "-" + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-" + this.state.date.getDate();
-		var hhmm = ('0' + this.state.time.getHours()).slice(-2) + ":" + ('0' + this.state.time.getMinutes()).slice(-2);
-		var datetimeString = yyyymmdd + "T" + hhmm + ":00+09:00"; // Date.parse()のためISO8601形式に変換
-		var timestamp = Date.parse(datetimeString);
-		var datetime = new Date(timestamp);
+		var datetime;
+		if (this.state.date != null) {
+			var yyyymmdd = this.state.date.getFullYear() + "-" + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-" + ('0' + (this.state.date.getDate())).slice(-2);
+			var hhmm = ('0' + this.state.time.getHours()).slice(-2) + ":" + ('0' + this.state.time.getMinutes()).slice(-2);
+			var datetimeString = yyyymmdd + "T" + hhmm + ":00+09:00"; // Date.parse()のためISO8601形式に変換
+			var timestamp = Date.parse(datetimeString);
+			datetime = new Date(timestamp);
+		}
 		var mentoring = {
 			id: this.state.mentoring.id,
 			user_id: this.state.mentoring.user_id,
@@ -689,7 +812,7 @@ export class EditMentoringPage extends React.Component {
 		let bottom = html.scrollHeight - html.clientHeight - scrollTop;
 		if (bottom <= 60) {
 			window.removeEventListener('scroll', this.onScroll);
-			//this.loadMessages(this.props.params.id, this.state.page + 1);
+			this.loadMessages(this.props.params.id, this.state.page + 1);
 		}
 	}
 
@@ -709,9 +832,13 @@ export class EditMentoringPage extends React.Component {
 			let data = JSON.parse(xhr.responseText);
 			this.setState({
 				mentoring: data.mentoring,
-				date: new Date(data.mentoring.datetime),
-				time: new Date(data.mentoring.datetime),
 			});
+			if (data.mentoring.datetime != "1970-01-01T00:00:00Z") {
+				this.setState({
+					date: new Date(data.mentoring.datetime),
+					time: new Date(data.mentoring.datetime),
+				});
+			}
 		}
 		xhr.send();
 	}
@@ -719,7 +846,6 @@ export class EditMentoringPage extends React.Component {
 	render() {
 		const styles = {
 			root: {
-				backgroundColor: 'white',
 			},
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
@@ -740,6 +866,9 @@ export class EditMentoringPage extends React.Component {
 			offer: {
 				width: '100%',
 			},
+			labelStyle: {
+				fontSize: '1.5rem',
+			},
 			dateRoot: {
 				display: 'flex',
 				flexFlow: 'row nowrap',
@@ -751,11 +880,21 @@ export class EditMentoringPage extends React.Component {
 				lineHeight: '1.5rem',
 				flexGrow: 1,
 				fontSize: '1.5rem',
-				color: this.context.colors.grey,
+				color: this.context.colors.black,
+			},
+			textareaStyle: {
+				color: this.context.colors.black,
+			},
+			digestText: {
+				width: '100%',
+				lineHeight: '1.5rem',
+				flexGrow: 1,
+				fontSize: '1.5rem',
+				marginBottom: '2rem',
 			},
 			selectCoverTitle: {
 				fontSize: '1.1rem',
-				color: this.context.colors.grey,
+				color: 'rgba(0, 0, 0, 0.298039)', // TextFieldのLabelカラーが変更できなかったので逆にLabelカラーに合わせた
 			},
 		}
 		const modalStyles = {
@@ -811,7 +950,8 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.dateRoot}>
 						<TextField
 							style={styles.dateText}
-							floatingLabelText="教えたいこと（40文字）"
+							textareaStyle={styles.textareaStyle}
+							floatingLabelText="タイトル（40文字）"
 							floatingLabelFixed={true}
 							errorText={this.state.errorTitle}
 							value={this.state.mentoring.title}
@@ -823,11 +963,11 @@ export class EditMentoringPage extends React.Component {
 						/>
 					</div>
 					<div style={styles.dateRoot}>
-						<p style={styles.selectCoverTitle}>以下より画像を選択して下さい</p>
+						<p style={styles.selectCoverTitle}>以下よりカバー画像を選択して下さい</p>
 					</div>
 					<MentoringCoverSwipe
 						covers={this.state.mentoring.covers}
-						title={this.state.mentoring.title}
+						title=""
 						index={this.state.coverIndex}
 					/>
 					<SelectableCover
@@ -835,18 +975,23 @@ export class EditMentoringPage extends React.Component {
 						mentoringCovers={this.state.mentoring.covers}
 					/>
 					<div style={styles.dateRoot}>
+						<p style={this.state.styles.errorCover}>カバー画像を選択して下さい</p>
+					</div>
+					<div style={styles.dateRoot}>
 						<DatePicker
+							textFieldStyle={styles.dateText}
+							inputStyle={styles.textareaStyle}
       						floatingLabelText="開催日"
 							floatingLabelFixed={true}
-							textFieldStyle={styles.dateText}
 							value={this.state.date}
 							minDate={new Date()}
 							onChange={this.onChangeDate}
 						/>
 						<TimePicker
+							textFieldStyle={styles.dateText}
+							inputStyle={styles.textareaStyle}
       						floatingLabelText="開催時刻"
 							floatingLabelFixed={true}
-							textFieldStyle={styles.dateText}
 							format="24hr"
 							value={this.state.time}
 							onChange={this.onChangeTime}
@@ -855,9 +1000,9 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.dateRoot}>
 						<TextField
 							style={styles.dateText}
+							inputStyle={styles.textareaStyle}
       						floatingLabelText="メンタリング時間(分)"
 							floatingLabelFixed={true}
-							hintText=""
 							errorText={this.state.errorDuration}
 							value={this.state.mentoring.duration}
 							type="text"
@@ -868,19 +1013,19 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.dateRoot}>
 						<TextField
 							style={styles.dateText}
-      						floatingLabelText="金額"
+							inputStyle={styles.textareaStyle}
+							floatingLabelText="金額"
 							floatingLabelFixed={true}
 							errorText={this.state.errorPrice}
 							value={this.state.mentoring.price}
-							type="text"
 							onChange={this.onInputPrice}
 							ref='priceTextField'
 						/>
 						<TextField
 							style={styles.dateText}
+							inputStyle={styles.textareaStyle}
       						floatingLabelText="募集人数"
 							floatingLabelFixed={true}
-							hintText=''
 							errorText={this.state.errorMaxUserNum}
 							value={this.state.mentoring.max_user_num}
 							type="text"
@@ -892,10 +1037,12 @@ export class EditMentoringPage extends React.Component {
 						<SelectField
 							style={styles.dateText}
 							value={this.state.category}
+							errorText={this.state.errorCategory}
 							onChange={this.onChangeCategory}
 							floatingLabelText="カテゴリ"
 							floatingLabelFixed={true}
 							fullWidth={true}
+							ref='categoryFIeld'
 						>
 							{(() => {
 								if (Array.isArray(this.context.categories)) {
@@ -912,10 +1059,12 @@ export class EditMentoringPage extends React.Component {
 						<SelectField
 							style={styles.dateText}
 							value={this.state.mentoring.kind}
+							errorText={this.state.errorKind}
 							onChange={this.onChangeKind}
 							floatingLabelText="メンタリングタイプ"
 							floatingLabelFixed={true}
 							fullWidth={true}
+							ref='kindField'
 						>
 							<MenuItem key={1} value={1} primaryText="通常" />
 							<MenuItem key={2} value={2} primaryText="ライブ配信" />
@@ -923,7 +1072,8 @@ export class EditMentoringPage extends React.Component {
 					</div>
 					<div style={styles.dateRoot}>
 						<TextField
-							style={styles.dateText}
+							style={styles.digestText}
+							textareaStyle={styles.textareaStyle}
 							hintText=""
 							floatingLabelText="事前メッセージ・告知"
 							floatingLabelFixed={true}
@@ -938,6 +1088,7 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.buttons}>
 						<RaisedButton
 							style={styles.offer}
+							labelStyle={styles.labelStyle}
 							label={this.state.selectMemberLabel}
 							icon={<SupervisorAccountButton />}
 							onTouchTap={this.onOpenModal}
@@ -946,6 +1097,7 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.buttons}>
 						<RaisedButton
 							style={styles.offer}
+							labelStyle={styles.labelStyle}
 							primary={true}
 							label="登録する"
 							onTouchTap={this.onSubmit}

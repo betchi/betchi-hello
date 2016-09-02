@@ -73,11 +73,15 @@ export class MentoringCover extends React.Component {
 		};
 
 		var price = this.props.price ? String.fromCharCode(165) + this.props.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
-
-		var datetime = new Date(this.props.datetime);
-		var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
-		var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);
-		var datetimeString = yyyymmdd + " " + hhmm;
+		var datetimeString;
+		if (this.props.datetime == "1970-01-01T00:00:00Z") {
+			datetimeString = "開催日時未定";
+		} else {
+			var datetime = new Date(this.props.datetime);
+			var yyyymmdd = datetime.getFullYear() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getDate();
+			var hhmm = datetime.getHours() + ":" + ('0' + datetime.getMinutes()).slice(-2);
+			datetimeString = yyyymmdd + " " + hhmm;
+		}
 
 		var brFlg = false;
 
@@ -140,7 +144,9 @@ export class MentoringCoverSwipe extends MentoringCover {
 		this.state = {
 			index: this.props.index,
 		};
-		this.onChangeIndex = this.onChangeIndex.bind(this);
+		this.onPaginationChangeIndex = this.onPaginationChangeIndex.bind(this);
+		this.onSwipeableChangeIndex = this.onSwipeableChangeIndex.bind(this);
+		this.onSwipeableSwitching = this.onSwipeableSwitching.bind(this);
 	}
     componentWillReceiveProps() {
 		this.state = {
@@ -148,7 +154,19 @@ export class MentoringCoverSwipe extends MentoringCover {
 		};
     }
 
-	onChangeIndex(index) {
+	onSwipeableChangeIndex(index, fromIndex) {
+		this.setState({
+			index: index,
+		});
+	}
+
+	onSwipeableSwitching(index, type) {
+		//console.log("onSwipeableSwitching");
+		//console.log(index);
+		//console.log(type);
+	}
+
+	onPaginationChangeIndex(index) {
 		this.setState({
 			index: index,
 		});
@@ -198,6 +216,8 @@ export class MentoringCoverSwipe extends MentoringCover {
 			<div style={styles.coverBox}>
 				<SwipeableViews
 					index={this.state.index}
+					onChangeIndex={this.onSwipeableChangeIndex}
+					onSwitching={this.onSwipeableSwitching}
 				>
 					{this.props.covers.map((cover, index) => {
 						let key = 'cover_' + index;
@@ -207,7 +227,7 @@ export class MentoringCoverSwipe extends MentoringCover {
 				<Pagination
 					dots={this.props.covers.length}
 					index={this.state.index}
-					onChangeIndex={this.onChangeIndex}
+					onChangeIndex={this.onPaginationChangeIndex}
 				/>
 				<div style={styles.title}>{this.props.title}</div>
 			</div>
@@ -610,7 +630,15 @@ export class MentoringCard extends React.Component {
 	}
 
 	onTap(e) {
-		this.context.router.push({pathname: '/mentoring/' + this.props.id, query: {category:this.props.category}});
+		var category = "";
+		for (var i = 0; i < this.context.categories.length; ++i) {
+			if (this.context.categories[i].value == this.props.category) {
+				console.log("here");
+				category = this.context.categories[i];
+				break;
+			}
+		}
+		this.context.router.push({pathname: '/mentoring/' + this.props.id, query: {category:category.value, category_name:category.label}});
 	}
 
 	render() {
@@ -654,7 +682,8 @@ export class MentoringCard extends React.Component {
 	}
 };
 MentoringCard.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	categories: React.PropTypes.array.isRequired,
 }
 MentoringCard.propTypes = {
 	id: React.PropTypes.number.isRequired,

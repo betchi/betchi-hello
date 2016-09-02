@@ -116,6 +116,7 @@ var Parent = React.createClass({
 				grey: "#9E9E9E",
 				lightGrey: "#E0E0E0",
 				fluorescent1: "#303f9f",
+				error: "#F06292",
 			},
 		}
 		muiTheme.textField.focusColor = childContext.colors.grey;
@@ -125,7 +126,9 @@ var Parent = React.createClass({
 		muiTheme.tabs.backgroundColor = childContext.colors.white;
 		muiTheme.tabs.textColor = (0, _colorManipulator.fade)(childContext.colors.bg2, 0.7);
 		muiTheme.tabs.selectedTextColor = childContext.colors.bg2;
-console.log(muiTheme.tabs);
+		//muiTheme.textField.textColor = childContext.colors.black;
+		//muiTheme.textField.floatingLabelColor = childContext.colors.black;
+		muiTheme.textField.errorColor = childContext.colors.error;
 		return childContext;
     },
 
