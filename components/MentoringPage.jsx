@@ -72,6 +72,7 @@ export class MentoringPage extends React.Component {
 			refreshStyle: {
 				position: 'relative',
 				display: 'inline-block',
+				display: 'none',
 			},
 			page: 1,
 		};
@@ -147,7 +148,7 @@ export class MentoringPage extends React.Component {
 		let bottom = html.scrollHeight - html.clientHeight - scrollTop;
 		if (bottom <= 60) {
 			window.removeEventListener('scroll', this.onScroll);
-			this.loadMessages(this.props.params.id, this.state.page + 1);
+			//this.loadMessages(this.props.params.id, this.state.page + 1);
 		}
 	}
 
@@ -282,9 +283,12 @@ export class MentoringPage extends React.Component {
 			buttonLabel: {
 				color: this.context.colors.white,
 				paddingRight: 0,
+				fontSize: '1.4rem',
 			},
 			buttonIcon: {
 				marginLeft: 0,
+				width: '36px',
+				height: '36px',
 			},
 			backIcon: {
 				position: 'fixed',
@@ -519,7 +523,7 @@ export class EditMentoringPage extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		window.removeEventListener('scroll', this.onScroll);
 		this.loadContents(nextProps.params.id);
-		this.loadMessages()
+		//this.loadMessages()
 	}
 
 	componentWillUnmount() {
@@ -551,7 +555,7 @@ export class EditMentoringPage extends React.Component {
 		mentoring.cover = mentoring.covers[0];
 		this.setState({
 			mentoring: mentoring,
-			coverIndex: mentoring.covers.length,
+			coverIndex: mentoring.covers.length - 1,
 		});
 	}
 
@@ -569,7 +573,7 @@ export class EditMentoringPage extends React.Component {
 			return;
 		}
 		const mentoring = this.state.mentoring;
-		mentoring.duration = numberDutation;
+		mentoring.duration = numberDuration;
 		this.setState({
 			mentoring: mentoring,
 		})
@@ -592,9 +596,9 @@ export class EditMentoringPage extends React.Component {
 		if (Number.isNaN(numberMaxUserNum)) {
 			return;
 		}
-		console.log(numberMaxUserNum);
 		const mentoring = this.state.mentoring;
 		mentoring.max_user_num = numberMaxUserNum;
+		console.log(mentoring);
 		this.setState({
 			mentoring: mentoring,
 		})
@@ -755,6 +759,7 @@ export class EditMentoringPage extends React.Component {
 			title: this.state.mentoring.title,
 			digest: this.state.mentoring.digest,
 			duration: this.state.mentoring.duration,
+			max_user_num: this.state.mentoring.max_user_num,
 			cover: this.state.mentoring.cover,
 			covers: this.state.mentoring.covers,
 			kind: this.state.mentoring.kind,
@@ -812,7 +817,7 @@ export class EditMentoringPage extends React.Component {
 		let bottom = html.scrollHeight - html.clientHeight - scrollTop;
 		if (bottom <= 60) {
 			window.removeEventListener('scroll', this.onScroll);
-			this.loadMessages(this.props.params.id, this.state.page + 1);
+			//this.loadMessages(this.props.params.id, this.state.page + 1);
 		}
 	}
 
@@ -866,8 +871,18 @@ export class EditMentoringPage extends React.Component {
 			offer: {
 				width: '100%',
 			},
+			offerLabelStyle: {
+				color: this.context.colors.text1,
+				fontSize: '1.4rem',
+			},
+			offerIconStyle: {
+				fill: this.context.colors.text1,
+				width: '36px',
+				height: '36px',
+				marginTop: '-10px',
+			},
 			labelStyle: {
-				fontSize: '1.5rem',
+				fontSize: '1.4rem',
 			},
 			dateRoot: {
 				display: 'flex',
@@ -881,6 +896,9 @@ export class EditMentoringPage extends React.Component {
 				flexGrow: 1,
 				fontSize: '1.5rem',
 				color: this.context.colors.black,
+			},
+			menuItem: {
+				fontSize: '1.5rem',
 			},
 			textareaStyle: {
 				color: this.context.colors.black,
@@ -967,7 +985,6 @@ export class EditMentoringPage extends React.Component {
 					</div>
 					<MentoringCoverSwipe
 						covers={this.state.mentoring.covers}
-						title=""
 						index={this.state.coverIndex}
 					/>
 					<SelectableCover
@@ -1048,7 +1065,7 @@ export class EditMentoringPage extends React.Component {
 								if (Array.isArray(this.context.categories)) {
 									var menuItems = [];
 									for (var i = 0; i < this.context.categories.length; i++) {
-										menuItems.push(<MenuItem key={i} value={this.context.categories[i].value} primaryText={this.context.categories[i].label} />)
+										menuItems.push(<MenuItem style={styles.menuItem} key={i} value={this.context.categories[i].value} primaryText={this.context.categories[i].label} />)
 									}
 									return menuItems;
 								}
@@ -1066,8 +1083,8 @@ export class EditMentoringPage extends React.Component {
 							fullWidth={true}
 							ref='kindField'
 						>
-							<MenuItem key={1} value={1} primaryText="通常" />
-							<MenuItem key={2} value={2} primaryText="ライブ配信" />
+							<MenuItem style={styles.menuItem} key={1} value={1} primaryText="通常" />
+							<MenuItem style={styles.menuItem} key={2} value={2} primaryText="ライブ配信" />
 						</SelectField>
 					</div>
 					<div style={styles.dateRoot}>
@@ -1088,9 +1105,9 @@ export class EditMentoringPage extends React.Component {
 					<div style={styles.buttons}>
 						<RaisedButton
 							style={styles.offer}
-							labelStyle={styles.labelStyle}
+							labelStyle={styles.offerLabelStyle}
 							label={this.state.selectMemberLabel}
-							icon={<SupervisorAccountButton />}
+							icon={<SupervisorAccountButton style={styles.offerIconStyle} />}
 							onTouchTap={this.onOpenModal}
 						/>
 					</div>

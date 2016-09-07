@@ -142,7 +142,7 @@ export class MentoringCoverSwipe extends MentoringCover {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			index: this.props.index,
+			index: 0,
 		};
 		this.onPaginationChangeIndex = this.onPaginationChangeIndex.bind(this);
 		this.onSwipeableChangeIndex = this.onSwipeableChangeIndex.bind(this);
@@ -150,7 +150,7 @@ export class MentoringCoverSwipe extends MentoringCover {
 	}
     componentWillReceiveProps() {
 		this.state = {
-			index: this.props.index,
+			index: this.props.covers.length - 1,
 		};
     }
 
@@ -240,8 +240,6 @@ MentoringCoverSwipe.contextTypes = {
 }
 MentoringCoverSwipe.propTypes = {
 	covers: React.PropTypes.array.isRequired,
-	title: React.PropTypes.string.isRequired,
-	index: React.PropTypes.number.isRequired,
 }
 
 export class SelectableCover extends React.Component {
@@ -633,7 +631,6 @@ export class MentoringCard extends React.Component {
 		var category = "";
 		for (var i = 0; i < this.context.categories.length; ++i) {
 			if (this.context.categories[i].value == this.props.category) {
-				console.log("here");
 				category = this.context.categories[i];
 				break;
 			}
