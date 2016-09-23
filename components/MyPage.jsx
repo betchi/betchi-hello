@@ -542,6 +542,7 @@ export class Profile extends React.Component {
 	}
 
 	onLogout(e) {
+		sessionStorage.user = null;
 		const xhr = new XMLHttpRequest();
 		xhr.open('GET', '/api/logout', false); // synchronous
 		xhr.onload = () => {
@@ -553,7 +554,7 @@ export class Profile extends React.Component {
 			}   
 		};  
 		xhr.send();
-		this.context.router.push('/login');
+		this.context.router.push('/first');
 	}
 
 	onFollow() {

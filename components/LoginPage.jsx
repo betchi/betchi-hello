@@ -6,6 +6,8 @@ import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
+import IconButton from 'material-ui/IconButton';
+import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 
 export class LoginIcon extends React.Component {
 	render() {
@@ -48,12 +50,17 @@ export class LoginForm extends React.Component {
 		this.onInputEmail = this.onInputEmail.bind(this);
 		this.onInputPassword = this.onInputPassword.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
+		this.onBack = this.onBack.bind(this);
 	}
 
 	componentWillMount() {
 		if (sessionStorage.user != null) {
 			this.context.router.push('/');
 		}
+	}
+
+	onBack(e) {
+		this.context.router.goBack();
 	}
 
 	onSubmit(e) {
@@ -171,10 +178,29 @@ console.log(data);
 				maxWidth: '30rem',
 				marginTop: '0.5rem',
 			},
+			backIcon: {
+				position: 'fixed',
+				top: '0.2rem',
+				zIndex: '200',
+			},
+			backIcon2: {
+				color: 'white',
+				boxShadow: '1px 1px 1px rgba(0,0,0,1)',
+				borderRadius: '50%',
+				padding: '5px',
+				backgroundColor: this.context.colors.bg2,
+			},
 		};
 
 		return (
 			<section style={styles.formBox}>
+				<IconButton
+					style={styles.backIcon}
+					iconStyle={styles.backIcon2}
+					onTouchTap={this.onBack}
+				>
+					<NavigationArrowBack />
+				</IconButton>
 				<form style={styles.form} onSubmit={this.onSubmit}>
 					<Card
 						style={styles.card}
@@ -201,8 +227,7 @@ console.log(data);
 							ref='passwordTextField'
 						/>
 					</Card>
-					<RaisedButton label="ログイン" primary={true} style={styles.login} type="submit" />
-					<RaisedButton label="新規登録" primary={true} style={styles.register} onTouchTap={this.onTapRegister} />
+					<RaisedButton label="ログイン" style={styles.login} backgroundColor={this.context.colors.bg2} labelColor={this.context.colors.lightGrey} type="submit" />
 				</form>
 				<Snackbar
 					open={this.state.snack.open}
@@ -216,7 +241,8 @@ console.log(data);
 };
 
 LoginForm.contextTypes = {
-  router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }
 
 export class LoginPage extends React.Component {

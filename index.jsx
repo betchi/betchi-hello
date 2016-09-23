@@ -16,6 +16,7 @@ import {ChatPage} from './components/ChatPage.jsx';
 import {SearchPage} from './components/SearchPage.jsx';
 import {MyPage} from './components/MyPage.jsx';
 import {OffersPage} from './components/OffersPage.jsx';
+import {ParticipantsListPage} from './components/ParticipantsListPage.jsx';
 
 var _colorManipulator = require('material-ui/utils/colorManipulator');
 
@@ -57,8 +58,7 @@ function requireAuth(next, replace) {
 	const goLogin = () => {
 		sessionStorage.user = null;
 		replace({
-			//pathname: '/first',
-			pathname: '/login',
+			pathname: '/first',
 			state: {
 				nextPathname: next.location.pathname
 			}
@@ -148,6 +148,7 @@ var Parent = React.createClass({
 					<Route path="/mypage/:id" component={MyPage} onEnter={requireAuth} />
 					<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
 					<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
+					<Route path="/participantsList/:mentoringId/:mentoringTitle" component={ParticipantsListPage} onEnter={requireAuth} />
 				</Router>
 			</MuiThemeProvider>
 		);

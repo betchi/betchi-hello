@@ -4,6 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import MailOutlineIcon from 'material-ui/svg-icons/communication/mail-outline.js';
 import Dialog from 'material-ui/Dialog';
 import CircularProgress from 'material-ui/CircularProgress';
+import Snackbar from 'material-ui/Snackbar';
 
 import FacebookLogin from 'react-facebook-login';
 
@@ -38,7 +39,11 @@ export class FirstPage extends React.Component {
 					textAlign: 'center',
 					top: '45%',
 				},
-			}
+			},
+			snack: {
+				open: false,
+				message: '',
+			},
 		};
 		this.onCreateEmailAccount = this.onCreateEmailAccount.bind(this);
 		this.onLogin = this.onLogin.bind(this);
@@ -86,7 +91,7 @@ export class FirstPage extends React.Component {
     render() {
 		const styles = {
 			root: {
-				background: 'url(/assets/img/splash.png) no-repeat',
+				background: 'url(/assets/img/first.jpg) no-repeat',
 				backgroundSize: 'cover',
 			},
 			video: {
@@ -171,12 +176,63 @@ export class FirstPage extends React.Component {
 						progressWrap: progressWrapStyle,
 					}
 				});
-				
+
+				setTimeout(function(self, response) {
+					facebookAuth(self, response);
+				}, 1500, this, response); // ただローディング画像を表示させたいだけの遅延処理
 			}
+		}
+
+		const facebookAuth = function(self, response) {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', '/api/register/facebook', false);
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 200) {
+					self.setState({
+						snack: {
+							open: true,
+							message: '通信に失敗しました。',
+						},
+					});
+					return;
+				}
+				let data = JSON.parse(xhr.responseText);
+				if (data.ok == false) {
+					console.log("error");
+					let dialogStyle = self.state.styles.dialog;
+					dialogStyle.display = "none";
+					self.setState({
+						styles: {
+							dialog: dialogStyle,
+							progressWrap: self.state.styles.progressWrap,
+						},
+						snack: {
+							open: true,
+							message: '登録に失敗しました。',
+						},
+					});
+					return;
+				}
+				self.context.router.push('/');
+			}
+			xhr.send(JSON.stringify({
+				user_id: response.userID,
+				email: response.email,
+				username: response.name,
+				picture_url: response.picture.data.url,
+			}));
+		}
+
+
+		var fbAppId = "260714887640724";
+		if (process.env.NODE_ENV == "staging") {
+			fbAppId = "290916524620560";
 		}
 
         return (
             <div ref="root" style={styles.root}>
+				<img src="/assets/img/first.jpg" width="100%" />
 				<div style={this.state.styles.dialog}>
 					<div style={this.state.styles.progressWrap}>
 						<CircularProgress color="#00B0FF" />
@@ -184,7 +240,7 @@ export class FirstPage extends React.Component {
 				</div>
 				<div style={styles.facebookLoginWrap}>
 					<FacebookLogin
-						appId="151715948604966"
+						appId={fbAppId}
 						textButton="Facebookでログイン"
 						fields="name,email,picture"
 						callback={responseFacebook}
@@ -215,6 +271,12 @@ export class FirstPage extends React.Component {
 						labelColor="#212121"
 					/>
 				</div>
+				<Snackbar
+					open={this.state.snack.open}
+					message={this.state.snack.message}
+					autoHideDuration={4000}
+					onRequestClose={this.onSnackClose}
+				/>
 			</div>
         )
     }
