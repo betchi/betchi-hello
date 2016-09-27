@@ -86,6 +86,7 @@ var Parent = React.createClass({
     childContextTypes: {
         categories: React.PropTypes.array,
         colors: React.PropTypes.object,
+        mentoringKinds: React.PropTypes.array,
     },
 
     getChildContext: function () {
@@ -93,6 +94,10 @@ var Parent = React.createClass({
 		xhr.open('GET', '/categories.json', false);
 		xhr.send();
 		let data = JSON.parse(xhr.responseText);
+		let mentoringKinds = [];
+		mentoringKinds[1] = "メンタリング(1対1)";
+		mentoringKinds[2] = "メンターグループ";
+		mentoringKinds[3] = "ライブ配信";
 
 		let childContext = {
 			categories: data.categories,
@@ -118,6 +123,7 @@ var Parent = React.createClass({
 				fluorescent1: "#303f9f",
 				error: "#F06292",
 			},
+			mentoringKinds: mentoringKinds,
 		}
 		muiTheme.textField.focusColor = childContext.colors.grey;
 		muiTheme.textField.textColor = childContext.colors.grey;

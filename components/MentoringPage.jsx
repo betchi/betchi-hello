@@ -22,6 +22,8 @@ import ContentCreateIcon from 'material-ui/svg-icons/content/create.js';
 import CardGiftcardIcon from 'material-ui/svg-icons/action/card-giftcard.js';
 import QuestionAnswerIcon from 'material-ui/svg-icons/action/question-answer.js';
 import EditorModeIcon from 'material-ui/svg-icons/editor/mode-edit.js';
+import ListIcon from 'material-ui/svg-icons/action/list.js';
+import AddCircle from 'material-ui/svg-icons/content/add-circle.js';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 import SupervisorAccountButton from 'material-ui/svg-icons/action/supervisor-account';
@@ -83,7 +85,9 @@ export class MentoringPage extends React.Component {
 		this.onBack = this.onBack.bind(this);
 		this.onFollow = this.onFollow.bind(this);
 		this.onOffer = this.onOffer.bind(this);
-		this.onOfferConfirm = this.onOfferConfirm.bind(this);
+		this.onOfferList = this.onOfferList.bind(this);
+		this.onParticipate = this.onParticipate.bind(this);
+		this.onParticipantsList = this.onParticipantsList.bind(this);
 		this.onBookmark = this.onBookmark.bind(this);
 		this.onBookmarkCancel = this.onBookmarkCancel.bind(this);
 		this.onMentoringEdit = this.onMentoringEdit.bind(this);
@@ -112,11 +116,29 @@ export class MentoringPage extends React.Component {
 	}
 
 	onOffer(e) {
-		this.context.router.push({pathname: '/chat/' + this.state.mentoring.id + '/' + sessionStorage.user.id + '/' + this.state.mentoring.title});
+		this.context.router.push({
+			pathname: '/chat/' + this.state.mentoring.id + '/' + sessionStorage.user.id + '/' + this.state.mentoring.title,
+			query: {
+				mentoringUserId: this.state.mentoring.user_id,
+			},
+		});
 	}
 
-	onOfferConfirm(e) {
-		this.context.router.push({pathname: '/offers/' + this.state.mentoring.id + '/' + this.state.mentoring.title});
+	onOfferList(e) {
+		this.context.router.push({
+			pathname: '/offers/' + this.state.mentoring.id + '/' + this.state.mentoring.title,
+			query: {
+				mentoringUserId: this.state.mentoring.user_id,
+			},
+		});
+	}
+
+	onParticipate(e) {
+		console.log("onParticipate");
+	}
+
+	onParticipantsList(e) {
+		this.context.router.push({pathname: '/participantsList/' + this.state.mentoring.id + '/' + this.state.mentoring.title});
 	}
 
 	onBookmark(e) {
@@ -129,7 +151,10 @@ export class MentoringPage extends React.Component {
 
 	onMentoringEdit(e) {
 		console.log("mentoring edit");
-		this.context.router.push({pathname: '/mentoring/' + this.state.mentoring.id + '/edit', query:{category: this.props.location.query.category}});
+		this.context.router.push({
+			pathname: '/mentoring/' + this.state.mentoring.id + '/edit',
+			query:{category: this.props.location.query.category},
+		});
 	}
 
 	onSnackClose(e) {
@@ -272,13 +297,15 @@ export class MentoringPage extends React.Component {
 				textAlign: 'center',
 			},
 			button: {
-				width: '46%',
+				width: '96%',
 				margin: '2%',
+				paddingLeft: '5%',
 				boxShadow: '2px 2px 2px rgba(1, 1, 1, 0.5)',
 				backgroundColor: this.context.colors.bg3,
 				borderRadius: '0.2rem',
 				height: '3rem',
 				color: this.context.colors.white,
+				textAlign: 'left',
 			},
 			buttonLabel: {
 				color: this.context.colors.white,
@@ -312,6 +339,7 @@ export class MentoringPage extends React.Component {
 				clear: 'both',
 				fontWeight: 'bold',
 				borderTop: '1px solid ' + this.context.colors.grey,
+				marginBottom: '5rem',
 			},
 			listItem: {
 			},
@@ -322,6 +350,7 @@ export class MentoringPage extends React.Component {
 				color: this.context.colors.text1,
 			},
 		}
+		
 		var price = this.state.mentoring.price ? String.fromCharCode(165) + this.state.mentoring.price.toString().replace(/(\d)(?=(\d{3})+$)/g , '$1,') : 'いいね値段';
 		var datetimeString;
 		if (this.state.mentoring.datetime == "1970-01-01T00:00:00Z") {
@@ -359,6 +388,7 @@ export class MentoringPage extends React.Component {
 				/>
 				<List style={styles.list}>
 					<ListItem style={styles.listItem} disabled={true} primaryText="カテゴリ" secondaryText={<p style={styles.secondaryText}>{this.props.location.query.category_name}</p>} />
+					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリングタイプ" secondaryText={<p style={styles.secondaryText}>{this.context.mentoringKinds[this.state.mentoring.kind]}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="開催日時" secondaryText={<p style={styles.secondaryText}>{datetimeString}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリング時間" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.duration} 分</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="金額" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
@@ -396,22 +426,44 @@ export class MentoringPage extends React.Component {
 				{(() => {
 					if (this.state.mentoring.user_id == sessionStorage.user.id) {
 						if (this.state.mentoring.count_offers != 0) {
-							return <FlatButton
-								style={styles.button}
-								icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
-								label="オファーを確認"
-								labelStyle={styles.buttonLabel}
-								onTouchTap={this.onOfferConfirm}
-							/>
+							if (this.state.mentoring.kind == 1) {
+								return <FlatButton
+									style={styles.button}
+									icon={<ListIcon style={styles.buttonIcon} />}
+									label="オファーを確認する"
+									labelStyle={styles.buttonLabel}
+									onTouchTap={this.onOfferList}
+								/>
+							} else {
+								return <FlatButton
+									style={styles.button}
+									icon={<ListIcon style={styles.buttonIcon} />}
+									label="参加リストを確認"
+									labelStyle={styles.buttonLabel}
+									onTouchTap={this.onParticipantsList}
+								/>
+							}
 						}
 					} else {
-						return <FlatButton
-							style={styles.button}
-							icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
-							label="オファー"
-							labelStyle={styles.buttonLabel}
-							onTouchTap={this.onOffer}
-						/>
+						if (this.state.mentoring.determinations == null) {
+							if (this.state.mentoring.kind == 1) {
+								return <FlatButton
+									style={styles.button}
+									icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
+									label="オファーする(メッセージ)"
+									labelStyle={styles.buttonLabel}
+									onTouchTap={this.onOffer}
+								/>
+							} else {
+								return <FlatButton
+									style={styles.button}
+									icon={<AddCircle style={styles.buttonIcon} />}
+									label="参加したい"
+									labelStyle={styles.buttonLabel}
+									onTouchTap={this.onParticipate}
+								/>
+							}
+						}
 					}
 				})()}
 				{(() => {
@@ -419,7 +471,7 @@ export class MentoringPage extends React.Component {
 						return <FlatButton
 							style={styles.button}
 							icon={<EditorModeIcon style={styles.buttonIcon} />}
-							label="編集"
+							label="編集する"
 							labelStyle={styles.buttonLabel}
 							onTouchTap={this.onMentoringEdit}
 						/>
@@ -436,7 +488,7 @@ export class MentoringPage extends React.Component {
 							return <FlatButton
 								style={styles.button}
 								icon={<BookmarkBorderIcon style={styles.buttonIcon} />}
-								label="ブックマーク"
+								label="ブックマークする"
 								labelStyle={styles.buttonLabel}
 								onTouchTap={this.onBookmark}
 							/>
@@ -451,6 +503,7 @@ export class MentoringPage extends React.Component {
 MentoringPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
+	mentoringKinds: React.PropTypes.array.isRequired,
 }
 MentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired
@@ -490,6 +543,13 @@ export class EditMentoringPage extends React.Component {
 					display: 'none',
 					fontSize: '12px',
 					color: this.context.colors.error,
+				},
+				controlBlockForDate: {
+					display: 'flex',
+					flexFlow: 'row nowrap',
+					width: '90%',
+					margin: '0 5%',
+					display: 'none',
 				},
 			},
 		};
@@ -598,7 +658,6 @@ export class EditMentoringPage extends React.Component {
 		}
 		const mentoring = this.state.mentoring;
 		mentoring.max_user_num = numberMaxUserNum;
-		console.log(mentoring);
 		this.setState({
 			mentoring: mentoring,
 		})
@@ -635,6 +694,24 @@ export class EditMentoringPage extends React.Component {
 		mentoring.kind = value;
 		this.setState({
 			mentoring: mentoring,
+		})
+
+		this.setControlBlockForDateStyle(value);
+	}
+
+	setControlBlockForDateStyle(value) {
+		const styles = this.state.styles;
+		if (value === 1) {
+			styles.controlBlockForDate.display = 'none';
+			this.setState({
+				date: null,
+				time: null,
+			})
+		} else {
+			styles.controlBlockForDate.display = 'flex';
+		}
+		this.setState({
+			styles: styles,
 		})
 	}
 
@@ -838,12 +915,18 @@ export class EditMentoringPage extends React.Component {
 			this.setState({
 				mentoring: data.mentoring,
 			});
-			if (data.mentoring.datetime != "1970-01-01T00:00:00Z") {
-				this.setState({
-					date: new Date(data.mentoring.datetime),
-					time: new Date(data.mentoring.datetime),
-				});
+			this.setControlBlockForDateStyle(data.mentoring.kind);
+			if (data.mentoring.datetime === "1970-01-01T00:00:00Z") {
+				date = null;
+				time = null;
+			} else {
+				date = new Date(data.mentoring.datetime);
+				time = new Date(data.mentoring.datetime);
 			}
+			this.setState({
+				date: date,
+				time: time,
+			});
 		}
 		xhr.send();
 	}
@@ -868,6 +951,36 @@ export class EditMentoringPage extends React.Component {
 				left: 0,
 				textAlign: 'center',
 			},
+			button: {
+				width: '96%',
+				margin: '2%',
+				paddingLeft: '5%',
+				boxShadow: '2px 2px 2px rgba(1, 1, 1, 0.5)',
+				backgroundColor: this.context.colors.bg3,
+				borderRadius: '0.2rem',
+				height: '3rem',
+				textAlign: 'left',
+			},
+			buttonLabel: {
+				color: this.context.colors.white,
+				paddingRight: 0,
+				fontSize: '1.4rem',
+			},
+			buttonMember: {
+				width: '96%',
+				margin: '2%',
+				paddingLeft: '5%',
+				boxShadow: '2px 2px 2px rgba(1, 1, 1, 0.5)',
+				backgroundColor: this.context.colors.white,
+				borderRadius: '0.2rem',
+				height: '3rem',
+				textAlign: 'left',
+			},
+			buttonLabelMember: {
+				color: this.context.colors.black,
+				paddingRight: 0,
+				fontSize: '1.4rem',
+			},
 			offer: {
 				width: '100%',
 			},
@@ -884,7 +997,7 @@ export class EditMentoringPage extends React.Component {
 			labelStyle: {
 				fontSize: '1.4rem',
 			},
-			dateRoot: {
+			controlBlock: {
 				display: 'flex',
 				flexFlow: 'row nowrap',
 				width: '90%',
@@ -965,7 +1078,27 @@ export class EditMentoringPage extends React.Component {
 					/>
 				</HeadRoom>
 				<form onSubmit={this.onSubmit}>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
+						<SelectField
+							style={styles.dateText}
+							value={this.state.mentoring.kind}
+							errorText={this.state.errorKind}
+							onChange={this.onChangeKind}
+							floatingLabelText="メンタリングタイプ"
+							floatingLabelFixed={true}
+							fullWidth={true}
+							ref='kindField'
+						>
+							{(() => {
+								var menuItems = [];
+								for (var i = 1; i < this.context.mentoringKinds.length; i++) {
+									menuItems.push(<MenuItem style={styles.menuItem} key={i} value={i} primaryText={this.context.mentoringKinds[i]} />)
+								}
+								return menuItems;
+							})()}
+						</SelectField>
+					</div>
+					<div style={styles.controlBlock}>
 						<TextField
 							style={styles.dateText}
 							textareaStyle={styles.textareaStyle}
@@ -980,7 +1113,7 @@ export class EditMentoringPage extends React.Component {
 							rowsMax={5}
 						/>
 					</div>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
 						<p style={styles.selectCoverTitle}>以下よりカバー画像を選択して下さい</p>
 					</div>
 					<MentoringCoverSwipe
@@ -991,10 +1124,10 @@ export class EditMentoringPage extends React.Component {
 						onTap={this.onCoverSelected}
 						mentoringCovers={this.state.mentoring.covers}
 					/>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
 						<p style={this.state.styles.errorCover}>カバー画像を選択して下さい</p>
 					</div>
-					<div style={styles.dateRoot}>
+					<div style={this.state.styles.controlBlockForDate}>
 						<DatePicker
 							textFieldStyle={styles.dateText}
 							inputStyle={styles.textareaStyle}
@@ -1014,7 +1147,7 @@ export class EditMentoringPage extends React.Component {
 							onChange={this.onChangeTime}
 						/>
 					</div>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
 						<TextField
 							style={styles.dateText}
 							inputStyle={styles.textareaStyle}
@@ -1027,7 +1160,7 @@ export class EditMentoringPage extends React.Component {
 							ref='durationTextField'
 						/>
 					</div>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
 						<TextField
 							style={styles.dateText}
 							inputStyle={styles.textareaStyle}
@@ -1050,7 +1183,7 @@ export class EditMentoringPage extends React.Component {
 							ref='maxUserNumTextField'
 						/>
 					</div>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
 						<SelectField
 							style={styles.dateText}
 							value={this.state.category}
@@ -1062,32 +1195,15 @@ export class EditMentoringPage extends React.Component {
 							ref='categoryFIeld'
 						>
 							{(() => {
-								if (Array.isArray(this.context.categories)) {
-									var menuItems = [];
-									for (var i = 0; i < this.context.categories.length; i++) {
-										menuItems.push(<MenuItem style={styles.menuItem} key={i} value={this.context.categories[i].value} primaryText={this.context.categories[i].label} />)
-									}
-									return menuItems;
+								var menuItems = [];
+								for (var i = 0; i < this.context.categories.length; i++) {
+									menuItems.push(<MenuItem style={styles.menuItem} key={i} value={this.context.categories[i].value} primaryText={this.context.categories[i].label} />)
 								}
+								return menuItems;
 							})()}
 						</SelectField>
 					</div>
-					<div style={styles.dateRoot}>
-						<SelectField
-							style={styles.dateText}
-							value={this.state.mentoring.kind}
-							errorText={this.state.errorKind}
-							onChange={this.onChangeKind}
-							floatingLabelText="メンタリングタイプ"
-							floatingLabelFixed={true}
-							fullWidth={true}
-							ref='kindField'
-						>
-							<MenuItem style={styles.menuItem} key={1} value={1} primaryText="通常" />
-							<MenuItem style={styles.menuItem} key={2} value={2} primaryText="ライブ配信" />
-						</SelectField>
-					</div>
-					<div style={styles.dateRoot}>
+					<div style={styles.controlBlock}>
 						<TextField
 							style={styles.digestText}
 							textareaStyle={styles.textareaStyle}
@@ -1103,18 +1219,17 @@ export class EditMentoringPage extends React.Component {
 						/>
 					</div>
 					<div style={styles.buttons}>
-						<RaisedButton
-							style={styles.offer}
-							labelStyle={styles.offerLabelStyle}
+						<FlatButton
+							style={styles.buttonMember}
+							labelStyle={styles.buttonLabelMember}
 							label={this.state.selectMemberLabel}
-							icon={<SupervisorAccountButton style={styles.offerIconStyle} />}
 							onTouchTap={this.onOpenModal}
 						/>
 					</div>
 					<div style={styles.buttons}>
-						<RaisedButton
-							style={styles.offer}
-							labelStyle={styles.labelStyle}
+						<FlatButton
+							style={styles.button}
+							labelStyle={styles.buttonLabel}
 							primary={true}
 							label="登録する"
 							onTouchTap={this.onSubmit}
@@ -1143,6 +1258,7 @@ EditMentoringPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
 	categories: React.PropTypes.array.isRequired,
+	mentoringKinds: React.PropTypes.array.isRequired,
 }
 EditMentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired

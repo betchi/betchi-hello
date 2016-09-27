@@ -19,6 +19,7 @@ var contactSearchTimerId = null;
 var mentoringId;
 var offerUserId;
 var mentoringTitle;
+var mentoring;
 
 export class OffersPage extends React.Component {
 	constructor(props, context) {
@@ -39,6 +40,7 @@ export class OffersPage extends React.Component {
 		offerUserId = this.props.params.userId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
+		this.getMentoring(mentoringId);
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/api/offers/' + mentoringId);
 		xhr.onload = () => {
@@ -56,7 +58,6 @@ export class OffersPage extends React.Component {
 			}
 			myContactList = [];
 			let data = JSON.parse(xhr.responseText);
-			console.log(data.offers);
 			this.setState({
 				contactList: data.offers,
 			});
@@ -81,7 +82,35 @@ export class OffersPage extends React.Component {
 	}
 
 	onItemTap(userId) {
-		this.context.router.push({pathname: '/chat/' + mentoringId + '/' + userId + '/' + mentoringTitle});
+		this.context.router.push({
+			pathname: '/chat/' + mentoringId + '/' + userId + '/' + mentoringTitle,
+			query: {
+				targetUserId: userId,
+				mentoringUserId: this.props.location.query.mentoringUserId,
+			},
+		});
+	}
+
+	getMentoring(id) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/mentoring/' + id, false);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			mentoring = data.mentoring;
+		}
+		xhr.send();
 	}
 
 	render() {
@@ -90,11 +119,9 @@ export class OffersPage extends React.Component {
 				position: 'absolute',
 				width: '100%',
 				height: '99%',
-				top: '0.2rem',
 			},
 			title: {
-				cursor: 'pointer',
-				fontSize: '1rem',
+				fontSize: '1.2rem',
 			},
 			searchContactWrap: {
 				position: 'absolute',
@@ -141,18 +168,37 @@ export class OffersPage extends React.Component {
 				transition: 'all .3s ease-in-out',
 			},
 			title: {
-				fontSize: '1rem',
+				fontSize: '1.2rem',
 			},
 			time: {
 				width: '2.5rem',
 				textAlign: 'right',
 				fontSize: '0.8em',
 			},
+			list: {
+				marginTop: '-8px',
+			},
 			listItem: {
 			},
 			secondoryText: {
 			},
+			label: {
+				backgroundColor: '#009688',
+				borderRadius: '1rem',
+				fontWeight: 'bold',
+				display: 'inline-block',
+				position: 'absolute',
+				top: '80%',
+				left: '0',
+				fontSize: '0.5rem',
+				padding: '0 0.1rem',
+				color: this.context.colors.white,
+				width: '2.2rem',
+				textAlign: 'center',
+				border: '1px solid ' + this.context.colors.white,
+			},
 		};
+
 		return (
 			<section style={styles.contactListSection}>
 				<HeadRoom
@@ -170,7 +216,7 @@ export class OffersPage extends React.Component {
 						}
 					/>
 				</HeadRoom>
-				<List>
+				<List style={styles.list}>
 				{(() => {
 					if (Array.isArray(this.state.contactList)) {
 						let contactList = [];
@@ -178,7 +224,21 @@ export class OffersPage extends React.Component {
 							var date = new Date( this.state.contactList[i].last_modified_at);
 							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 							var message = decodeURI(this.state.contactList[i].last_message);
-							contactList.push(<ListItem style={styles.listItem} key={i} primaryText={this.state.contactList[i].username} secondaryText={<span style={styles.secondoryText}>{message}</span>} leftAvatar={<Avatar src={this.state.contactList[i].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)} secondaryTextLines={2} rightIcon={<p style={styles.time}>{hhmm}</p>} />);
+							var determinationLabel = null;
+							if (mentoring.determinations !== null &&
+								mentoring.determinations.indexOf(this.state.contactList[i].user_id) >= 0) {
+								determinationLabel = <div style={styles.label}>確定</div>;
+							}
+							contactList.push(<ListItem
+								style={styles.listItem}
+								key={i}
+								primaryText={this.state.contactList[i].username}
+								secondaryText={<span style={styles.secondoryText}>{message}</span>}
+								leftAvatar={<Avatar src={this.state.contactList[i].avatar} />}
+								onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)}
+								secondaryTextLines={2}
+								rightIcon={<p style={styles.time}>{hhmm}{determinationLabel}</p>}
+							/>);
 						}
 						return contactList;
 					}
@@ -195,5 +255,6 @@ export class OffersPage extends React.Component {
 	}
 };
 OffersPage.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: React.PropTypes.object.isRequired,
+	colors: React.PropTypes.object.isRequired,
 }

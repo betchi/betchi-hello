@@ -18,9 +18,9 @@ import Scroll from 'react-scroll';
 import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import PersonAdd from 'material-ui/svg-icons/social/person-add';
 import ContentSend from 'material-ui/svg-icons/content/send';
 import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 
 var ws;
 var self;
@@ -64,6 +64,7 @@ var styleSendButton = {
 	width: '50px',
 	fontSize: '2em',
 };
+var mentoring;
 
 export class ChatPage extends React.Component {
 
@@ -76,12 +77,17 @@ export class ChatPage extends React.Component {
 				open: false,
 				message: '',
 			},
+			dialog: {
+				open: false,
+			},
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
 		this.sendMessage = this.sendMessage.bind(this);
 		this.changeText = this.changeText.bind(this);
 		this.onBack = this.onBack.bind(this);
 		this.onOffer = this.onOffer.bind(this);
+		this.dialogHandleClose = this.dialogHandleClose.bind(this);
+		this.dialogHandleOpen = this.dialogHandleOpen.bind(this);
 
 		self = this;
 	}
@@ -91,6 +97,9 @@ export class ChatPage extends React.Component {
 		offerUserId = this.props.params.offerUserId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
+
+		this.getMentoring(mentoringId);
+
 		name = sessionStorage.user.username;
 		isDoneFirstShow = false;
 		var wsDomain = "ws-mentor.fairway.ne.jp";
@@ -278,94 +287,188 @@ export class ChatPage extends React.Component {
 
 	onOffer(e) {
 		console.log("onOffer");
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/mentoring/determinations', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+		}
+		var mentoring = {
+			id: parseInt(mentoringId),
+			determinations: [parseInt(this.props.location.query.targetUserId)]
+		};
+		const json = JSON.stringify({
+			mentoring:mentoring
+		});
+		xhr.send(json);
+		this.dialogHandleClose();
+	}
+
+	dialogHandleOpen() {
+		this.setState({
+			dialog: {
+				open: true,
+			},
+		});
+	}
+
+	dialogHandleClose() {
+		this.setState({
+			dialog: {
+				open: false,
+			},
+		});
+	}
+
+	getMentoring(id) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/mentoring/' + id, false);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			mentoring = data.mentoring;
+		}
+		xhr.send();
 	}
 
 	render() {
 		const styles = {
-		headroom: {
-			WebkitTransition: 'all .3s ease-in-out',
-			MozTransition: 'all .3s ease-in-out',
-			OTransition: 'all .3s ease-in-out',
-			transition: 'all .3s ease-in-out',
-		},
-		title: {
-			fontSize: '1.2rem',
-		},
-		avatar: {
-			marginLeft: '10px',
-		},
-		leftBalloon: {
-			width: 'auto',
-			maxWidth: '60%',
-			wordBreak: 'break-all',
-			background: '#f1f0f0',
-			border: '0px solid #777',
-			padding: '5px 10px',
-			margin: '5px 10px 5px 60px',
-			borderRadius: '15px',
-			clear: 'both',
-			float: 'left',
-		},
-		rightBalloon: {
-			width: 'auto',
-			maxWidth: '70%',
-			wordBreak: 'break-all',
-			color: this.context.colors.white,
-			position: 'relative',
-			background: '#0084ff',
-			border: '0px solid #777',
-			padding: '5px 10px',
-			margin: '5px 10px 5px 10px',
-			borderRadius: '15px',
-			clear: 'both',
-			float: 'right',
-		},
-		clearBalloon: {
-			clear: 'both',
-		},
-		senderName: {
-			fontSize: '0.6em',
-			marginTop: '-30px',
-			marginLeft: '70px',
-			marginBottom: '-5px',
-			color: this.context.colors.black,
-		},
-		timeRight: {
-			fontSize: '0.6em',
-			color: this.context.colors.black,
-			float: 'right',
-			marginTop: '10px',
-		},
-		timeLeft: {
-			fontSize: '0.6em',
-			color: this.context.colors.black,
-			float: 'left',
-			marginTop: '10px',
-		},
-		date: {
-			fontSize: '0.6em',
-			color: this.context.colors.black,
-			width: 'auto',
-			wordBreak: 'break-all',
-			backgroundColor: this.context.colors.lightGrey,
-			border: '0px solid ' + this.context.colors.lightGrey,
-			borderRadius: '15px',
-			padding: '5px 10px',
-			margin: '-12px 0 20px 43%',
-			textAlign: 'center',
-			clear: 'both',
-			float: 'left',
-		},
-		dateLi: {
-			marginTop: '30px',
-		},
-		hr: {
-			width: '100%',
-			borderTop: '1px solid',
-			borderColor: this.context.colors.lightGrey,
-		},
-	};
-	var indents = [];
+			headroom: {
+				WebkitTransition: 'all .3s ease-in-out',
+				MozTransition: 'all .3s ease-in-out',
+				OTransition: 'all .3s ease-in-out',
+				transition: 'all .3s ease-in-out',
+			},
+			title: {
+				fontSize: '1.2rem',
+			},
+			avatar: {
+				marginLeft: '10px',
+			},
+			personAdd: {
+				marginTop: '0.4rem',
+				fontWeight: '1000',
+			},
+			leftBalloon: {
+				width: 'auto',
+				maxWidth: '60%',
+				wordBreak: 'break-all',
+				background: '#f1f0f0',
+				border: '0px solid #777',
+				padding: '5px 10px',
+				margin: '5px 10px 5px 60px',
+				borderRadius: '15px',
+				clear: 'both',
+				float: 'left',
+			},
+			rightBalloon: {
+				width: 'auto',
+				maxWidth: '70%',
+				wordBreak: 'break-all',
+				color: this.context.colors.white,
+				position: 'relative',
+				background: '#0084ff',
+				border: '0px solid #777',
+				padding: '5px 10px',
+				margin: '5px 10px 5px 10px',
+				borderRadius: '15px',
+				clear: 'both',
+				float: 'right',
+			},
+			clearBalloon: {
+				clear: 'both',
+			},
+			senderName: {
+				fontSize: '0.6em',
+				marginTop: '-30px',
+				marginLeft: '70px',
+				marginBottom: '-5px',
+				color: this.context.colors.black,
+			},
+			timeRight: {
+				fontSize: '0.6em',
+				color: this.context.colors.black,
+				float: 'right',
+				marginTop: '10px',
+			},
+			timeLeft: {
+				fontSize: '0.6em',
+				color: this.context.colors.black,
+				float: 'left',
+				marginTop: '10px',
+			},
+			date: {
+				fontSize: '0.6em',
+				color: this.context.colors.black,
+				width: 'auto',
+				wordBreak: 'break-all',
+				backgroundColor: this.context.colors.lightGrey,
+				border: '0px solid ' + this.context.colors.lightGrey,
+				borderRadius: '15px',
+				padding: '5px 10px',
+				margin: '-12px 0 20px 43%',
+				textAlign: 'center',
+				clear: 'both',
+				float: 'left',
+			},
+			dateLi: {
+				marginTop: '30px',
+			},
+			hr: {
+				width: '100%',
+				borderTop: '1px solid',
+				borderColor: this.context.colors.lightGrey,
+			},
+		};
+
+		var rightIcon = null;
+		if (this.props.location.query.mentoringUserId == sessionStorage.user.id) {
+			rightIcon = <FlatButton
+				style={styles.personAdd}
+				primary={true}
+				label="このユーザに決定"
+				onTouchTap={this.dialogHandleOpen}
+			/>;
+		}
+		var indents = [];
+
+		const actions = [
+		  <FlatButton
+			label="キャンセル"
+			primary={true}
+			onTouchTap={this.dialogHandleClose}
+		  />,
+		  <FlatButton
+			label="はい"
+			primary={true}
+			keyboardFocused={true}
+			onTouchTap={this.onOffer}
+		  />,
+		];
+
 		return (
 			<section>
 				<HeadRoom
@@ -381,14 +484,7 @@ export class ChatPage extends React.Component {
 								<NavigationArrowBack />
 							</IconButton>
 						}
-						iconElementRight={
-							<FlatButton
-								primary={true}
-								label="オファー"
-								icon={<PersonAdd />}
-								onTouchTap={this.onOffer}
-							/>
-						}
+						iconElementRight={rightIcon}
 					/>
 				</HeadRoom>
 				<ul style={styleUl}>
@@ -434,6 +530,15 @@ export class ChatPage extends React.Component {
 					/>
 				</div>
 				<FlatButton icon={<ContentSend color={this.context.colors.white} />} primary={true} style={styleSendButton} onTouchTap={this.sendMessage} />
+				<Dialog
+					title="確認"
+					actions={actions}
+					modal={false}
+					open={this.state.dialog.open}
+					onRequestClose={this.dialogHandleClose}
+				>
+					このユーザとメンタリングします
+				</Dialog>
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}
@@ -447,5 +552,7 @@ export class ChatPage extends React.Component {
 ChatPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
+	targetUserId: React.PropTypes.number.isRequired,
+	mentoringUserId: React.PropTypes.number.isRequired,
 }
 

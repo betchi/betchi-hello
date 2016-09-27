@@ -114,7 +114,7 @@ export class MentoringCover extends React.Component {
 					{datetimeString} ( {this.props.duration}分間 )<br />
 					{price}
 					{(() => {
-						if (this.props.kind == 2) {
+						if (this.props.kind == 3) {
 							return <LiveMark />
 						}
 					})()}
