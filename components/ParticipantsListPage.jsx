@@ -11,6 +11,9 @@ import Avatar from 'material-ui/Avatar';
 import AppBar from 'material-ui/AppBar';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import IconButton from 'material-ui/IconButton';
+import Toggle from 'material-ui/Toggle';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 
 var self;
 var searchContactList = null;
@@ -29,9 +32,14 @@ export class ParticipantsListPage extends React.Component {
 				open: false,
 				message: '',
 			},
+			dialog: {
+				open: false,
+			},
 		};
 		this.onItemTap = this.onItemTap.bind(this);
 		this.onBack = this.onBack.bind(this);
+		this.dialogHandleClose = this.dialogHandleClose.bind(this);
+		this.dialogHandleOpen = this.dialogHandleOpen.bind(this);
 		self = this;
 	}
 
@@ -81,7 +89,54 @@ export class ParticipantsListPage extends React.Component {
 	}
 
 	onItemTap(userId) {
-		this.context.router.push({pathname: '/chat/' + mentoringId + '/' + userId + '/' + mentoringTitle});
+		console.log(userId);
+	}
+
+	onOffer(e) {
+		console.log("onOffer");
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/mentoring/determinations', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+		}
+		var mentoring = {
+			id: parseInt(mentoringId),
+			determinations: [parseInt(this.props.location.query.targetUserId)]
+		};
+		const json = JSON.stringify({
+			mentoring:mentoring
+		});
+		xhr.send(json);
+		this.dialogHandleClose();
+	}
+
+	dialogHandleOpen() {
+		this.setState({
+			dialog: {
+				open: true,
+			},
+		});
+	}
+
+	dialogHandleClose() {
+		this.setState({
+			dialog: {
+				open: false,
+			},
+		});
 	}
 
 	render() {
@@ -148,18 +203,42 @@ export class ParticipantsListPage extends React.Component {
 				textAlign: 'right',
 				fontSize: '0.8em',
 			},
+			list: {
+				marginTop: '-8px',
+			},
 			listItem: {
 			},
 			secondoryText: {
 			},
+			toggle: {
+				position: 'absolute',
+				width: '48px',
+				height: '48px',
+				left: '80%',
+			},
 		};
+
+		const actions = [
+		  <FlatButton
+			label="キャンセル"
+			primary={true}
+			onTouchTap={this.dialogHandleClose}
+		  />,
+		  <FlatButton
+			label="はい"
+			primary={true}
+			keyboardFocused={true}
+			onTouchTap={this.onOffer}
+		  />,
+		];
+
 		return (
 			<section style={styles.contactListSection}>
 				<HeadRoom
 					style={styles.headroom}
 				>
 					<AppBar
-						title={mentoringTitle}
+						title="参加リスト"
 						titleStyle={styles.title}
 						iconElementLeft={
 							<IconButton
@@ -168,9 +247,16 @@ export class ParticipantsListPage extends React.Component {
 							<NavigationArrowBack />
 							</IconButton>
 						}
+						iconElementRight={
+							<FlatButton
+								primary={true}
+								label="OK"
+								onTouchTap={this.dialogHandleOpen}
+							/>
+						}
 					/>
 				</HeadRoom>
-				<List>
+				<List style={styles.list}>
 				{(() => {
 					if (Array.isArray(this.state.contactList)) {
 						let contactList = [];
@@ -178,12 +264,35 @@ export class ParticipantsListPage extends React.Component {
 							var date = new Date( this.state.contactList[i].last_modified_at);
 							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 							var message = decodeURI(this.state.contactList[i].last_message);
-							contactList.push(<ListItem style={styles.listItem} key={i} primaryText={this.state.contactList[i].username} leftAvatar={<Avatar src={this.state.contactList[i].avatar} />} onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)} secondaryTextLines={2} rightIcon={<p style={styles.time}>{hhmm}</p>} />);
+							contactList.push(
+								<ListItem
+									style={styles.listItem}
+									key={i}
+									primaryText={this.state.contactList[i].username}
+									leftAvatar={<Avatar src={this.state.contactList[i].avatar} />}
+									secondaryTextLines={2}
+									disabled={true}
+								>
+									<Toggle
+										style={styles.toggle}
+										onToggle={this.onItemTap.bind(this, this.state.contactList[i].user_id)}
+									/>
+								</ListItem>
+							);
 						}
 						return contactList;
 					}
 				})()}
 				</List>
+				<Dialog
+					title="確認"
+					actions={actions}
+					modal={false}
+					open={this.state.dialog.open}
+					onRequestClose={this.dialogHandleClose}
+				>
+					このユーザとメンタリングします
+				</Dialog>
 				<Snackbar
 					open={this.state.snack.open}
 					message={this.state.snack.message}
