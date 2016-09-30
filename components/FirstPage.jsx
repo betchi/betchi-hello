@@ -45,9 +45,19 @@ export class FirstPage extends React.Component {
 				message: '',
 			},
 		};
+		this.onFacebookLoginByNative = this.onFacebookLoginByNative.bind(this);
 		this.onCreateEmailAccount = this.onCreateEmailAccount.bind(this);
 		this.onLogin = this.onLogin.bind(this);
     }
+
+    componentWillReceiveProps() {
+		if (sessionStorage.isFacebook) {
+			sessionStorage.isFacebook = null;
+			var userInfo = JSON.parse(sessionStorage.userInfo);
+			sessionStorage.userInfo = null;
+			this.facebookAuth(userInfo);
+		}
+	}
 
     componentDidMount() {
 /*
@@ -80,12 +90,64 @@ export class FirstPage extends React.Component {
 */
     }
 
+	onFacebookLoginByNative(e) {
+		this.context.router.push({pathname: '/facebookLogin/'}); // ネイティブ側へ
+	}
+
 	onCreateEmailAccount(e) {
 		this.context.router.push({pathname: '/register/'});
 	}
 
 	onLogin(e) {
 		this.context.router.push({pathname: '/login/'});
+	}
+
+	facebookAuth(userInfo) {
+		let dialogStyle = this.state.styles.dialog;
+		let progressWrapStyle = this.state.styles.progressWrap;
+		dialogStyle.display = "block";
+		progressWrapStyle.display = "block";
+		this.setState({
+			styles: {
+				dialog: dialogStyle,
+				progressWrap: progressWrapStyle,
+			}
+		});
+		setTimeout(function(self, userInfo) {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', '/api/register/facebook', false);
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 200) {
+					self.setState({
+						snack: {
+							open: true,
+							message: '通信に失敗しました。',
+						},
+					});
+					return;
+				}
+				let data = JSON.parse(xhr.responseText);
+				if (data.ok == false) {
+					console.log("error");
+					let dialogStyle = self.state.styles.dialog;
+					dialogStyle.display = "none";
+					self.setState({
+						styles: {
+							dialog: dialogStyle,
+							progressWrap: self.state.styles.progressWrap,
+						},
+						snack: {
+							open: true,
+							message: '登録に失敗しました。',
+						},
+					});
+					return;
+				}
+				self.context.router.push('/');
+			}
+			xhr.send(JSON.stringify(userInfo));
+		}, 1500, this, userInfo); // ただローディング画像を表示させたいだけの遅延処理
 	}
 
     render() {
@@ -123,19 +185,24 @@ export class FirstPage extends React.Component {
 				bottom: '12%',
 				width: '100%',
 			},
+			facebookLoginIcon: {
+				marginTop: '-5px',
+				width: '18px',
+				height: '18px',
+			},
 			createEmailAccount: {
 				display: 'block',
 				width: '90%',
 				height: '3rem',
 				margin: '0 auto',
 				borderRadius: '5px',
-  				//boxShadow: '1px 1px 1px #F44336',
 			},
 			createEmailAccountLabel: {
   				fontSize: '0.9rem',
 				display: 'inline-block',
 				lineHeight: '3rem',
   				letterSpacing: '2px',
+				textTransform: 'none',
 			},
 			createEmailAccountIcon: {
 				marginTop: '-1px',
@@ -153,7 +220,6 @@ export class FirstPage extends React.Component {
 				height: '3rem',
 				margin: '0 auto',
 				borderRadius: '5px',
-  				//boxShadow: '1px 1px 1px #E0E0E0',
 			},
 			loginLabel: {
   				fontSize: '0.9rem',
@@ -164,64 +230,15 @@ export class FirstPage extends React.Component {
 		}
 
 		const responseFacebook = (response) => {
-			console.log(response);
 			if (response.status != "unknown") {
-				let dialogStyle = this.state.styles.dialog;
-				let progressWrapStyle = this.state.styles.progressWrap;
-				dialogStyle.display = "block";
-				progressWrapStyle.display = "block";
-				this.setState({
-					styles: {
-						dialog: dialogStyle,
-						progressWrap: progressWrapStyle,
-					}
-				});
-
-				setTimeout(function(self, response) {
-					facebookAuth(self, response);
-				}, 1500, this, response); // ただローディング画像を表示させたいだけの遅延処理
-			}
-		}
-
-		const facebookAuth = function(self, response) {
-			const xhr = new XMLHttpRequest();
-			xhr.open('POST', '/api/register/facebook', false);
-			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-			xhr.onload = () => {
-				if (xhr.status !== 200) {
-					self.setState({
-						snack: {
-							open: true,
-							message: '通信に失敗しました。',
-						},
-					});
-					return;
+				var userInfo = {
+					user_id: response.userID,
+					email: response.email,
+					username: response.name,
+					picture_url: response.picture.data.url,
 				}
-				let data = JSON.parse(xhr.responseText);
-				if (data.ok == false) {
-					console.log("error");
-					let dialogStyle = self.state.styles.dialog;
-					dialogStyle.display = "none";
-					self.setState({
-						styles: {
-							dialog: dialogStyle,
-							progressWrap: self.state.styles.progressWrap,
-						},
-						snack: {
-							open: true,
-							message: '登録に失敗しました。',
-						},
-					});
-					return;
-				}
-				self.context.router.push('/');
+				this.facebookAuth(userInfo);
 			}
-			xhr.send(JSON.stringify({
-				user_id: response.userID,
-				email: response.email,
-				username: response.name,
-				picture_url: response.picture.data.url,
-			}));
 		}
 
 
@@ -239,16 +256,34 @@ export class FirstPage extends React.Component {
 					</div>
 				</div>
 				<div style={styles.facebookLoginWrap}>
-					<FacebookLogin
-						appId={fbAppId}
-						textButton="Facebookでログイン"
-						fields="name,email,picture"
-						callback={responseFacebook}
-						cssClass="fb-button"
-						icon="fa-facebook" 
-						size="large"
-						language="ja_JP"
-					/>
+				{(() => {
+					if (window.navigator.userAgent.match(/MentorApp/)) {
+						return (
+							<RaisedButton
+								label="facebookでログイン"
+								icon={<img src="/assets/img/FB-f-Logo__blue_100.png" style={styles.facebookLoginIcon} />}
+								style={styles.createEmailAccount}
+								labelStyle={styles.createEmailAccountLabel}
+								labelColor="white"
+								backgroundColor="#3b579d"
+								onTouchTap={this.onFacebookLoginByNative}
+							/>
+						);
+					} else {
+						return (
+							<FacebookLogin
+								appId={fbAppId}
+								textButton="facebookでログイン"
+								fields="name,email,picture"
+								callback={responseFacebook}
+								cssClass="fb-button"
+								icon="fa-facebook"
+								size="large"
+								language="ja_JP"
+							/>
+						);
+					}
+				})()}
 				</div>
 				<div style={styles.createEmailAccountWrap}>
 					<RaisedButton

@@ -15,6 +15,17 @@
 		<script type="text/javascript">
 			var snsEndpointArn;
 			var deviceToken;
+			function facebookLoginSubmit(userId, username, email, pictureUrl) {
+				var userInfo = {
+					user_id: userId,
+					email: email,
+					username: username,
+					picture_url: pictureUrl,
+				}
+				sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+				sessionStorage.setItem('isFacebook', true);
+				location.href = "/#/first";
+			}
 		</script>
 	</body>
 </html>
