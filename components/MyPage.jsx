@@ -55,14 +55,12 @@ export class MyPage extends React.Component {
 			page: 1,
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
-		this.loadContents = this.loadContents.bind(this);
 		this.loadMessages = this.loadMessages.bind(this);
 		this.onScroll = this.onScroll.bind(this);
 		this.onOffer = this.onOffer.bind(this);
 	}
 
-	componentDidMount() {
-		this.loadContents(this.props.params.id);
+	componentWillMount() {
 		this.loadMessages(this.props.params.id);
 	}
 
@@ -97,30 +95,6 @@ export class MyPage extends React.Component {
 			window.removeEventListener('scroll', this.onScroll);
 			this.loadMessages(this.props.params.id, this.state.page + 1);
 		}
-	}
-
-	loadContents(id = 1) {
-		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/api/user/' + id);
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '通信に失敗しました。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			let data = JSON.parse(xhr.responseText);
-			this.setState({
-				pageUser: data.user,
-			});
-		}
-		xhr.send();
 	}
 
 	loadMessages(id = 1, page = 1) {
@@ -291,13 +265,6 @@ export class MyPage extends React.Component {
 			<section style={styles.root}>
 				<Profile
 					userId={this.props.params.id}
-					cover={this.state.pageUser.cover}
-					avatar={this.state.pageUser.avatar}
-					username={this.state.pageUser.username}
-					countFollowers={this.state.pageUser.count_followers}
-					countFollows={this.state.pageUser.count_follows}
-					countThanx={this.state.pageUser.count_thanx}
-					countStar={this.state.pageUser.count_star}
 				/>
 				<MenuIcon userId={this.props.params.id} />
 				<Tabs
@@ -501,11 +468,15 @@ export class Profile extends React.Component {
 				open: false,
 			},
 			user: {
-				username: this.props.username,
+				username: "",
 			},
 		};
+		this.loadContents(this.props.userId);
+
+		this.onProfileEdit = this.onProfileEdit.bind(this);
 		this.onProfileEditOpen = this.onProfileEditOpen.bind(this);
 		this.onProfileEditClose = this.onProfileEditClose.bind(this);
+		this.changeUsername = this.changeUsername.bind(this);
 		this.onFollow = this.onFollow.bind(this);
 		this.onFollower = this.onFollower.bind(this);
 		this.onThanx = this.onThanx.bind(this);
@@ -519,26 +490,90 @@ export class Profile extends React.Component {
 	componentDidMount() {
 	}
 
+	loadContents(id) {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/user/' + id);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			this.setState({
+				user: data.user,
+			});
+		}
+		xhr.send();
+	}
+
+	onProfileEdit() {
+		console.log("onProfileEdit");
+		if (this.state.changeUserName === undefined || this.state.changeUserName === this.state.user.username) {
+			return;
+		}
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/user', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+					changeUsername: this.state.user.username,
+				});
+				return;
+			} else {
+				let data = JSON.parse(xhr.responseText);
+				let user = this.state.user;
+				user.username = this.state.changeUserName;
+				this.setState({
+					user: user,
+				});
+				this.onProfileEditClose();
+			}
+		}
+		const json = JSON.stringify({
+			id: sessionStorage.user.id,
+			username: this.state.changeUserName,
+		});
+		xhr.send(json);
+	}
+
 	onProfileEditOpen() {
 		console.log("onProfileEditOpen");
-			/*
-		this.state = {
+		this.setState({
 			profileEditDialog: {
 				open: true,
 			}
-		};
-			 */
+		});
 	}
 
 	onProfileEditClose() {
 		console.log("onProfileEditClose");
-			/*
-		this.state = {
+		this.setState({
 			profileEditDialog: {
 				open: false,
 			}
-		};
-			 */
+		});
+	}
+
+	changeUsername(e) {
+		this.setState({
+			changeUserName: e.target.value,
+		});
 	}
 
 	onLogout(e) {
@@ -867,11 +902,10 @@ export class Profile extends React.Component {
 							);
 						}
 					})()}
-					<img style={styles.cover} src={this.props.cover} />
-					<img style={styles.avatar} src={this.props.avatar} />
-					<div style={styles.username}>{this.props.username}
+					<img style={styles.cover} src={this.state.user.cover} />
+					<img style={styles.avatar} src={this.state.user.avatar} />
+					<div style={styles.username}>{this.state.user.username}
 						{(() => {
-							console.log(this.state);
 							if (this.props.userId == sessionStorage.user.id) {
 								return (
 									<div style={styles.profileEditButtonWrap}>
@@ -880,23 +914,25 @@ export class Profile extends React.Component {
 											icon={<EditorModeIcon style={styles.profileEditButtonIconStyle} />}
 											onTouchTap={this.onProfileEditOpen}
 										/>
-<Dialog
-	title="名前を変更"
-	actions={<FlatButton
-		label="Ok"
-		primary={true}
-		keyboardFocused={true}
-		onTouchTap={this.onProfileEditClose}
-	/>}
-	modal={false}
-	open={this.state.profileEditDialog.open}
-	onRequestClose={this.onProfileEditClose}
->
-	<TextField
-          id="text-field-controlled"
-          value={this.state.user.username}
-	/>
-</Dialog>
+										<Dialog
+											title="名前を変更"
+											actions={<FlatButton
+												label="Ok"
+												primary={true}
+												keyboardFocused={true}
+												onTouchTap={this.onProfileEdit}
+											/>}
+											modal={false}
+											open={this.state.profileEditDialog.open}
+											onRequestClose={this.onProfileEditClose}
+										>
+											<TextField
+												id="text-field-controlled"
+												value={this.state.changeUserName}
+												defaultValue={this.state.user.username}
+												onChange={this.changeUsername}
+											/>
+										</Dialog>
 									</div>
 								);
 							}
@@ -932,12 +968,5 @@ Profile.contextTypes = {
 	colors: React.PropTypes.object.isRequired,
 }
 Profile.propTypes = {
-	userId: React.PropTypes.number.isRequired,
-	cover: React.PropTypes.string.isRequired,
-	avatar: React.PropTypes.string.isRequired,
-	username: React.PropTypes.string.isRequired,
-	countFollowers: React.PropTypes.number.isRequired,
-	countFollows: React.PropTypes.number.isRequired,
-	countThanx: React.PropTypes.number.isRequired,
-	countStar: React.PropTypes.number.isRequired,
+	userId: React.PropTypes.string.isRequired,
 }
