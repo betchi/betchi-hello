@@ -65,6 +65,10 @@ var styleSendButton = {
 	fontSize: '2em',
 };
 var mentoring;
+var rightIconTitleOk = "このユーザに決定";
+var rightIconTitleCancel = "このユーザをキャンセル";
+var dialogMessageOk = "このユーザとメンタリングしますか？";
+var dialogMessageCancel = "このユーザとのメンタリングをキャンセルしますか？";
 
 export class ChatPage extends React.Component {
 
@@ -285,8 +289,9 @@ export class ChatPage extends React.Component {
 		this.context.router.goBack();
 	}
 
-	onOffer(e) {
+	onOffer(action) {
 		console.log("onOffer");
+		console.log(action);
 		let xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/mentoring/determinations', false);
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -304,12 +309,27 @@ export class ChatPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
+			if (data.mentoring.determinations !== null &&
+				data.mentoring.determinations.indexOf(parseInt(this.props.location.query.targetUserId)) >= 0) {
+				this.setState({
+					rightIconMessage: rightIconTitleCancel,
+					rightIconAction: "remove",
+					dialogMessage: dialogMessageCancel,
+				});
+			} else {
+				this.setState({
+					rightIconMessage: rightIconTitleOk,
+					rightIconAction: "all",
+					dialogMessage: dialogMessageOk,
+				});
+			}
 		}
 		var mentoring = {
 			id: parseInt(mentoringId),
 			determinations: [parseInt(this.props.location.query.targetUserId)]
 		};
 		const json = JSON.stringify({
+			action: action,
 			mentoring:mentoring
 		});
 		xhr.send(json);
@@ -350,6 +370,20 @@ export class ChatPage extends React.Component {
 			}
 			let data = JSON.parse(xhr.responseText);
 			mentoring = data.mentoring;
+			if (data.mentoring.determinations !== null &&
+				data.mentoring.determinations.indexOf(parseInt(this.props.location.query.targetUserId)) >= 0) {
+				this.setState({
+					rightIconMessage: rightIconTitleCancel,
+					rightIconAction: "remove",
+					dialogMessage: dialogMessageCancel,
+				});
+			} else {
+				this.setState({
+					rightIconMessage: rightIconTitleOk,
+					rightIconAction: "all",
+					dialogMessage: dialogMessageOk,
+				});
+			}
 		}
 		xhr.send();
 	}
@@ -449,7 +483,7 @@ export class ChatPage extends React.Component {
 			rightIcon = <FlatButton
 				style={styles.personAdd}
 				primary={true}
-				label="このユーザに決定"
+				label={this.state.rightIconMessage}
 				onTouchTap={this.dialogHandleOpen}
 			/>;
 		}
@@ -465,7 +499,7 @@ export class ChatPage extends React.Component {
 			label="はい"
 			primary={true}
 			keyboardFocused={true}
-			onTouchTap={this.onOffer}
+			onTouchTap={this.onOffer.bind(this, this.state.rightIconAction)}
 		  />,
 		];
 
@@ -537,7 +571,7 @@ export class ChatPage extends React.Component {
 					open={this.state.dialog.open}
 					onRequestClose={this.dialogHandleClose}
 				>
-					このユーザとメンタリングします
+					{this.state.dialogMessage}
 				</Dialog>
 				<Snackbar
 					open={this.state.snack.open}

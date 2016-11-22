@@ -108,6 +108,7 @@ export class OffersPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
+			console.log(data.mentoring);
 			mentoring = data.mentoring;
 		}
 		xhr.send();

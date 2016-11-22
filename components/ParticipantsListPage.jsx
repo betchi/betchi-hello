@@ -40,6 +40,7 @@ export class ParticipantsListPage extends React.Component {
 		this.onBack = this.onBack.bind(this);
 		this.dialogHandleClose = this.dialogHandleClose.bind(this);
 		this.dialogHandleOpen = this.dialogHandleOpen.bind(this);
+		this.onPostDeterminations = this.onPostDeterminations.bind(this);
 		self = this;
 	}
 
@@ -92,8 +93,8 @@ export class ParticipantsListPage extends React.Component {
 		console.log(userId);
 	}
 
-	onOffer(e) {
-		console.log("onOffer");
+	onPostDeterminations(e) {
+		console.log("onPostDeterminations");
 		let xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/mentoring/determinations', false);
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -117,7 +118,8 @@ export class ParticipantsListPage extends React.Component {
 			determinations: [parseInt(this.props.location.query.targetUserId)]
 		};
 		const json = JSON.stringify({
-			mentoring:mentoring
+			action: "all",
+			mentoring:mentoring,
 		});
 		xhr.send(json);
 		this.dialogHandleClose();
@@ -228,7 +230,7 @@ export class ParticipantsListPage extends React.Component {
 			label="はい"
 			primary={true}
 			keyboardFocused={true}
-			onTouchTap={this.onOffer}
+			onTouchTap={this.onPostDeterminations}
 		  />,
 		];
 

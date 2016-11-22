@@ -28,12 +28,10 @@ import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 import SupervisorAccountButton from 'material-ui/svg-icons/action/supervisor-account';
 import {List, ListItem} from 'material-ui/List';
-
+import Dialog from 'material-ui/Dialog';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import ActionFavorite from 'material-ui/svg-icons/action/favorite';
 import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
-import Toggle from 'material-ui/Toggle';
-
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
@@ -71,6 +69,11 @@ export class MentoringPage extends React.Component {
 				open: false,
 				message: '',
 			},
+			dialog: {
+				open: false,
+				message: "",
+				action: "",
+			},
 			refreshStyle: {
 				position: 'relative',
 				display: 'inline-block',
@@ -86,11 +89,13 @@ export class MentoringPage extends React.Component {
 		this.onFollow = this.onFollow.bind(this);
 		this.onOffer = this.onOffer.bind(this);
 		this.onOfferList = this.onOfferList.bind(this);
-		this.onParticipate = this.onParticipate.bind(this);
 		this.onParticipantsList = this.onParticipantsList.bind(this);
 		this.onBookmark = this.onBookmark.bind(this);
 		this.onBookmarkCancel = this.onBookmarkCancel.bind(this);
 		this.onMentoringEdit = this.onMentoringEdit.bind(this);
+		this.dialogHandleClose = this.dialogHandleClose.bind(this);
+		this.dialogHandleOpen = this.dialogHandleOpen.bind(this);
+		this.onPostDeterminations = this.onPostDeterminations.bind(this);
 	}
 
 	componentDidMount() {
@@ -131,10 +136,6 @@ export class MentoringPage extends React.Component {
 				mentoringUserId: this.state.mentoring.user_id,
 			},
 		});
-	}
-
-	onParticipate(e) {
-		console.log("onParticipate");
 	}
 
 	onParticipantsList(e) {
@@ -194,6 +195,7 @@ export class MentoringPage extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
+			console.log(data);
 			this.setState({
 				mentoring: data.mentoring,
 			});
@@ -258,9 +260,104 @@ export class MentoringPage extends React.Component {
 		xhr.send();
 	}
 
+	onPostDeterminations() {
+		console.log("onPostDeterminations");
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/mentoring/determinations', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+
+			let data = JSON.parse(xhr.responseText);
+			let mentoring = this.state.mentoring;
+			mentoring.determinations = data.mentoring.determinations;
+			this.setState({
+				mentoring: mentoring,
+			});
+		}
+		var mentoring = {
+			id: parseInt(this.state.mentoring.id),
+			determinations: [parseInt(sessionStorage.user.id)]
+		};
+		const json = JSON.stringify({
+			action: this.state.dialog.action,
+			mentoring:mentoring,
+		});
+		xhr.send(json);
+		this.dialogHandleClose();
+	}
+
+	dialogHandleOpen(message, action) {
+		console.log(message);
+		console.log(action);
+		this.setState({
+			dialog: {
+				open: true,
+				action: action,
+				message: message,
+			},
+		});
+	}
+
+	dialogHandleClose() {
+		this.setState({
+			dialog: {
+				open: false,
+				action: "",
+				message: "",
+			},
+		});
+	}
+
 	render() {
 		const styles = {
-			root: {
+			contactListSection: {
+				position: 'absolute',
+				width: '100%',
+				height: '99%',
+				top: '0.2rem',
+			},
+			title: {
+				cursor: 'pointer',
+				fontSize: '1rem',
+			},
+			searchContactWrap: {
+				position: 'absolute',
+				opacity: '1.0',
+				paddingBottom: '0.5rem',
+				zIndex: '1',
+				width: '100%',
+				top: '1rem',
+			},
+			clearModalButton: {
+				position: 'absolute',
+				top: '-0.5rem',
+				left: '-0.5rem',
+				padding: '1rem',
+				zIndex: '10001',
+			},
+			doneModalButton: {
+				position: 'absolute',
+				top: '-0.5rem',
+				right: '-0.5rem',
+				padding: '1rem',
+				zIndex: '10001',
+			},
+			modalTitle: {
+				textAlign: 'center',
+				marginTop: '0.6rem',
+				fontSize: '1rem',
 			},
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
@@ -362,6 +459,20 @@ export class MentoringPage extends React.Component {
 			datetimeString = yyyymmdd + " " + hhmm;
 		}
 
+		const actions = [
+		  <FlatButton
+			label="キャンセル"
+			primary={true}
+			onTouchTap={this.dialogHandleClose}
+		  />,
+		  <FlatButton
+			label="はい"
+			primary={true}
+			keyboardFocused={true}
+			onTouchTap={this.onPostDeterminations}
+		  />,
+		];
+
 		return (
 			<section style={styles.root}>
 				<IconButton
@@ -445,14 +556,23 @@ export class MentoringPage extends React.Component {
 							}
 						}
 					} else {
-						if (this.state.mentoring.determinations == null) {
-							if (this.state.mentoring.kind == 1) {
+						if (this.state.mentoring.kind == 1) {
+							return <FlatButton
+								style={styles.button}
+								icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
+								label="オファーする(メッセージ)"
+								labelStyle={styles.buttonLabel}
+								onTouchTap={this.onOffer}
+							/>
+						} else {
+							if (this.state.mentoring.determinations !== undefined &&
+								this.state.mentoring.determinations.indexOf(sessionStorage.user.id) >= 0) {
 								return <FlatButton
 									style={styles.button}
-									icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
-									label="オファーする(メッセージ)"
+									icon={<AddCircle style={styles.buttonIcon} />}
+									label="参加を取り消す"
 									labelStyle={styles.buttonLabel}
-									onTouchTap={this.onOffer}
+									onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
 								/>
 							} else {
 								return <FlatButton
@@ -460,7 +580,7 @@ export class MentoringPage extends React.Component {
 									icon={<AddCircle style={styles.buttonIcon} />}
 									label="参加したい"
 									labelStyle={styles.buttonLabel}
-									onTouchTap={this.onParticipate}
+									onTouchTap={this.dialogHandleOpen.bind(this, "参加をしますか？", "add")}
 								/>
 							}
 						}
@@ -496,6 +616,15 @@ export class MentoringPage extends React.Component {
 					}
 				})()}
 				</div>
+				<Dialog
+					title="確認"
+					actions={actions}
+					modal={false}
+					open={this.state.dialog.open}
+					onRequestClose={this.dialogHandleClose}
+				>
+					{this.state.dialog.message}
+				</Dialog>
 			</section>
 		);
 	}
@@ -549,7 +678,6 @@ export class EditMentoringPage extends React.Component {
 					flexFlow: 'row nowrap',
 					width: '90%',
 					margin: '0 5%',
-					display: 'none',
 				},
 			},
 		};
@@ -702,17 +830,12 @@ export class EditMentoringPage extends React.Component {
 	setControlBlockForDateStyle(value) {
 		const styles = this.state.styles;
 		if (value === 1) {
-			styles.controlBlockForDate.display = 'none';
 			this.setState({
 				date: null,
 				time: null,
 			})
 		} else {
-			styles.controlBlockForDate.display = 'flex';
 		}
-		this.setState({
-			styles: styles,
-		})
 	}
 
 	onSubmit(e) {

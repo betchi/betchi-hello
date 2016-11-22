@@ -34,8 +34,10 @@ export class Tabbar extends React.Component {
 			this.context.router.push('/search');
 			break;
 		case "message":
+			//webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
 			break;
 		case "notification":
+			//webkit.messageHandlers.startFollowerVideoChat.postMessage('hogehoge');
 			break;
 		case "mypage":
 			this.context.router.push('/mypage/' + sessionStorage.user.id);
