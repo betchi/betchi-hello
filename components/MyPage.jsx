@@ -11,6 +11,7 @@ import SettingsIcon from 'material-ui/svg-icons/action/settings.js';
 import EditorModeIcon from 'material-ui/svg-icons/editor/mode-edit.js';
 import StarIcon from 'material-ui/svg-icons/toggle/star';
 import CommunicationEmailIcon from 'material-ui/svg-icons/communication/email.js';
+import NavigationConfirmClose from 'material-ui/svg-icons/navigation/close';
 import ExitToAppIcon from 'material-ui/svg-icons/action/exit-to-app.js';
 import FlatButton from 'material-ui/FlatButton';
 import {List, ListItem} from 'material-ui/List';
@@ -20,6 +21,7 @@ import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
+import CircularProgress from 'material-ui/CircularProgress';
 
 import {ThxMessageList} from './ThxMessageList.jsx';
 import {RatingStar} from './content.jsx';
@@ -55,18 +57,18 @@ export class MyPage extends React.Component {
 			page: 1,
 		};
 		this.onSnackClose = this.onSnackClose.bind(this);
-		this.loadMessages = this.loadMessages.bind(this);
+		//this.loadMessages = this.loadMessages.bind(this);
 		this.onScroll = this.onScroll.bind(this);
 		this.onOffer = this.onOffer.bind(this);
 	}
 
 	componentWillMount() {
-		this.loadMessages(this.props.params.id);
+		//this.loadMessages(this.props.params.id);
 	}
 
 	componentWillReceiveProps(nextProps) {
 		window.removeEventListener('scroll', this.onScroll);
-		this.loadMessages(nextProps.params.id);
+		//this.loadMessages(nextProps.params.id);
 	}
 
 	componentWillUnmount() {
@@ -93,7 +95,7 @@ export class MyPage extends React.Component {
 		let bottom = html.scrollHeight - html.clientHeight - scrollTop;
 		if (bottom <= 60) {
 			window.removeEventListener('scroll', this.onScroll);
-			this.loadMessages(this.props.params.id, this.state.page + 1);
+			//this.loadMessages(this.props.params.id, this.state.page + 1);
 		}
 	}
 
@@ -470,9 +472,38 @@ export class Profile extends React.Component {
 			user: {
 				username: "",
 			},
+			styles: {
+				confirm: {
+					display: 'none',
+					position: 'fixed',
+					top: 0,
+					width: '100%',
+					height: '100%',
+					background: 'rgba(0, 0, 0, 0.6)',
+					textAlign: 'center',
+					zIndex: 10000,
+				},
+				confirmImage: {
+					display: 'block',
+					margin: '50% auto 0',
+					height: '40%',
+				},
+				imageUploading: {
+					display: 'none',
+					margin: '65% auto 0',
+					height: '40%',
+				},
+				close: {
+					display: 'block',
+					color: 'white',
+					position: 'fixed',
+					marginTop: '10px',
+					right: '10px',
+				},
+			},
 		};
+		this.selectImage = null;
 		this.loadContents(this.props.userId);
-
 		this.onProfileEdit = this.onProfileEdit.bind(this);
 		this.onProfileEditOpen = this.onProfileEditOpen.bind(this);
 		this.onProfileEditClose = this.onProfileEditClose.bind(this);
@@ -485,6 +516,95 @@ export class Profile extends React.Component {
 		this.onCoverPhotoEdit= this.onCoverPhotoEdit.bind(this);
 		this.onBack = this.onBack.bind(this);
 		this.onLogout = this.onLogout.bind(this);
+		this.onConfirmClose = this.onConfirmClose.bind(this);
+		this.onFileUploadRequest = this.onFileUploadRequest.bind(this);
+		this.onProfilePhotoEditChange= this.onProfilePhotoEditChange.bind(this);
+	}
+
+	onFileUploadRequest() {
+		console.log("onFileUploadRequest");
+
+		let styles = this.state.styles;
+		styles.confirmImage.display = "none";
+		styles.close.display = "none"; // FIXME Not disappear
+		styles.imageUploading.display = "block";
+		this.setState({
+			styles: styles,
+		})
+
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/asset', true);
+		let formData = new FormData();
+		formData.append("asset", this.selectImage);
+		formData.append("userId", sessionStorage.user.id);
+		xhr.onload = () => {
+			if (xhr.status !== 201) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '読み込みに失敗しました。',
+					},
+				});
+				return;
+			} else {
+				//let data = JSON.parse(xhr.responseText);
+				//console.log(data.assetId);
+				alert("画像のアップロードを受け付けました。反映までしばらくお待ち下さい。");
+				this.onConfirmClose();
+
+				let styles = this.state.styles;
+				styles.confirmImage.display = "block";
+				styles.close.display = "block";
+				styles.imageUploading.display = "none";
+				this.setState({
+					styles: styles,
+				})
+			}
+
+				/*
+			var avatar = "https://s3-ap-northeast-1.amazonaws.com/mentor-fairway-ne-jp/assets/" + sessionStorage.user.id + "_" + data.assetId + "." + data.extension;
+			// POSTリクエスト
+			let postJson = {
+				userId: this.props.userId,
+				avatar: avatar,
+			};
+			console.log(postJson);
+			let xhrUser = new XMLHttpRequest();
+			xhrUser.open('POST', '/api/user');
+			xhrUser.onload = () => {
+				if (xhrUser.status !== 200) {
+					console.log("送信に失敗しました");
+					this.setState({
+						snack: {
+							open: false,
+							message: '送信に失敗しました。',
+						},
+					});
+					return;
+				}
+				let data = JSON.parse(xhrUser.responseText);
+				let user = this.state.user;
+				user.avatar = avatar;
+				this.setState({
+					user: user,
+				})
+			};
+			xhrUser.onerror = function() {
+				console.log(xhr);
+			};
+			xhrUser.setRequestHeader("Content-type", "application/json");
+			xhrUser.send(JSON.stringify(postJson));
+			*/
+		};
+		xhr.send(formData);
+	}
+
+	onConfirmClose() {
+		let styles = this.state.styles;
+		styles.confirm.display = 'none';
+		this.setState({
+			styles: styles,
+		}); 
 	}
 
 	componentDidMount() {
@@ -613,6 +733,22 @@ export class Profile extends React.Component {
 	}
 	onProfilePhotoEditChange(e) {
 		console.log("onProfilePhotoEditChange");
+		this.selectImage = e.target.files[0];
+		if (!this.selectImage.type.match('image.*')) {
+		  return;
+		}   
+
+		var reader = new FileReader();
+		reader.onload = (function(e) {
+			let confirmImageDOM = ReactDOM.findDOMNode(this.refs.confirmImage);
+			confirmImageDOM.src = e.target.result;
+			let styles = this.state.styles;
+			styles.confirm.display = 'block';
+			this.setState({
+			  styles: styles,
+			}); 
+		}.bind(this));
+		reader.readAsDataURL(this.selectImage);
 	}
 
 	onCoverPhotoEdit() {
@@ -883,6 +1019,11 @@ export class Profile extends React.Component {
 										style={{"display": "none"}}
 										onChange={this.onProfilePhotoEditChange}
 									/>
+									<div style={this.state.styles.confirm}>
+										<NavigationConfirmClose style={this.state.styles.close} onTouchTap={this.onConfirmClose} />
+										<img id="confirmImage" ref="confirmImage" style={this.state.styles.confirmImage} onTouchTap={this.onFileUploadRequest} role="presentation" />
+										<CircularProgress style={this.state.styles.imageUploading} color="white" />
+									</div>
 								</div>
 							);
 						}
