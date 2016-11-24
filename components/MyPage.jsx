@@ -503,22 +503,26 @@ export class Profile extends React.Component {
 			},
 		};
 		this.selectImage = null;
+		this.selectImageKind = "";
 		this.loadContents(this.props.userId);
+
 		this.onProfileEdit = this.onProfileEdit.bind(this);
 		this.onProfileEditOpen = this.onProfileEditOpen.bind(this);
 		this.onProfileEditClose = this.onProfileEditClose.bind(this);
+
+		this.onProfilePhotoEdit = this.onProfilePhotoEdit.bind(this);
+		this.onCoverPhotoEdit = this.onCoverPhotoEdit.bind(this);
+		this.onPhotoEditChange = this.onPhotoEditChange.bind(this);
+		this.onConfirmClose = this.onConfirmClose.bind(this);
+		this.onFileUploadRequest = this.onFileUploadRequest.bind(this);
+
 		this.changeUsername = this.changeUsername.bind(this);
 		this.onFollow = this.onFollow.bind(this);
 		this.onFollower = this.onFollower.bind(this);
 		this.onThanx = this.onThanx.bind(this);
 		this.onStar = this.onStar.bind(this);
-		this.onProfilePhotoEdit = this.onProfilePhotoEdit.bind(this);
-		this.onCoverPhotoEdit= this.onCoverPhotoEdit.bind(this);
 		this.onBack = this.onBack.bind(this);
 		this.onLogout = this.onLogout.bind(this);
-		this.onConfirmClose = this.onConfirmClose.bind(this);
-		this.onFileUploadRequest = this.onFileUploadRequest.bind(this);
-		this.onProfilePhotoEditChange= this.onProfilePhotoEditChange.bind(this);
 	}
 
 	onFileUploadRequest() {
@@ -537,6 +541,7 @@ export class Profile extends React.Component {
 		let formData = new FormData();
 		formData.append("asset", this.selectImage);
 		formData.append("userId", sessionStorage.user.id);
+		formData.append("kind", this.selectImageKind);
 		xhr.onload = () => {
 			if (xhr.status !== 201) {
 				this.setState({
@@ -732,10 +737,17 @@ export class Profile extends React.Component {
 	}
 
 	onProfilePhotoEdit() {
+		this.selectImageKind = "avatar";
 		this.refs.profilePhotoFileEdit.click();
 	}
-	onProfilePhotoEditChange(e) {
-		console.log("onProfilePhotoEditChange");
+
+	onCoverPhotoEdit() {
+		this.selectImageKind = "cover";
+		this.refs.coverPhotoFileEdit.click();
+	}
+
+	onPhotoEditChange(e) {
+		console.log("onPhotoEditChange");
 		this.selectImage = e.target.files[0];
 		if (!this.selectImage.type.match('image.*')) {
 		  return;
@@ -752,13 +764,6 @@ export class Profile extends React.Component {
 			}); 
 		}.bind(this));
 		reader.readAsDataURL(this.selectImage);
-	}
-
-	onCoverPhotoEdit() {
-		this.refs.coverPhotoFileEdit.click();
-	}
-	onCoverPhotoEditChange(e) {
-		console.log("onCoverPhotoEditChange");
 	}
 
 	onBack(e) {
@@ -1020,7 +1025,7 @@ export class Profile extends React.Component {
 										ref="profilePhotoFileEdit"
 										type="file" 
 										style={{"display": "none"}}
-										onChange={this.onProfilePhotoEditChange}
+										onChange={this.onPhotoEditChange}
 									/>
 									<div style={this.state.styles.confirm}>
 										<NavigationConfirmClose style={this.state.styles.close} onTouchTap={this.onConfirmClose} />
@@ -1040,7 +1045,7 @@ export class Profile extends React.Component {
 										ref="coverPhotoFileEdit"
 										type="file" 
 										style={{"display": "none"}}
-										onChange={this.onCoverPhotoEditChange}
+										onChange={this.onPhotoEditChange}
 									/>
 								</div>
 							);
