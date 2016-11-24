@@ -602,6 +602,9 @@ export class Profile extends React.Component {
 	onConfirmClose() {
 		let styles = this.state.styles;
 		styles.confirm.display = 'none';
+		styles.confirmImage.display = "block";
+		styles.close.display = "block";
+		styles.imageUploading.display = "none";
 		this.setState({
 			styles: styles,
 		}); 
