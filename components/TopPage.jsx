@@ -41,6 +41,74 @@ export class TopPage extends React.Component {
 		this.onSearchOpen = this.onSearchOpen.bind(this);
 	}
 
+	componentWillMount() {
+		if (sessionStorage.user.swagchat_id === undefined) {
+			async function asyncFunc(self) {
+				let swagchatUserInfo = {
+					name: sessionStorage.user.username,
+					pictureUrl: sessionStorage.user.avatar,
+				};
+				const postSwagchatUser = await self.postSwagchatUser(swagchatUserInfo);
+
+				let userInfo = {
+					id: sessionStorage.user.id,
+					swagchat_id: postSwagchatUser.userId,
+				};
+				await self.postUser(userInfo);
+			}
+			asyncFunc(this);
+		}
+	}
+
+	postSwagchatUser(userInfo) {
+		const p = new Promise((resolve, reject) => {
+			let xhr = new XMLHttpRequest();
+			xhr.open('POST', this.context.swagchat.config.apiBaseUrl + '/users');
+			xhr.onload = function() {
+				if (xhr.status !== 201) {
+					return;
+				}
+				let data = JSON.parse(xhr.responseText);
+				resolve(data);
+			};
+			xhr.onerror = function() {
+				return;
+			};
+			xhr.setRequestHeader("Content-type", "application/json");
+			xhr.send(JSON.stringify(userInfo));
+		});
+		return p;
+	}
+
+	postUser(userInfo) {
+		new Promise((resolve, reject) => {
+			let xhr = new XMLHttpRequest();
+			xhr.open('POST', '/api/user', false);
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 200) {
+					this.setState({
+						snack: {
+							open: true,
+							message: '通信に失敗しました。',
+						},
+						refreshStyle: {
+							display: 'none',
+						},
+						changeUsername: this.state.user.username,
+					});
+					return;
+				} else {
+					console.log("swagchatId=" + data.userId);
+					let user = sessionStorage.user;
+					user.swagchat_id = data.userId;
+					sessionStorage.setItem("user", user);
+				}
+			}
+			xhr.send(JSON.stringify(userInfo));
+		});
+	}
+
 	componentDidMount() {
 		this.loadContents();
 	}
@@ -222,6 +290,7 @@ export class TopPage extends React.Component {
 TopPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
+	swagchat: React.PropTypes.object.isRequired,
 }
 
 export class TopTab extends React.Component {

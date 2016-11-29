@@ -25,7 +25,6 @@ export class Tabbar extends React.Component {
 	}
 
 	onChange(value) {
-		console.log(value)
 		switch (value) {
 		case "top":
 			this.context.router.push('/top');
@@ -34,10 +33,11 @@ export class Tabbar extends React.Component {
 			this.context.router.push('/search');
 			break;
 		case "message":
-			//webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
+			this.context.router.push('/roomList');
 			break;
 		case "notification":
 			//webkit.messageHandlers.startFollowerVideoChat.postMessage('hogehoge');
+			//webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
 			break;
 		case "mypage":
 			this.context.router.push('/mypage/' + sessionStorage.user.id);
@@ -100,4 +100,3 @@ Tabbar.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
 }
-

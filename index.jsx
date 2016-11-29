@@ -17,6 +17,9 @@ import {SearchPage} from './components/SearchPage.jsx';
 import {MyPage} from './components/MyPage.jsx';
 import {OffersPage} from './components/OffersPage.jsx';
 import {ParticipantsListPage} from './components/ParticipantsListPage.jsx';
+import {RoomListPage} from './components/RoomListPage.jsx';
+import {OfferListPage} from './components/OfferListPage.jsx';
+import {MessagePage} from './swagchat/MessagePage.jsx';
 
 var _colorManipulator = require('material-ui/utils/colorManipulator');
 
@@ -64,20 +67,22 @@ function requireAuth(next, replace) {
 			}
 		});
 	}
-	const xhr = new XMLHttpRequest();
-	xhr.open('GET', '/api/user', false); // synchronous
-	xhr.onload = () => {
-		if (xhr.status !== 200) {
-			return;
-		}
-		const data = JSON.parse(xhr.responseText);
-		if (!data.ok) {
-			goLogin();
-			return
-		}
-		sessionStorage.user = data.user;
-	};
-	xhr.send();
+	if (sessionStorage.user === null) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/user', false); // synchronous
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				return;
+			}
+			const data = JSON.parse(xhr.responseText);
+			if (!data.ok) {
+				goLogin();
+				return
+			}
+			sessionStorage.user = data.user;
+		};
+		xhr.send();
+	}
 }
 
 var muiTheme = getMuiTheme();
@@ -87,6 +92,7 @@ var Parent = React.createClass({
         categories: React.PropTypes.array,
         colors: React.PropTypes.object,
         mentoringKinds: React.PropTypes.array,
+        swagchat: React.PropTypes.object,
     },
 
     getChildContext: function () {
@@ -98,6 +104,17 @@ var Parent = React.createClass({
 		mentoringKinds[1] = "メンタリング(1対1)";
 		mentoringKinds[2] = "メンターグループ";
 		mentoringKinds[3] = "ライブ配信";
+
+		let swagchat = {
+			config: {
+				//apiBaseUrl: "https://realtime.swagchat.online/v1"
+				apiBaseUrl: "https:///minobe-ws-mentor.fairway.ne.jp/swagchat/v1",
+				wsBaseUrl: "wss://realtime.swagchat.online/v1",
+				imageBaseUrl: "https://storage.googleapis.com/direct-archery-148703.appspot.com/assets/",
+				isUseMenu: false,
+				isUseSticker: false,
+			}
+		}
 
 		let childContext = {
 			categories: data.categories,
@@ -124,6 +141,7 @@ var Parent = React.createClass({
 				error: "#F06292",
 			},
 			mentoringKinds: mentoringKinds,
+			swagchat: swagchat,
 		}
 		muiTheme.textField.focusColor = childContext.colors.grey;
 		muiTheme.textField.textColor = childContext.colors.grey;
@@ -155,6 +173,9 @@ var Parent = React.createClass({
 					<Route path="/chat/:mentoringId/:offerUserId/:mentoringTitle" component={ChatPage} onEnter={requireAuth} />
 					<Route path="/offers/:mentoringId/:mentoringTitle" component={OffersPage} onEnter={requireAuth} />
 					<Route path="/participantsList/:mentoringId/:mentoringTitle" component={ParticipantsListPage} onEnter={requireAuth} />
+					<Route path="/roomList" component={RoomListPage} onEnter={requireAuth} />
+					<Route path="/offerList" component={OfferListPage} onEnter={requireAuth} />
+					<Route path="/messages/:roomId/:userId" component={MessagePage} onEnter={requireAuth} />
 				</Router>
 			</MuiThemeProvider>
 		);

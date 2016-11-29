@@ -121,20 +121,143 @@ export class MentoringPage extends React.Component {
 	}
 
 	onOffer(e) {
+		console.log("onOffer");
+		let user = JSON.parse(sessionStorage.getItem("user"));
+		console.log(sessionStorage.user);
+		if (user.rooms === undefined) {
+			user.rooms = {};
+			sessionStorage.setItem("user", JSON.stringify(user));
+		}
+		if (user.rooms[this.props.params.id] === undefined) {
+			async function asyncFunc(self) {
+				let roomInfo = {
+					name: self.state.mentoring.title,
+					pictureUrl: self.state.mentoring.cover,
+					isPublic: false,
+				};
+				const postRoom = await self.postRoom(roomInfo);
+
+				let roomMemberInfo = {
+					members: [self.state.mentoring.user.swagchat_id, user.swagchat_id]
+				};
+				await self.postRoomMember(postRoom.roomId, roomMemberInfo);
+
+				let userRoomInfo = {
+					mentoring_user_id: self.state.mentoring.user_id,
+					mentoring_id: String(self.state.mentoring.id),
+					room_id: postRoom.roomId
+				};
+				console.log(userRoomInfo);
+				let postUserRoom = await self.postUserRoom(userRoomInfo);
+				if (postUserRoom.ok) {
+					console.log("成功");
+					let user = JSON.parse(sessionStorage.getItem("user"));
+					user.rooms = postUserRoom.rooms;
+					sessionStorage.setItem("user", JSON.stringify(user));
+				}
+				self.moveMessagePage();
+
+			}
+			asyncFunc(this);
+		} else {
+			this.moveMessagePage();
+		}
+	}
+
+	moveMessagePage() {
 		this.context.router.push({
-			pathname: '/chat/' + this.state.mentoring.id + '/' + sessionStorage.user.id + '/' + this.state.mentoring.title,
+			pathname: '/messages/' + sessionStorage.user.rooms[this.state.mentoring.id][0] + '/' + sessionStorage.user.swagchat_id,
 			query: {
-				mentoringUserId: this.state.mentoring.user_id,
+				title: this.state.mentoring.title,
+				mentoringId: this.state.mentoring.id,
 			},
 		});
 	}
 
+	postRoom(roomInfo) {
+		console.log("postRoom");
+		const p = new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', this.context.swagchat.config.apiBaseUrl + '/rooms', false);
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 201) {
+					this.setState({
+						snack: {
+							open: true,
+							message: '通信に失敗しました。',
+						},
+						refreshStyle: {
+							display: 'none',
+						},
+					});
+				} else {
+					let data = JSON.parse(xhr.responseText);
+					resolve(data);
+				}
+			}
+			xhr.send(JSON.stringify(roomInfo));
+		});
+		return p;
+	}
+
+	postRoomMember(roomId, roomMemberInfo) {
+		console.log("postRoomMember");
+		new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('PUT', this.context.swagchat.config.apiBaseUrl + '/rooms/' + roomId + '/members', false);
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 204) {
+					this.setState({
+						snack: {
+							open: true,
+							message: '通信に失敗しました。',
+						},
+						refreshStyle: {
+							display: 'none',
+						},
+					});
+					return;
+				}
+			}
+			xhr.send(JSON.stringify(roomMemberInfo));
+		});
+	}
+
+	postUserRoom(userRoomInfo) {
+		console.log("postUser");
+		const p = new Promise((resolve, reject) => {
+			let xhr = new XMLHttpRequest();
+			xhr.open('POST', '/api/userRoom', false);
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 200) {
+					this.setState({
+						snack: {
+							open: true,
+							message: '通信に失敗しました。',
+						},
+						refreshStyle: {
+							display: 'none',
+						},
+					});
+				} else {
+					let data = JSON.parse(xhr.responseText);
+					resolve(data);
+				}
+			}
+			xhr.send(JSON.stringify(userRoomInfo));
+		});
+		return p;
+	}
+
 	onOfferList(e) {
 		this.context.router.push({
-			pathname: '/offers/' + this.state.mentoring.id + '/' + this.state.mentoring.title,
+			pathname: '/offerList',
 			query: {
-				mentoringUserId: this.state.mentoring.user_id,
-			},
+				mentoringId: this.state.mentoring.id,
+			}
 		});
 	}
 
@@ -209,10 +332,12 @@ export class MentoringPage extends React.Component {
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
 				this.setState({
+/*
 					snack: {
 						open: true,
 						message: '通信に失敗しました。',
 					},
+*/
 					refreshStyle: {
 						display: 'none',
 					},
@@ -633,6 +758,7 @@ MentoringPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
 	mentoringKinds: React.PropTypes.array.isRequired,
+	swagchat: React.PropTypes.object.isRequired,
 }
 MentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired
@@ -916,10 +1042,13 @@ export class EditMentoringPage extends React.Component {
 		}
 
 		if (error) {
-			this.refs.titleTextField.focus(); // 一番上に持って行く
+			this.refs.titleTextField.focus();
 			return;
 		}
+		this.postMentoring();
+	}
 
+	postMentoring() {
 		const xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/mentoring', false);
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -943,6 +1072,7 @@ export class EditMentoringPage extends React.Component {
 				});
 				return;
 			}
+			//this.context.router.push('/mentoring/' + data.mentoring.id); // TODO この画面から戻ると登録画面に戻ってしまう
 			this.context.router.push('/');
 		}
 		var datetime;
@@ -1382,6 +1512,7 @@ EditMentoringPage.contextTypes = {
 	colors: React.PropTypes.object.isRequired,
 	categories: React.PropTypes.array.isRequired,
 	mentoringKinds: React.PropTypes.array.isRequired,
+	swagchat: React.PropTypes.object.isRequired,
 }
 EditMentoringPage.propTypes = {
 	params: React.PropTypes.object.isRequired

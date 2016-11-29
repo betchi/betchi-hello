@@ -295,6 +295,7 @@ export class SelectableCover extends React.Component {
 			root: {
 				width: '100%',
 				overflow: 'scroll',
+				WebkitOverflowScrolling: 'touch',
 			},
 			covers: {
 				width: '1000%',
