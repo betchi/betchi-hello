@@ -107,8 +107,7 @@ var Parent = React.createClass({
 
 		let swagchat = {
 			config: {
-				//apiBaseUrl: "https://api.swagchat.online/v1"
-				apiBaseUrl: "https:///minobe-ws-mentor.fairway.ne.jp/swagchat/v1",
+				apiBaseUrl: "https://api.swagchat.online/v1",
 				wsBaseUrl: "wss://realtime.swagchat.online/v1",
 				imageBaseUrl: "https://storage.googleapis.com/direct-archery-148703.appspot.com/assets/",
 				adminUserId: "18f2e7aa-f0ad-42b5-80f8-70fdcf8b02b1",
