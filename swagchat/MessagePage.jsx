@@ -39,7 +39,7 @@ export class MessagePage extends React.Component {
 
 			if (ws.readyState === 1) {
 				let postJson = {
-					roomId: self.props.params.roomId
+					roomId: self.props.location.state.roomId
 				};
 				console.log(postJson);
 				ws.send(JSON.stringify(postJson));
@@ -161,7 +161,7 @@ export class MessagePage extends React.Component {
 	getRoomMember() {
 		new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
-			xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + this.props.params.roomId + '/members');
+			xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + this.props.location.state.roomId + '/members');
 			xhr.onload = () => {
 				if (xhr.status !== 200) {
 					this.setState({
@@ -192,7 +192,7 @@ export class MessagePage extends React.Component {
 	getMessage() {
 		new Promise((resolve, reject) => {
 			let xhr = new XMLHttpRequest();
-			xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + this.props.params.roomId + '/messages');
+			xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + this.props.location.state.roomId + '/messages');
 			xhr.onload = () => {
 				if (xhr.status !== 200) {
 					this.setState({
@@ -308,8 +308,8 @@ console.log(data);
 			}
 
 			let messageInfo = {
-				roomId: self.props.params.roomId,
-				userId: self.props.params.userId,
+				roomId: self.props.location.state.roomId,
+				userId: self.props.location.state.userId,
 				messages: [
 					{
 						type: "text",
@@ -321,7 +321,7 @@ console.log(data);
 			};
 			await self.postMessage(messageInfo);
 
-			if (self.props.location.query.mentoringId !== undefined) {
+			if (self.props.location.state.mentoringId !== undefined) {
 				let offerInfo = {
 					user_id: sessionStorage.user.id,
 					message: self.state.textValue
@@ -362,7 +362,7 @@ console.log(data);
 				let messageId = data.messageIds[0];
 				let json = {
 					messageId: messageId,
-					userId: this.props.params.userId,
+					userId: this.props.location.state.userId,
 					type: "text",
 					payload: {
 						text: this.state.textValue,
@@ -389,7 +389,7 @@ console.log(data);
 		console.log("postOffer");
 		new Promise((resolve, reject) => {
 			let xhr = new XMLHttpRequest();
-			xhr.open('POST', '/api/offers/' + this.props.location.query.mentoringId);
+			xhr.open('POST', '/api/offers/' + this.props.location.state.mentoringId);
 			xhr.onload = () => {
 				if (xhr.status !== 200) {
 					this.setState({
@@ -634,7 +634,7 @@ console.log(data);
 					style={styles.headroom}
 				>
 					<AppBar
-						title={this.props.location.query.title}
+						title={this.props.location.state.title}
 						titleStyle={styles.title}
 						iconElementLeft={
 							<IconButton
@@ -678,7 +678,7 @@ console.log(data);
 									var message = messages[key].payload.text.split('\n').map(function(line) {
 										return <span key={"data_" + j++}>{line}<br /></span>;
 									});
-									if (messages[key].userId === this.props.params.userId) {
+									if (messages[key].userId === this.props.location.state.userId) {
 										indents.push(
 											<li key={key}>
 												<p style={styles.rightBalloon}>{message}</p>
@@ -717,7 +717,7 @@ console.log(data);
 									} else {
 										imageSrc = localStorage.getItem("image-" + key);
 									}
-									if (messages[key].userId === this.props.params.userId) {
+									if (messages[key].userId === this.props.location.state.userId) {
 										indents.push(
 											<li key={key}>
 												<img role="presentation" src={imageSrc} style={styles.rightImage} />
@@ -820,8 +820,8 @@ console.log(data);
 					/>
           <Menu
             isMenuDisplay={this.state.isMenuDisplay}
-            userId={this.props.params.userId}
-            roomId={this.props.params.roomId}
+            userId={this.props.location.state.userId}
+            roomId={this.props.location.state.roomId}
             onTouchTap={this.fileuploadComplete}
           />
 				</div>

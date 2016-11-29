@@ -107,11 +107,12 @@ var Parent = React.createClass({
 
 		let swagchat = {
 			config: {
-				//apiBaseUrl: "https://realtime.swagchat.online/v1"
+				//apiBaseUrl: "https://api.swagchat.online/v1"
 				apiBaseUrl: "https:///minobe-ws-mentor.fairway.ne.jp/swagchat/v1",
 				wsBaseUrl: "wss://realtime.swagchat.online/v1",
 				imageBaseUrl: "https://storage.googleapis.com/direct-archery-148703.appspot.com/assets/",
-				isUseMenu: false,
+				adminUserId: "18f2e7aa-f0ad-42b5-80f8-70fdcf8b02b1",
+				isUseMenu: true,
 				isUseSticker: false,
 			}
 		}
@@ -175,7 +176,7 @@ var Parent = React.createClass({
 					<Route path="/participantsList/:mentoringId/:mentoringTitle" component={ParticipantsListPage} onEnter={requireAuth} />
 					<Route path="/roomList" component={RoomListPage} onEnter={requireAuth} />
 					<Route path="/offerList" component={OfferListPage} onEnter={requireAuth} />
-					<Route path="/messages/:roomId/:userId" component={MessagePage} onEnter={requireAuth} />
+					<Route path="/messages" component={MessagePage} onEnter={requireAuth} />
 				</Router>
 			</MuiThemeProvider>
 		);

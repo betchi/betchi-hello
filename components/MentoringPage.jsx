@@ -138,8 +138,10 @@ export class MentoringPage extends React.Component {
 				const postRoom = await self.postRoom(roomInfo);
 
 				let roomMemberInfo = {
-					members: [self.state.mentoring.user.swagchat_id, user.swagchat_id]
+					members: [self.state.mentoring.user.swagchat_id, user.swagchat_id, self.context.swagchat.config.adminUserId]
 				};
+				console.log(roomMemberInfo);
+				console.log(self.context);
 				await self.postRoomMember(postRoom.roomId, roomMemberInfo);
 
 				let userRoomInfo = {
@@ -147,7 +149,6 @@ export class MentoringPage extends React.Component {
 					mentoring_id: String(self.state.mentoring.id),
 					room_id: postRoom.roomId
 				};
-				console.log(userRoomInfo);
 				let postUserRoom = await self.postUserRoom(userRoomInfo);
 				if (postUserRoom.ok) {
 					console.log("成功");
@@ -166,10 +167,12 @@ export class MentoringPage extends React.Component {
 
 	moveMessagePage() {
 		this.context.router.push({
-			pathname: '/messages/' + sessionStorage.user.rooms[this.state.mentoring.id][0] + '/' + sessionStorage.user.swagchat_id,
-			query: {
+			pathname: '/messages',
+			state: {
 				title: this.state.mentoring.title,
 				mentoringId: this.state.mentoring.id,
+				roomId: sessionStorage.user.rooms[this.state.mentoring.id][0],
+				userId: sessionStorage.user.swagchat_id,
 			},
 		});
 	}

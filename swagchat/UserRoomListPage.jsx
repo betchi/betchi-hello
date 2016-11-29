@@ -21,8 +21,10 @@ export class UserRoomListPage extends React.Component {
 	onItemTap(roomId, title) {
 		let userId = this.props.userId;
 		this.context.router.push({
-			pathname: '/messages/' + roomId + '/' + userId,
-			query: {
+			pathname: '/messages',
+			state: {
+				roomId: roomId,
+				userId: userId,
 				title: title,
 			},
 		});
