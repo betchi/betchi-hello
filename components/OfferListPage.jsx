@@ -17,30 +17,26 @@ export class OfferListPage extends React.Component {
   }
 
 	componentWillMount() {
+		this.updateUserSession();
 		async function asyncFunc(self) {
-			await self.updateUserSession()
 			await self.getUserRoom()
 		}
 		asyncFunc(this);
 	}
 
 	updateUserSession() {
-		new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			xhr.open('GET', '/api/user/' + sessionStorage.user.id, false); // synchronous
-			xhr.onload = () => {
-				if (xhr.status !== 200) {
-					return;
-				}
-				const data = JSON.parse(xhr.responseText);
-				if (!data.ok) {
-					goLogin();
-					return
-				}
-				sessionStorage.user = data.user;
-			};
-			xhr.send();
-		});
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/user/' + sessionStorage.user.id, false); // synchronous
+		xhr.send();
+		if (xhr.status !== 200) {
+			return;
+		}
+		const data = JSON.parse(xhr.responseText);
+		if (!data.ok) {
+			goLogin();
+			return
+		}
+		sessionStorage.user = data.user;
 	}
 
 	getUserRoom() {
@@ -69,9 +65,12 @@ export class OfferListPage extends React.Component {
 					return;
 				}
 				let talkList = [];
+				let roomId;
 				for (let i = 0; i < data.rooms.length; i++) {
-					if (sessionStorage.user.rooms[this.props.location.query.mentoringId].indexOf(data.rooms[i].roomId) >= 0) {
-						talkList.push(data.rooms[i]);
+					for (let userId in sessionStorage.user.rooms[this.props.location.query.mentoringId]) {
+						if (data.rooms[i].roomId == sessionStorage.user.rooms[this.props.location.query.mentoringId][userId]) {
+							talkList.push(data.rooms[i]);
+						}
 					}
 				}
 				this.setState({

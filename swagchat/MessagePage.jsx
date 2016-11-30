@@ -75,8 +75,6 @@ export class MessagePage extends React.Component {
 		}
 
 		this.state = {
-			mentoring: null,
-			members: [],
 			messages: [],
 			snack: {
 				open: false,
@@ -150,68 +148,10 @@ export class MessagePage extends React.Component {
 
   componentWillMount() {
 		async function asyncFunc(self) {
-			if (self.props.location.state.mentoringId !== undefined) {
-				await self.getMentoring();
-			}
-			await self.getRoomMember();
 			await self.getMessage();
 			await self.getStickers();
 		}
 		asyncFunc(this);
-	}
-
-	getMentoring() {
-		const xhr = new XMLHttpRequest();
-		xhr.open('GET', '/api/mentoring/' + self.props.location.state.mentoringId);
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '通信に失敗しました。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			let data = JSON.parse(xhr.responseText);
-			console.log(data.mentoring);
-			this.setState({
-				mentoring: data.mentoring,
-			});
-		}
-		xhr.send();
-	}
-
-	getRoomMember() {
-		new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + this.props.location.state.roomId + '/members');
-			xhr.onload = () => {
-				if (xhr.status !== 200) {
-					this.setState({
-						snack: {
-							open: true,
-							message: '読み込みに失敗しました。',
-						},
-					});
-					return;
-				}
-				let data = JSON.parse(xhr.responseText);
-				if (data.members !== undefined) {
-					let members = {}
-					for (var i = 0; i < data.members.length; i++) {
-						members[data.members[i].userId] = data.members[i];
-					}
-					this.setState({
-						members: members,
-					});
-				}
-			};
-			xhr.send();
-		});
 	}
 
 	getMessage() {
@@ -339,8 +279,8 @@ export class MessagePage extends React.Component {
 			};
 			await self.postMessage(messageInfo);
 
-			if (self.props.location.state.mentoringId !== undefined &&
-					self.state.mentoring.user_id !== sessionStorage.user.id) {
+			if (self.props.location.state.mentoring.id !== undefined &&
+					self.props.location.state.mentoring.user_id !== sessionStorage.user.id) {
 				let offerInfo = {
 					user_id: sessionStorage.user.id,
 					message: self.state.textValue
@@ -405,7 +345,7 @@ export class MessagePage extends React.Component {
 		console.log("postOffer");
 		new Promise((resolve, reject) => {
 			let xhr = new XMLHttpRequest();
-			xhr.open('POST', '/api/offers/' + this.props.location.state.mentoringId);
+			xhr.open('POST', '/api/offers/' + this.props.location.state.mentoring.id);
 			xhr.onload = () => {
 				if (xhr.status !== 200) {
 					this.setState({
@@ -688,7 +628,14 @@ export class MessagePage extends React.Component {
 
 								// message
 								if (messages[key].type === "text") {
-									var message = messages[key].payload.text.split('\n').map(function(line) {
+									let textMessage = "";
+									if (this.props.location.state.mentoring.user_id === sessionStorage.user.id && messages[key].payload.textForMemtor !== undefined) {
+										textMessage = messages[key].payload.textForMemtor;
+									} else {
+										textMessage = messages[key].payload.text;
+									}
+
+									var message = textMessage.split('\n').map(function(line) {
 										return <span key={"data_" + j++}>{line}<br /></span>;
 									});
 									if (messages[key].userId === this.props.location.state.userId) {
@@ -702,8 +649,8 @@ export class MessagePage extends React.Component {
 									} else {
 										indents.push(
 											<li key={key}>
-												<Avatar style={styles.avatar} src={this.state.members[messages[key].userId].pictureUrl} />
-												<p style={styles.senderName}>{this.state.members[messages[key].userId].name}</p>
+												<Avatar style={styles.avatar} src={this.props.location.state.members[messages[key].userId].pictureUrl} />
+												<p style={styles.senderName}>{this.props.location.state.members[messages[key].userId].name}</p>
 												<div style={styles.leftBalloon}>{message}</div>
 												<div style={styles.timeLeft}>{hhmm}</div>
 												<p style={styles.clearBalloon}></p>
@@ -738,8 +685,8 @@ export class MessagePage extends React.Component {
 									} else {
 										indents.push(
 											<li key={key}>
-												<Avatar style={styles.avatar} src={this.state.members[messages[key].userId].pictureUrl} />
-												<p style={styles.senderName}>{this.state.members[messages[key].userId].name}</p>
+												<Avatar style={styles.avatar} src={this.props.location.state.members[messages[key].userId].pictureUrl} />
+												<p style={styles.senderName}>{this.props.location.state.members[messages[key].userId].name}</p>
 												<p style={styles.clearBalloon}></p>
 												<img role="presentation" src={imageSrc} style={styles.leftImage} />
 												<div style={styles.timeLeft}>{hhmm}</div>
@@ -832,7 +779,8 @@ export class MessagePage extends React.Component {
             isMenuDisplay={this.state.isMenuDisplay}
             userId={this.props.location.state.userId}
             roomId={this.props.location.state.roomId}
-						mentoring={this.state.mentoring}
+						mentoring={this.props.location.state.mentoring}
+						targetUserIds={this.props.location.state.targetUserIds}
             onTouchTap={this.fileuploadComplete}
           />
 				</div>
@@ -849,4 +797,6 @@ export class MessagePage extends React.Component {
 MessagePage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	swagchat: React.PropTypes.object.isRequired,
+	mentoring: React.PropTypes.object.isRequired,
+	members: React.PropTypes.array.isRequired,
 }

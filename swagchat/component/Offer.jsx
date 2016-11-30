@@ -18,12 +18,6 @@ export class Offer extends React.Component {
 		}
 	}
 
-	componentWillReceiveProps() {
-		this.setState({
-			mentoring: this.props.mentoring,
-		});
-	}
-
 	handleOpen(action) {
 		this.setState({
 			open: true,
@@ -38,20 +32,42 @@ export class Offer extends React.Component {
 	}
 
 	sendOffer() {
-		console.log("sendOffer");
 		this.handleClose();
 
+		console.log(this.state.mentoring.offers);
+
+		let userIds = [];
+		let determinationRoomIds = [];
+		let cancelRoomIds = [];
+		let tmpRoomId;
+		for (let userId in sessionStorage.user.rooms[this.state.mentoring.id]) {
+			tmpRoomId = sessionStorage.user.rooms[this.state.mentoring.id][userId];
+			if (tmpRoomId == this.props.roomId) {
+				userIds.push(parseInt(userId));
+				determinationRoomIds.push(tmpRoomId);
+			} else {
+				cancelRoomIds.push(tmpRoomId);
+			}
+		}
 		const mentoring = {
 			id: parseInt(this.props.mentoring.id),
-			determinations: [sessionStorage.user.id]
+			determinations: userIds,
 		};
+
+		for (let i = 0; i < sessionStorage.user.rooms[this.state.mentoring.id].length; i++) {
+			tmpRoomId = sessionStorage.user.rooms[this.state.mentoring.id][i];
+		}
+
 		const postMentoringDetermination = {
 			action: this.state.action,
-			mentoring:mentoring
+			mentoring:mentoring,
+			determination_roomIds: determinationRoomIds,
+			cancel_roomIds: cancelRoomIds,
+			mentor_user_id: sessionStorage.user.swagchat_id,
 		};
 		console.log(postMentoringDetermination);
 		const xhr = new XMLHttpRequest();
-		xhr.open('POST', '/api/mentoring/determinations', false);
+		xhr.open('POST', '/api/mentoring/determinations');
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
@@ -67,24 +83,11 @@ export class Offer extends React.Component {
 				return;
 			}
 			let data = JSON.parse(xhr.responseText);
+			let mentoring = this.state.mentoring;
+			mentoring.determinations = data.mentoring.determinations;
 			this.setState({
-				mentoring: data.mentoring,
+				mentoring: mentoring,
 			});
-
-			//if (data.mentoring.determinations !== null &&
-			//	data.mentoring.determinations.indexOf(parseInt(this.props.location.query.targetUserId)) >= 0) {
-			//	this.setState({
-			//		rightIconMessage: rightIconTitleCancel,
-			//		rightIconAction: "remove",
-			//		dialogMessage: dialogMessageCancel,
-			//	});
-			//} else {
-			//	this.setState({
-			//		rightIconMessage: rightIconTitleOk,
-			//		rightIconAction: "all",
-			//		dialogMessage: dialogMessageOk,
-			//	});
-			//}
 		}
 		xhr.send(JSON.stringify(postMentoringDetermination));
 	}
@@ -176,4 +179,5 @@ Offer.propTypes = {
 	userId: React.PropTypes.string.isRequired,
 	roomId: React.PropTypes.string.isRequired,
 	mentoring: React.PropTypes.object.isRequired,
+	targetUserIds: React.PropTypes.array.isRequired,
 }

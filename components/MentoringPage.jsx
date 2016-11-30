@@ -166,15 +166,32 @@ export class MentoringPage extends React.Component {
 	}
 
 	moveMessagePage() {
+		let roomId = sessionStorage.user.rooms[this.state.mentoring.id][sessionStorage.user.id];
+		let members = this.getRoomMember(sessionStorage.user.rooms[this.state.mentoring.id][0]);
 		this.context.router.push({
 			pathname: '/messages',
 			state: {
 				title: this.state.mentoring.title,
-				mentoringId: this.state.mentoring.id,
-				roomId: sessionStorage.user.rooms[this.state.mentoring.id][0],
+				roomId: sessionStorage.user.rooms[this.state.mentoring.id][sessionStorage.user.id],
 				userId: sessionStorage.user.swagchat_id,
+				mentoring: this.state.mentoring,
+				members: members,
 			},
 		});
+	}
+
+	getRoomMember(roomId) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + roomId + '/members', false);
+		xhr.send();
+		let data = JSON.parse(xhr.responseText);
+		if (data.members !== undefined) {
+			let members = {}
+			for (var i = 0; i < data.members.length; i++) {
+				members[data.members[i].userId] = data.members[i];
+			}
+			return members;
+		}
 	}
 
 	postRoom(roomInfo) {

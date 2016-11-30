@@ -17,6 +17,22 @@ export class RoomListPage extends React.Component {
 
 	componentWillMount() {
 		this.getUserRoom()
+		this.updateUserSession();
+	}
+
+	updateUserSession() {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/user/' + sessionStorage.user.id, false); // synchronous
+		xhr.send();
+		if (xhr.status !== 200) {
+			return;
+		}
+		const data = JSON.parse(xhr.responseText);
+		if (!data.ok) {
+			goLogin();
+			return
+		}
+		sessionStorage.user = data.user;
 	}
 
 	getUserRoom() {

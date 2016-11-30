@@ -30,14 +30,14 @@ export class Tabbar extends React.Component {
 			this.context.router.push('/top');
 			break;
 		case "search":
-			this.context.router.push('/search');
+			//this.context.router.push('/search');
+			webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
 			break;
 		case "message":
 			this.context.router.push('/roomList');
 			break;
 		case "notification":
-			//webkit.messageHandlers.startFollowerVideoChat.postMessage('hogehoge');
-			//webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
+			webkit.messageHandlers.startFollowerVideoChat.postMessage('hogehoge');
 			break;
 		case "mypage":
 			this.context.router.push('/mypage/' + sessionStorage.user.id);

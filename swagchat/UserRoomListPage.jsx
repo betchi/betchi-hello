@@ -27,25 +27,56 @@ export class UserRoomListPage extends React.Component {
 
 	onItemTap(roomId, title) {
 		let mentoringId;
-		if (this.props.mentoringId !== undefined) {
-			mentoringId = this.props.mentoringId;
-		} else {
-			for (let key in sessionStorage.user.rooms) {
-				if (sessionStorage.user.rooms[key].indexOf(roomId) >= 0) {
-					mentoringId = key;
-					break;
+		let targetUserIds = [];
+		//if (this.props.mentoringId !== undefined) {
+		//	mentoringId = this.props.mentoringId;
+		//} else {
+			let rooms = sessionStorage.user.rooms;
+			for (let searchMentoringId in rooms) {
+				for (let userId in rooms[searchMentoringId]) {
+					if (rooms[searchMentoringId][userId] == roomId) {
+						mentoringId = searchMentoringId;
+						targetUserIds.push(userId);
+					}
 				}
 			}
-		}
+			//}
+		let mentoring = this.getMentoring(mentoringId);
+		console.log(mentoring);
+		let members = this.getRoomMember(roomId);
 		this.context.router.push({
 			pathname: '/messages',
 			state: {
 				roomId: roomId,
 				userId: this.props.userId,
+				targetUserIds: targetUserIds,
 				title: title,
-				mentoringId: mentoringId,
+				mentoring: mentoring,
+				members: members,
 			},
 		});
+	}
+
+	getMentoring(mentoringId) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/mentoring/' + mentoringId, false);
+		xhr.send();
+		let data = JSON.parse(xhr.responseText);
+		return data.mentoring;
+	}
+
+	getRoomMember(roomId) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + roomId + '/members', false);
+		xhr.send();
+		let data = JSON.parse(xhr.responseText);
+		if (data.members !== undefined) {
+			let members = {}
+			for (var i = 0; i < data.members.length; i++) {
+				members[data.members[i].userId] = data.members[i];
+			}
+			return members;
+		}
 	}
 
 	render() {
