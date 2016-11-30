@@ -15,17 +15,35 @@ export class UserRoomListPage extends React.Component {
 				open: false,
 				message: '',
 			},
+			talkList: null,
 		};
 	}
 
+	componentWillReceiveProps() {
+		this.setState({
+			talkList: this.props.talkList,
+		});
+	}
+
 	onItemTap(roomId, title) {
-		let userId = this.props.userId;
+		let mentoringId;
+		if (this.props.mentoringId !== undefined) {
+			mentoringId = this.props.mentoringId;
+		} else {
+			for (let key in sessionStorage.user.rooms) {
+				if (sessionStorage.user.rooms[key].indexOf(roomId) >= 0) {
+					mentoringId = key;
+					break;
+				}
+			}
+		}
 		this.context.router.push({
 			pathname: '/messages',
 			state: {
 				roomId: roomId,
-				userId: userId,
+				userId: this.props.userId,
 				title: title,
+				mentoringId: mentoringId,
 			},
 		});
 	}

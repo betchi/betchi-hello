@@ -1,11 +1,13 @@
 import React from 'react';
 
 import {FileUpload} from './FileUpload.jsx';
+import {Offer} from './Offer.jsx';
 
 export class Menu extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
+			mentoring: null,
 			styles: {
 				section: {
 					position: 'relative',
@@ -38,6 +40,7 @@ export class Menu extends React.Component {
 		styles.section.display = this.updateDisplay(e.isMenuDisplay);
 		this.state = {
 			styles: styles,
+			mentoring: this.props.mentoring,
 		}
 	}
 
@@ -61,6 +64,11 @@ export class Menu extends React.Component {
       <section style={this.state.styles.section}>
 				<div style={this.state.styles.itemCarousel}>
 					<FileUpload userId={this.props.userId} roomId={this.props.roomId} onTouchTap={this.onMenuClose.bind(this)} />
+					{(() => {
+						if (this.state.mentoring !== null && this.state.mentoring.user_id === sessionStorage.user.id) {
+							return <Offer userId={this.props.userId} roomId={this.props.roomId} onTouchTap={this.onMenuClose.bind(this)} mentoring={this.state.mentoring} />
+						}
+					})()}
 				</div>
 			</section>
 		);

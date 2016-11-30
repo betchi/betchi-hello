@@ -984,6 +984,20 @@ export class Profile extends React.Component {
 			},
 		};
 
+		const actions = [
+      <FlatButton
+        label="キャンセル"
+        primary={true}
+        onTouchTap={this.onProfileEditClose.bind(this)}
+      />,
+			<FlatButton
+				label="Ok"
+				primary={true}
+				keyboardFocused={true}
+				onTouchTap={this.onProfileEdit}
+			/>
+		]
+
 		return (
 			<div style={styles.root}>
 				<div style={styles.coverRoot}>
@@ -1065,12 +1079,7 @@ export class Profile extends React.Component {
 										/>
 										<Dialog
 											title="名前を変更"
-											actions={<FlatButton
-												label="Ok"
-												primary={true}
-												keyboardFocused={true}
-												onTouchTap={this.onProfileEdit}
-											/>}
+											actions={actions}
 											modal={false}
 											open={this.state.profileEditDialog.open}
 											onRequestClose={this.onProfileEditClose}

@@ -17,44 +17,69 @@ export class OfferListPage extends React.Component {
   }
 
 	componentWillMount() {
-		this.getUserRoom()
+		async function asyncFunc(self) {
+			await self.updateUserSession()
+			await self.getUserRoom()
+		}
+		asyncFunc(this);
+	}
+
+	updateUserSession() {
+		new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('GET', '/api/user/' + sessionStorage.user.id, false); // synchronous
+			xhr.onload = () => {
+				if (xhr.status !== 200) {
+					return;
+				}
+				const data = JSON.parse(xhr.responseText);
+				if (!data.ok) {
+					goLogin();
+					return
+				}
+				sessionStorage.user = data.user;
+			};
+			xhr.send();
+		});
 	}
 
 	getUserRoom() {
-		let xhr = new XMLHttpRequest();
-		xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/users/' + sessionStorage.user.swagchat_id + '/rooms');
-		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: 'オファーの読み込みに失敗しました。',
-					},
-				});
-				return;
-			}
-			let data = JSON.parse(xhr.responseText);
-			if (data.rooms.length === 0) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '検索ヒット0件です。',
-					},
-				});
-				return;
-			}
-			let talkList = [];
-			for (let i = 0; i < data.rooms.length; i++) {
-				if (sessionStorage.user.rooms[this.props.location.query.mentoringId].indexOf(data.rooms[i].roomId) >= 0) {
-					talkList.push(data.rooms[i]);
+		new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/users/' + sessionStorage.user.swagchat_id + '/rooms');
+			xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+			xhr.onload = () => {
+				if (xhr.status !== 200) {
+					this.setState({
+						snack: {
+							open: true,
+							message: 'オファーの読み込みに失敗しました。',
+						},
+					});
+					return;
 				}
-			}
-			this.setState({
-				talkList: talkList,
-			});
-		};
-		xhr.send();
+				let data = JSON.parse(xhr.responseText);
+				if (data.rooms.length === 0) {
+					this.setState({
+						snack: {
+							open: true,
+							message: '検索ヒット0件です。',
+						},
+					});
+					return;
+				}
+				let talkList = [];
+				for (let i = 0; i < data.rooms.length; i++) {
+					if (sessionStorage.user.rooms[this.props.location.query.mentoringId].indexOf(data.rooms[i].roomId) >= 0) {
+						talkList.push(data.rooms[i]);
+					}
+				}
+				this.setState({
+					talkList: talkList,
+				});
+			};
+			xhr.send();
+		});
 	}
 
 	onBack() {

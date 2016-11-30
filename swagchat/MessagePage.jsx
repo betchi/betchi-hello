@@ -41,7 +41,6 @@ export class MessagePage extends React.Component {
 				let postJson = {
 					roomId: self.props.location.state.roomId
 				};
-				console.log(postJson);
 				ws.send(JSON.stringify(postJson));
 			} else {
 				this.setState({
@@ -58,7 +57,6 @@ export class MessagePage extends React.Component {
 
 		ws.onerror = function(e) {
 			console.log("onerror");
-			console.log(e);
 			console.log(ws);
 		};
 
@@ -77,6 +75,7 @@ export class MessagePage extends React.Component {
 		}
 
 		this.state = {
+			mentoring: null,
 			members: [],
 			messages: [],
 			snack: {
@@ -151,11 +150,39 @@ export class MessagePage extends React.Component {
 
   componentWillMount() {
 		async function asyncFunc(self) {
+			if (self.props.location.state.mentoringId !== undefined) {
+				await self.getMentoring();
+			}
 			await self.getRoomMember();
 			await self.getMessage();
 			await self.getStickers();
 		}
 		asyncFunc(this);
+	}
+
+	getMentoring() {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/mentoring/' + self.props.location.state.mentoringId);
+		xhr.onload = () => {
+			if (xhr.status !== 200) {
+				this.setState({
+					snack: {
+						open: true,
+						message: '通信に失敗しました。',
+					},
+					refreshStyle: {
+						display: 'none',
+					},
+				});
+				return;
+			}
+			let data = JSON.parse(xhr.responseText);
+			console.log(data.mentoring);
+			this.setState({
+				mentoring: data.mentoring,
+			});
+		}
+		xhr.send();
 	}
 
 	getRoomMember() {
@@ -181,8 +208,6 @@ export class MessagePage extends React.Component {
 					this.setState({
 						members: members,
 					});
-					console.log("===================================");
-					console.log(this.state.members);
 				}
 			};
 			xhr.send();
@@ -204,22 +229,16 @@ export class MessagePage extends React.Component {
 					return;
 				}
 				let data = JSON.parse(xhr.responseText);
-				console.log(data);
 				if (data.messages !== undefined) {
 					let mapMessages = {}
 					for (var i = 0; i < data.messages.length; i++) {
 						mapMessages[data.messages[i].messageId] = data.messages[i];
 					}
-					console.log(mapMessages);
-
-
 					let messages = data.messages;
-					console.log(messages);
 					this.setState({
 						messages: mapMessages,
 						isDoneFirstShow: true,
 					});
-					localStorage.setItem("messages", JSON.stringify(mapMessages));
 				}
 			};
 			xhr.send();
@@ -270,7 +289,6 @@ export class MessagePage extends React.Component {
         return;
       }
       let data = JSON.parse(xhr.responseText);
-console.log(data);
 			if (data !== undefined) {
 				localStorage.setItem("sticker-" + stickerId, JSON.stringify(data));
 			}
@@ -321,12 +339,12 @@ console.log(data);
 			};
 			await self.postMessage(messageInfo);
 
-			if (self.props.location.state.mentoringId !== undefined) {
+			if (self.props.location.state.mentoringId !== undefined &&
+					self.state.mentoring.user_id !== sessionStorage.user.id) {
 				let offerInfo = {
 					user_id: sessionStorage.user.id,
 					message: self.state.textValue
 				}
-				console.log(offerInfo);
 				await self.postOffer(offerInfo);
 			}
 		}
@@ -356,7 +374,6 @@ console.log(data);
 					return;
 				}
 				let data = JSON.parse(xhr.responseText);
-				console.log(data.messageIds);
 
 				var newMessages = this.state.messages;	
 				let messageId = data.messageIds[0];
@@ -370,7 +387,6 @@ console.log(data);
 					created: new Date().getTime() * 1000000
 				};
 				newMessages[messageId] = json;
-				localStorage.setItem("messages", JSON.stringify(newMessages));
 				this.setState({
 					messages: newMessages,
 					textValue: "",
@@ -401,7 +417,6 @@ console.log(data);
 					return;
 				}
 				let data = JSON.parse(xhr.responseText);
-				console.log(data);
 			}
 			xhr.onerror = function() {
 				console.log(xhr);
@@ -485,7 +500,6 @@ console.log(data);
 
 	fileuploadComplete() {
 		console.log("fileuploadComplete");
-		console.log(localStorage.getItem("confirmImageMessageId"));
 		this.contentAdd();
 
 		/*
@@ -627,7 +641,6 @@ console.log(data);
 				float: 'right',
 			},
 		}
-		//console.log(<Menu />);
     return (
       <section>
 				<HeadRoom
@@ -699,24 +712,21 @@ console.log(data);
 									}
 								} else if (messages[key].type === "image") {
 									let imageSrc;
-									console.log(localStorage.getItem("image-" + key));
-									if (localStorage.getItem("image-" + key) === null) {
-										let imgObj = new Image();
-										imgObj.src = this.context.swagchat.config.imageBaseUrl + messages[key].payload.assetId;
-										imgObj.onload = function() {
-											let reader = new FileReader();
-											reader.onload = (function() {
-												return function(e) {
-													console.log(e.target.result);
-												}
-											})
-											reader.readAsDataURL(imgObj);
-										}
-
-										imageSrc = this.context.swagchat.config.imageBaseUrl + messages[key].payload.assetId;
-									} else {
-										imageSrc = localStorage.getItem("image-" + key);
+/*
+									let imgObj = new Image();
+									imgObj.onload = function() {
+										let reader = new FileReader();
+										reader.onload = (function() {
+											return function(e) {
+												console.log(e.target.result);
+											}
+										})
+										reader.readAsDataURL(imgObj);
 									}
+									imgObj.src = this.context.swagchat.config.imageBaseUrl + messages[key].payload.assetId;
+*/
+
+									imageSrc = this.context.swagchat.config.imageBaseUrl + messages[key].payload.assetId;
 									if (messages[key].userId === this.props.location.state.userId) {
 										indents.push(
 											<li key={key}>
@@ -728,7 +738,7 @@ console.log(data);
 									} else {
 										indents.push(
 											<li key={key}>
-												<Avatar style={styles.avatar} src={messages[key].userPictureUrl} />
+												<Avatar style={styles.avatar} src={this.state.members[messages[key].userId].pictureUrl} />
 												<p style={styles.senderName}>{this.state.members[messages[key].userId].name}</p>
 												<p style={styles.clearBalloon}></p>
 												<img role="presentation" src={imageSrc} style={styles.leftImage} />
@@ -822,6 +832,7 @@ console.log(data);
             isMenuDisplay={this.state.isMenuDisplay}
             userId={this.props.location.state.userId}
             roomId={this.props.location.state.roomId}
+						mentoring={this.state.mentoring}
             onTouchTap={this.fileuploadComplete}
           />
 				</div>
