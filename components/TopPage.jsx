@@ -44,17 +44,17 @@ export class TopPage extends React.Component {
 	componentWillMount() {
 		if (sessionStorage.user.swagchat_id === undefined) {
 			async function asyncFunc(self) {
-				let swagchatUserInfo = {
-					name: sessionStorage.user.username,
-					pictureUrl: sessionStorage.user.avatar,
-				};
-				const postSwagchatUser = await self.postSwagchatUser(swagchatUserInfo);
+				//let swagchatUserInfo = {
+				//	name: sessionStorage.user.username,
+				//	pictureUrl: sessionStorage.user.avatar,
+				//};
+				//const postSwagchatUser = await self.postSwagchatUser(swagchatUserInfo);
 
-				let userInfo = {
-					id: sessionStorage.user.id,
-					swagchat_id: postSwagchatUser.userId,
-				};
-				await self.postUser(userInfo);
+				//let userInfo = {
+				//	id: sessionStorage.user.id,
+				//	swagchat_id: postSwagchatUser.userId,
+				//};
+				//await self.postUser(userInfo);
 			}
 			asyncFunc(this);
 		}

@@ -110,10 +110,10 @@ export class ParticipantsListPage extends React.Component {
 		let userId = event.target.value;
 		let isBlocked = toggled ? 0 : 1;
 		let determinations = this.state.determinations;
-		for (let i = 0; i < determinations.length; i++) {
-			if (determinations[i].user_id === parseInt(userId)) {
-				determinations[i].is_blocked = isBlocked;
-				determinations[i].action = "update";
+		for (let searchUserId in determinations) {
+			if (parseInt(searchUserId) === parseInt(userId)) {
+				determinations[userId].is_blocked = isBlocked;
+				determinations[userId].action = "update";
 				break;
 			}
 		}
@@ -244,11 +244,11 @@ export class ParticipantsListPage extends React.Component {
 					ref="list"
 				>
 				{(() => {
-					if (Array.isArray(this.state.determinations)) {
+					if (this.state.determinations !== undefined) {
 						let determinations = [];
 						let isBlocked;
-						for (var i = 0; i < this.state.determinations.length; i++) {
-							if (this.state.determinations[i].is_blocked === 1) {
+						for (var userId in this.state.determinations) {
+							if (this.state.determinations[userId].is_blocked === 1) {
 								isBlocked = false;
 							} else {
 								isBlocked = true;
@@ -256,16 +256,16 @@ export class ParticipantsListPage extends React.Component {
 							determinations.push(
 								<ListItem
 									style={styles.listItem}
-									key={i}
-									primaryText={this.state.determinations[i].username}
-									leftAvatar={<Avatar src={this.state.determinations[i].avatar} />}
+									key={userId}
+									primaryText={this.state.determinations[userId].username}
+									leftAvatar={<Avatar src={this.state.determinations[userId].avatar} />}
 									secondaryTextLines={2}
 									disabled={true}
 								>
 									<Toggle
 										style={styles.toggle}
 										defaultToggled={isBlocked}
-										value={this.state.determinations[i].user_id}
+										value={this.state.determinations[userId].user_id}
 										onToggle={this.handleToggle.bind(this)}
 									/>
 								</ListItem>

@@ -461,7 +461,9 @@ export class MentoringPage extends React.Component {
 			is_blocked: 0,
 		}
 		let determinationsInfo = {
-			determinations: [determination],
+			determinations: {
+				1: determination
+			}
 		}
 		let xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/determinations/' + this.state.mentoring.id, false);
@@ -654,6 +656,10 @@ export class MentoringPage extends React.Component {
 			},
 			listItem: {
 			},
+			listItemNg: {
+				color: this.context.colors.error,
+				lineHeight: '1.2rem',
+			},
 			secondaryText: {
 				float: 'right',
 				marginTop: '-1rem',
@@ -686,6 +692,22 @@ export class MentoringPage extends React.Component {
 			onTouchTap={this.onPostDeterminations}
 		  />,
 		];
+
+		let isNowDetermination = false;
+		let isBlocked = false;
+		if (this.state.mentoring.determinations === null ||
+			this.state.mentoring.determinations === undefined) {
+		} else {
+			for (let i in this.state.mentoring.determinations) {
+				if (this.state.mentoring.determinations[i].user_id === sessionStorage.user.id) {
+					isNowDetermination = true;
+					if (this.state.mentoring.determinations[i].is_blocked === 1) {
+						isBlocked = true;
+					}
+					break;
+				}
+			}
+		}
 
 		return (
 			<section style={styles.root}>
@@ -745,6 +767,11 @@ export class MentoringPage extends React.Component {
 									}
 								/>
 							)
+						}
+					})()}
+					{(() => {
+						if (isBlocked) {
+							return <ListItem style={styles.listItemNg} disabled={true} primaryText="申し訳御座いませんがこのメンタリングには参加できません。" />
 						}
 					})()}
 				</List>
@@ -809,24 +836,24 @@ export class MentoringPage extends React.Component {
 								onTouchTap={this.onOffer}
 							/>
 						} else {
-							if (this.state.mentoring.determinations === null ||
-									this.state.mentoring.determinations === undefined ||
-									this.state.mentoring.determinations[sessionStorage.user.id] === undefined) {
-								return <FlatButton
-									style={styles.button}
-									icon={<AddCircle style={styles.buttonIcon} />}
-									label="参加したい"
-									labelStyle={styles.buttonLabel}
-									onTouchTap={this.dialogHandleOpen.bind(this, "参加をしますか？", "add")}
-								/>
-							} else if (this.state.mentoring.determinations[sessionStorage.user.id] !== undefined) {
-								return <FlatButton
-									style={styles.button}
-									icon={<AddCircle style={styles.buttonIcon} />}
-									label="参加を取り消す"
-									labelStyle={styles.buttonLabel}
-									onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
-								/>
+							if (!isBlocked) { 
+								if (isNowDetermination) {
+									return <FlatButton
+										style={styles.button}
+										icon={<AddCircle style={styles.buttonIcon} />}
+										label="参加を取り消す"
+										labelStyle={styles.buttonLabel}
+										onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
+									/>
+								} else {
+									return <FlatButton
+										style={styles.button}
+										icon={<AddCircle style={styles.buttonIcon} />}
+										label="参加したい"
+										labelStyle={styles.buttonLabel}
+										onTouchTap={this.dialogHandleOpen.bind(this, "参加をしますか？", "add")}
+									/>
+								}
 							}
 						}
 					}
