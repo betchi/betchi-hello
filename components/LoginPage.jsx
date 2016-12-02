@@ -59,6 +59,10 @@ export class LoginForm extends React.Component {
 		}
 	}
 
+	componentDidMount() {
+			this.refs.emailTextField.focus();
+	}
+
 	onBack(e) {
 		this.context.router.goBack();
 	}
@@ -117,7 +121,6 @@ export class LoginForm extends React.Component {
 				});
 				return;
 			}
-console.log(data);
 			this.context.router.push('/');
 		}
 		xhr.send(JSON.stringify({email:this.state.email, password:this.state.password}));

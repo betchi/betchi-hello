@@ -38,6 +38,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {MentoringCoverSwipe, MentoringDigest, SelectableCover} from './content.jsx';
 import {ThxMessageList} from './ThxMessageList.jsx';
 import {ContactList} from './ContactList.jsx';
+import {Tabbar} from './Tabbar.jsx';
 
 export class MentoringPage extends React.Component {
 	constructor(props, context) {
@@ -45,26 +46,7 @@ export class MentoringPage extends React.Component {
 		this.state = {
 			messages: [],
 			user: sessionStorage.user,
-			mentoring: {
-				id: this.props.params.id,
-				user_id: 0,
-				cover: '',
-				covers: [],
-				avatar: '',
-				title: '',
-				duration: 0,
-				price: 0,
-				star: 0,
-				digest: '',
-				countThx: 0,
-				user: {
-					username: '',
-					avatar: '',
-					count_thanx: 0,
-					count_star: 0,
-					count_followers: 0,
-				},
-			},
+			mentoring: this.props.location.state.mentoring,
 			snack: {
 				open: false,
 				message: '',
@@ -96,6 +78,8 @@ export class MentoringPage extends React.Component {
 		this.dialogHandleClose = this.dialogHandleClose.bind(this);
 		this.dialogHandleOpen = this.dialogHandleOpen.bind(this);
 		this.onPostDeterminations = this.onPostDeterminations.bind(this);
+
+		this.getDeterminations();
 	}
 
 	componentDidMount() {
@@ -115,6 +99,17 @@ export class MentoringPage extends React.Component {
 
 	onBack(e) {
 		this.context.router.goBack();
+	}
+
+	getDeterminations() {
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/determinations/' + this.props.location.state.mentoring.id, false);
+		xhr.send();;
+		let data = JSON.parse(xhr.responseText);
+		console.log(data.determinations);
+		this.setState({
+			determinations: data.determinations,
+		});
 	}
 
 	onFollow(e) {
@@ -167,7 +162,7 @@ export class MentoringPage extends React.Component {
 
 	moveMessagePage() {
 		let roomId = sessionStorage.user.rooms[this.state.mentoring.id][sessionStorage.user.id];
-		let members = this.getRoomMember(sessionStorage.user.rooms[this.state.mentoring.id][0]);
+		let members = this.getRoomMember(sessionStorage.user.rooms[this.state.mentoring.id][sessionStorage.user.id]);
 		this.context.router.push({
 			pathname: '/messages',
 			state: {
@@ -274,9 +269,9 @@ export class MentoringPage extends React.Component {
 
 	onOfferList(e) {
 		this.context.router.push({
-			pathname: '/offerList',
-			query: {
-				mentoringId: this.state.mentoring.id,
+			pathname: '/offers/' + this.state.mentoring.id + '/' + this.state.mentoring.title,
+			state: {
+				mentoring: this.state.mentoring,
 			}
 		});
 	}
@@ -405,10 +400,104 @@ export class MentoringPage extends React.Component {
 		xhr.send();
 	}
 
+	/*
 	onPostDeterminations() {
 		console.log("onPostDeterminations");
 		let xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/mentoring/determinations', false);
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		//var mentoring = {
+		//	id: parseInt(this.state.mentoring.id),
+		//	determinations: [parseInt(sessionStorage.user.id)]
+		//};
+		const json = JSON.stringify({
+			action: this.state.dialog.action,
+			mentoring: {
+				id: parseInt(this.state.mentoring.id),
+				determinations: [parseInt(sessionStorage.user.id)]
+			}
+		});
+		xhr.send(json);
+		if (xhr.status !== 200) {
+			this.setState({
+				snack: {
+					open: true,
+					message: '通信に失敗しました。',
+				},
+				refreshStyle: {
+					display: 'none',
+				},
+			});
+			return;
+		}
+		let data = JSON.parse(xhr.responseText);
+		let mentoring = this.state.mentoring;
+		this.setState({
+			mentoring: data.mentoring,
+		});
+		this.dialogHandleClose();
+	}
+	*/
+
+	dialogHandleOpen(message, action) {
+		console.log(message);
+		console.log(action);
+		console.log(this.state.mentoring.determinations);
+		//this.postDeterminations();
+		this.setState({
+			dialog: {
+				open: true,
+				action: action,
+				message: message,
+			},
+		});
+	}
+
+	onPostDeterminations() {
+		console.log("onPostDeterminations");
+		let determination = {
+			action: this.state.dialog.action,
+			user_id: sessionStorage.user.id,
+			is_blocked: 0,
+		}
+		let determinationsInfo = {
+			determinations: [determination],
+		}
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/determinations/' + this.state.mentoring.id, false);
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.send(JSON.stringify(determinationsInfo));
+		if (xhr.status !== 200) {
+			this.setState({
+				snack: {
+					open: false,
+					message: '送信に失敗しました。',
+				},
+			});
+			return;
+		}
+		let data = JSON.parse(xhr.responseText);
+		this.setState({
+			mentoring: data.mentoring,
+		})
+		this.dialogHandleClose();
+	}
+
+	/*
+	postDeterminations() {
+		let userIds = [sessionStorage.user.id];
+		const mentoring = {
+			id: parseInt(this.state.mentoring.id),
+			determinations: userIds,
+		};
+
+		const postMentoringDetermination = {
+			action: this.state.action,
+			mentoring:mentoring,
+		};
+		console.log(postMentoringDetermination);
+		const xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/determinations');
 		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 		xhr.onload = () => {
 			if (xhr.status !== 200) {
@@ -423,7 +512,7 @@ export class MentoringPage extends React.Component {
 				});
 				return;
 			}
-
+			console.log(xhr);
 			let data = JSON.parse(xhr.responseText);
 			let mentoring = this.state.mentoring;
 			mentoring.determinations = data.mentoring.determinations;
@@ -431,29 +520,9 @@ export class MentoringPage extends React.Component {
 				mentoring: mentoring,
 			});
 		}
-		var mentoring = {
-			id: parseInt(this.state.mentoring.id),
-			determinations: [parseInt(sessionStorage.user.id)]
-		};
-		const json = JSON.stringify({
-			action: this.state.dialog.action,
-			mentoring:mentoring,
-		});
-		xhr.send(json);
-		this.dialogHandleClose();
+		xhr.send(JSON.stringify(postMentoringDetermination));
 	}
-
-	dialogHandleOpen(message, action) {
-		console.log(message);
-		console.log(action);
-		this.setState({
-			dialog: {
-				open: true,
-				action: action,
-				message: message,
-			},
-		});
-	}
+	*/
 
 	dialogHandleClose() {
 		this.setState({
@@ -649,7 +718,35 @@ export class MentoringPage extends React.Component {
 					<ListItem style={styles.listItem} disabled={true} primaryText="メンタリング時間" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.duration} 分</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="金額" secondaryText={<p style={styles.secondaryText}>{price}</p>} />
 					<ListItem style={styles.listItem} disabled={true} primaryText="募集人数" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.max_user_num} 人</p>} />
-					<ListItem style={styles.listItem} disabled={true} primaryText="現在のオファー人数" secondaryText={<p style={styles.secondaryText}>{this.state.mentoring.count_offers} 人</p>} />
+					{(() => {
+						if (this.state.mentoring.kind == 2 || this.state.mentoring.count_determinations > 0) {
+							return (
+								<ListItem
+									style={styles.listItem}
+									disabled={true}
+									primaryText="現在の参加人数"
+									secondaryText={
+										<p style={styles.secondaryText}>
+												{this.state.mentoring.count_determinations} 人
+										</p>
+									}
+								/>
+							)
+						} else {
+							return (
+								<ListItem
+									style={styles.listItem}
+									disabled={true}
+									primaryText="現在のオファー人数"
+									secondaryText={
+										<p style={styles.secondaryText}>
+												{this.state.mentoring.count_offers} 人
+										</p>
+									}
+								/>
+							)
+						}
+					})()}
 				</List>
 				{(() => {
 					if (this.state.messages.length != 0) {
@@ -681,8 +778,8 @@ export class MentoringPage extends React.Component {
 				<div style={styles.buttons}>
 				{(() => {
 					if (this.state.mentoring.user_id == sessionStorage.user.id) {
-						if (this.state.mentoring.count_offers != 0) {
-							if (this.state.mentoring.kind == 1) {
+						if (this.state.mentoring.kind == 1) {
+							if (this.state.mentoring.count_offers > 0) {
 								return <FlatButton
 									style={styles.button}
 									icon={<ListIcon style={styles.buttonIcon} />}
@@ -690,7 +787,9 @@ export class MentoringPage extends React.Component {
 									labelStyle={styles.buttonLabel}
 									onTouchTap={this.onOfferList}
 								/>
-							} else {
+							}
+						} else {
+							if (this.state.mentoring.count_determinations > 0) {
 								return <FlatButton
 									style={styles.button}
 									icon={<ListIcon style={styles.buttonIcon} />}
@@ -710,22 +809,23 @@ export class MentoringPage extends React.Component {
 								onTouchTap={this.onOffer}
 							/>
 						} else {
-							if (this.state.mentoring.determinations !== undefined &&
-								this.state.mentoring.determinations.indexOf(sessionStorage.user.id) >= 0) {
-								return <FlatButton
-									style={styles.button}
-									icon={<AddCircle style={styles.buttonIcon} />}
-									label="参加を取り消す"
-									labelStyle={styles.buttonLabel}
-									onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
-								/>
-							} else {
+							if (this.state.mentoring.determinations === null ||
+									this.state.mentoring.determinations === undefined ||
+									this.state.mentoring.determinations[sessionStorage.user.id] === undefined) {
 								return <FlatButton
 									style={styles.button}
 									icon={<AddCircle style={styles.buttonIcon} />}
 									label="参加したい"
 									labelStyle={styles.buttonLabel}
 									onTouchTap={this.dialogHandleOpen.bind(this, "参加をしますか？", "add")}
+								/>
+							} else if (this.state.mentoring.determinations[sessionStorage.user.id] !== undefined) {
+								return <FlatButton
+									style={styles.button}
+									icon={<AddCircle style={styles.buttonIcon} />}
+									label="参加を取り消す"
+									labelStyle={styles.buttonLabel}
+									onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
 								/>
 							}
 						}
@@ -1207,6 +1307,7 @@ export class EditMentoringPage extends React.Component {
 	render() {
 		const styles = {
 			root: {
+				marginBottom: '3rem',
 			},
 			headroom: {
 				WebkitTransition: 'all .3s ease-in-out',
@@ -1337,18 +1438,32 @@ export class EditMentoringPage extends React.Component {
 				<HeadRoom
 					style={styles.headroom}
 				>
-					<AppBar
-						title={appBarTitle}
-						titleStyle={styles.title}
-						iconElementLeft={
-							<IconButton
-								style={styles.backIcon}
-								onTouchTap={this.onBack}
-							>
-								<NavigationArrowBack />
-							</IconButton>
+					{(() => {
+						if (this.props.params.id == undefined) {
+							return (
+								<AppBar
+									title={appBarTitle}
+									titleStyle={styles.title}
+									showMenuIconButton={false}
+								/>
+							);
+						} else {
+							return (
+								<AppBar
+									title={appBarTitle}
+									titleStyle={styles.title}
+									iconElementLeft={
+										<IconButton
+											style={styles.backIcon}
+											onTouchTap={this.onBack}
+										>
+											<NavigationArrowBack />
+										</IconButton>
+									}
+								/>
+							);
 						}
-					/>
+					})()}
 				</HeadRoom>
 				<form onSubmit={this.onSubmit}>
 					<div style={styles.controlBlock}>
@@ -1491,6 +1606,7 @@ export class EditMentoringPage extends React.Component {
 							multiLine={true}
 						/>
 					</div>
+					{(() => {
 					<div style={styles.buttons}>
 						<FlatButton
 							style={styles.buttonMember}
@@ -1499,6 +1615,7 @@ export class EditMentoringPage extends React.Component {
 							onTouchTap={this.onOpenModal}
 						/>
 					</div>
+					})()}
 					<div style={styles.buttons}>
 						<FlatButton
 							style={styles.button}
@@ -1516,6 +1633,12 @@ export class EditMentoringPage extends React.Component {
 					autoHideDuration={4000}
 					onRequestClose={this.onSnackClose}
 				/>
+				{(() => {
+					if (this.props.params.id == undefined) {
+						return <Tabbar value={"add"} />
+					}
+				})()}
+				{(() => {
 				<Modal
 					isOpen={this.state.modalIsOpen}
 					onRequestClose={this.onCloseModal}
@@ -1523,6 +1646,7 @@ export class EditMentoringPage extends React.Component {
 				>
 					<ContactList onCloseModal={this.onCloseModal} selectedAvatarList={this.state.selectedAvatarList} />
 				</Modal>
+				})()}
 			</section>
 		);
 	}

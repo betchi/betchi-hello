@@ -70,7 +70,7 @@ export class RoomListPage extends React.Component {
 			<div>
 				<HeadRoom>
 					<AppBar
-						title="トーク"
+						title="メッセージ"
 						showMenuIconButton={false}
 						titleStyle={{textAlign: 'center'}}
 					/>

@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import HeadRoom from 'react-headroom';
 
 import {List, ListItem} from 'material-ui/List';
@@ -27,7 +26,7 @@ export class ParticipantsListPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			contactList: [],
+			determinations: [],
 			snack: {
 				open: false,
 				message: '',
@@ -36,7 +35,6 @@ export class ParticipantsListPage extends React.Component {
 				open: false,
 			},
 		};
-		this.onItemTap = this.onItemTap.bind(this);
 		this.onBack = this.onBack.bind(this);
 		this.dialogHandleClose = this.dialogHandleClose.bind(this);
 		this.dialogHandleOpen = this.dialogHandleOpen.bind(this);
@@ -45,83 +43,50 @@ export class ParticipantsListPage extends React.Component {
 	}
 
 	componentWillMount() {
-		offerUserId = this.props.params.userId;
+		this.getDeterminations();
+	}
+
+	getDeterminations() {
 		mentoringId = this.props.params.mentoringId;
-		mentoringTitle = this.props.params.mentoringTitle;
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', '/api/offers/' + mentoringId);
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: 'オファーの読み込みに失敗しました。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			myContactList = [];
-			let data = JSON.parse(xhr.responseText);
-			console.log(data.offers);
-			this.setState({
-				contactList: data.offers,
-			});
-			if (data.offers.length == 0) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '検索ヒット0件です。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-		};
+		xhr.open('GET', '/api/determinations/' + mentoringId, false);
 		xhr.send();;
+		let data = JSON.parse(xhr.responseText);
+		console.log(data.determinations);
+		this.setState({
+			determinations: data.determinations,
+		});
 	}
 
 	onBack(e) {
 		this.context.router.goBack();
 	}
 
-	onItemTap(userId) {
-		console.log(userId);
-	}
-
-	onPostDeterminations(e) {
+	onPostDeterminations() {
 		console.log("onPostDeterminations");
-		let xhr = new XMLHttpRequest();
-		xhr.open('POST', '/api/mentoring/determinations', false);
-		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '通信に失敗しました。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			let data = JSON.parse(xhr.responseText);
+		console.log(this.state.determinations);
+		let determinationsInfo = {
+			determinations: this.state.determinations,
 		}
-		var mentoring = {
-			id: parseInt(mentoringId),
-			determinations: [parseInt(this.props.location.query.targetUserId)]
-		};
-		const json = JSON.stringify({
-			action: "all",
-			mentoring:mentoring,
-		});
-		xhr.send(json);
+		console.log(determinationsInfo);
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/determinations/' + this.props.params.mentoringId, false);
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.send(JSON.stringify(determinationsInfo));
+		if (xhr.status !== 200) {
+			this.setState({
+				snack: {
+					open: false,
+					message: '送信に失敗しました。',
+				},
+			});
+			return;
+		}
+		let data = JSON.parse(xhr.responseText);
+		this.setState({
+			mentoring: data.mentoring,
+		})
+		console.log(data);
 		this.dialogHandleClose();
 	}
 
@@ -141,9 +106,25 @@ export class ParticipantsListPage extends React.Component {
 		});
 	}
 
+  handleToggle(event, toggled) {
+		let userId = event.target.value;
+		let isBlocked = toggled ? 0 : 1;
+		let determinations = this.state.determinations;
+		for (let i = 0; i < determinations.length; i++) {
+			if (determinations[i].user_id === parseInt(userId)) {
+				determinations[i].is_blocked = isBlocked;
+				determinations[i].action = "update";
+				break;
+			}
+		}
+		this.setState({
+			determinations: determinations,
+		})
+  };
+
 	render() {
 		const styles = {
-			contactListSection: {
+			determinationsSection: {
 				position: 'absolute',
 				width: '100%',
 				height: '99%',
@@ -235,7 +216,7 @@ export class ParticipantsListPage extends React.Component {
 		];
 
 		return (
-			<section style={styles.contactListSection}>
+			<section style={styles.determinationsSection}>
 				<HeadRoom
 					style={styles.headroom}
 				>
@@ -258,31 +239,39 @@ export class ParticipantsListPage extends React.Component {
 						}
 					/>
 				</HeadRoom>
-				<List style={styles.list}>
+				<List
+					style={styles.list}
+					ref="list"
+				>
 				{(() => {
-					if (Array.isArray(this.state.contactList)) {
-						let contactList = [];
-						for (var i = 0; i < this.state.contactList.length; i++) {
-							var date = new Date( this.state.contactList[i].last_modified_at);
-							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
-							var message = decodeURI(this.state.contactList[i].last_message);
-							contactList.push(
+					if (Array.isArray(this.state.determinations)) {
+						let determinations = [];
+						let isBlocked;
+						for (var i = 0; i < this.state.determinations.length; i++) {
+							if (this.state.determinations[i].is_blocked === 1) {
+								isBlocked = false;
+							} else {
+								isBlocked = true;
+							}
+							determinations.push(
 								<ListItem
 									style={styles.listItem}
 									key={i}
-									primaryText={this.state.contactList[i].username}
-									leftAvatar={<Avatar src={this.state.contactList[i].avatar} />}
+									primaryText={this.state.determinations[i].username}
+									leftAvatar={<Avatar src={this.state.determinations[i].avatar} />}
 									secondaryTextLines={2}
 									disabled={true}
 								>
 									<Toggle
 										style={styles.toggle}
-										onToggle={this.onItemTap.bind(this, this.state.contactList[i].user_id)}
+										defaultToggled={isBlocked}
+										value={this.state.determinations[i].user_id}
+										onToggle={this.handleToggle.bind(this)}
 									/>
 								</ListItem>
 							);
 						}
-						return contactList;
+						return determinations;
 					}
 				})()}
 				</List>
@@ -293,7 +282,7 @@ export class ParticipantsListPage extends React.Component {
 					open={this.state.dialog.open}
 					onRequestClose={this.dialogHandleClose}
 				>
-					このユーザとメンタリングします
+					更新します
 				</Dialog>
 				<Snackbar
 					open={this.state.snack.open}

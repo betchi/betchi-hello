@@ -27,7 +27,6 @@ import {ThxMessageList} from './ThxMessageList.jsx';
 import {RatingStar} from './content.jsx';
 import {AvatarGrid} from './avatar.jsx';
 import {Tabbar} from './Tabbar.jsx';
-import {MenuIcon} from './MenuIcon.jsx';
 import {NumberChip} from './NumberChip.jsx';
 import {PhotoEditChip} from './PhotoEditChip.jsx';
 import {LiveMark} from './LiveMark.jsx';
@@ -268,7 +267,6 @@ export class MyPage extends React.Component {
 				<Profile
 					userId={this.props.params.id}
 				/>
-				<MenuIcon userId={this.props.params.id} />
 				<Tabs
 					inkBarStyle={{backgroundColor:this.context.colors.fluorescent1}}
 					style={styles.tabs}

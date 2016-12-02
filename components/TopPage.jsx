@@ -228,7 +228,6 @@ export class TopPage extends React.Component {
 				zIndex: '10000',
 			},  
 			brandBar: {
-				marginTop: '0.5rem',
 				height: '2rem',
 				lineHeight: '2rem',
 				width: '100%',
@@ -238,6 +237,7 @@ export class TopPage extends React.Component {
 				fontSize: '1.1rem',
 				zIndex: '10001',
 				color: this.context.colors.text1,
+				backgroundColor: this.context.colors.bg1,
 			},  
 			title: {
 				fontSize: '1.2rem',

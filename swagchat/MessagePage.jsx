@@ -147,6 +147,7 @@ export class MessagePage extends React.Component {
 	}
 
   componentWillMount() {
+		console.log("componentWillMount");
 		async function asyncFunc(self) {
 			await self.getMessage();
 			await self.getStickers();

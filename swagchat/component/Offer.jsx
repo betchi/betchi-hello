@@ -31,7 +31,7 @@ export class Offer extends React.Component {
 		});
 	}
 
-	sendOffer() {
+	postDeterminations() {
 		this.handleClose();
 
 		console.log(this.state.mentoring.offers);
@@ -123,7 +123,7 @@ export class Offer extends React.Component {
 				label="Ok"
 				primary={true}
 				keyboardFocused={true}
-				onTouchTap={this.sendOffer.bind(this)}
+				onTouchTap={this.postDeterminations.bind(this)}
 				onRequestClose={this.handleClose.bind(this)}
 			/>
 		]

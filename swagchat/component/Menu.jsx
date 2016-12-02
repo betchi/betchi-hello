@@ -7,7 +7,7 @@ export class Menu extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			mentoring: null,
+			mentoring: this.props.mentoring,
 			styles: {
 				section: {
 					position: 'relative',

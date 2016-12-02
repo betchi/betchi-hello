@@ -86,7 +86,11 @@ export class MentoringCover extends React.Component {
 		var brFlg = false;
 
 		var offersString = "";
-		if (this.props.countOffers != 0) {
+		console.log(this.props.mentoringId + " 参加者:" + this.props.countDeterminations);
+		if (this.props.countDeterminations != 0) {
+			offersString = "現在" + this.props.countDeterminations + "名の方が参加予定";
+			brFlg = true;
+		} else if (this.props.countOffers != 0) {
 			offersString = "現在" + this.props.countOffers + "名の方がオファー中";
 			brFlg = true;
 		}
@@ -128,12 +132,14 @@ MentoringCover.contextTypes = {
 	colors: React.PropTypes.object.isRequired,
 }
 MentoringCover.propTypes = {
+	mentoringId: React.PropTypes.number.isRequired,
 	title: React.PropTypes.string.isRequired,
 	duration: React.PropTypes.number.isRequired,
 	datetime: React.PropTypes.string.isRequired,
 	cover: React.PropTypes.string.isRequired,
 	price: React.PropTypes.number.isRequired,
 	maxUserNum: React.PropTypes.number.isRequired,
+	countDeterminations: React.PropTypes.number.isRequired,
 	countOffers: React.PropTypes.number.isRequired,
 	kind: React.PropTypes.number.isRequired,
 }
@@ -636,7 +642,15 @@ export class MentoringCard extends React.Component {
 				break;
 			}
 		}
-		this.context.router.push({pathname: '/mentoring/' + this.props.id, query: {category:category.value, category_name:category.label}});
+		this.context.router.push({
+			pathname: '/mentoring/' + this.props.id,
+			query: {
+				category:category.value, category_name:category.label
+			},
+			state: {
+				mentoring: this.props.mentoring,
+			},
+		});
 	}
 
 	render() {
@@ -655,12 +669,14 @@ export class MentoringCard extends React.Component {
 				style={styles.card}
 			>
 				<MentoringCover
+					mentoringId={this.props.id}
 					title={this.props.title}
 					duration={this.props.duration}
 					datetime={this.props.datetime}
 					cover={this.props.cover}
 					price={this.props.price}
 					maxUserNum={this.props.maxUserNum}
+					countDeterminations={this.props.countDeterminations}
 					countOffers={this.props.countOffers}
 					kind={this.props.kind}
 					onTouchTap={this.onTap}
@@ -760,6 +776,7 @@ export class MentoringList extends React.Component {
 							countThanx={mentoring.user.count_thanx}
 							countStar={mentoring.user.count_star}
 							category={this.props.category}
+							mentoring={mentoring}
 						/>
 					);
 				})}

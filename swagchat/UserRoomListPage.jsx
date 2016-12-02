@@ -28,21 +28,16 @@ export class UserRoomListPage extends React.Component {
 	onItemTap(roomId, title) {
 		let mentoringId;
 		let targetUserIds = [];
-		//if (this.props.mentoringId !== undefined) {
-		//	mentoringId = this.props.mentoringId;
-		//} else {
-			let rooms = sessionStorage.user.rooms;
-			for (let searchMentoringId in rooms) {
-				for (let userId in rooms[searchMentoringId]) {
-					if (rooms[searchMentoringId][userId] == roomId) {
-						mentoringId = searchMentoringId;
-						targetUserIds.push(userId);
-					}
+		let rooms = sessionStorage.user.rooms;
+		for (let searchMentoringId in rooms) {
+			for (let userId in rooms[searchMentoringId]) {
+				if (rooms[searchMentoringId][userId] == roomId) {
+					mentoringId = searchMentoringId;
+					targetUserIds.push(userId);
 				}
 			}
-			//}
+		}
 		let mentoring = this.getMentoring(mentoringId);
-		console.log(mentoring);
 		let members = this.getRoomMember(roomId);
 		this.context.router.push({
 			pathname: '/messages',

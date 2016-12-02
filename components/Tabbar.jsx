@@ -10,9 +10,11 @@ import FontIcon from 'material-ui/FontIcon';
 import ActionAndroid from 'material-ui/svg-icons/action/android';
 import HomeIcon from 'material-ui/svg-icons/action/home';
 import SearchIcon from 'material-ui/svg-icons/action/search';
-import QuestionAnswerIcon from 'material-ui/svg-icons/action/question-answer.js';
-import NotificationNoneIcon from 'material-ui/svg-icons/social/notifications-none';
+import QuestionAnswerIcon from 'material-ui/svg-icons/action/question-answer';
+import ContentAddBoxIcon from 'material-ui/svg-icons/content/add-box';
 import FaceIcon from 'material-ui/svg-icons/action/face';
+import VideoCallIcon from 'material-ui/svg-icons/av/video-call';
+import VideoCamIcon from 'material-ui/svg-icons/av/videocam';
 import {indigo500, indigo900, blue50} from 'material-ui/styles/colors';
 
 export class Tabbar extends React.Component {
@@ -30,17 +32,22 @@ export class Tabbar extends React.Component {
 			this.context.router.push('/top');
 			break;
 		case "search":
-			//this.context.router.push('/search');
-			webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
+			this.context.router.push('/search');
+			break;
+		case "add":
+			this.context.router.push('/mentoring/new');
 			break;
 		case "message":
 			this.context.router.push('/roomList');
 			break;
-		case "notification":
-			webkit.messageHandlers.startFollowerVideoChat.postMessage('hogehoge');
-			break;
 		case "mypage":
 			this.context.router.push('/mypage/' + sessionStorage.user.id);
+			break;
+		case "videoCall":
+			webkit.messageHandlers.startMentorVideoChat.postMessage('hogehoge');
+			break;
+		case "videoCam":
+			webkit.messageHandlers.startFollowerVideoChat.postMessage('hogehoge');
 			break;
 		default:
 			break;
@@ -57,6 +64,10 @@ export class Tabbar extends React.Component {
 				borderTop: '1px solid ' + this.context.colors.lightGrey,
 			},
 			tab: {
+			},
+			tabContentAdd: {
+			},
+			iconContentAdd: {
 			},
 		}
 
@@ -78,18 +89,28 @@ export class Tabbar extends React.Component {
 					style={styles.tab}
 				/>
 				<Tab
+					icon={<ContentAddBoxIcon iconStyle={styles.iconContentAdd} />}
+					value={"add"}
+					style={styles.tabContentAdd}
+				/>
+				<Tab
 					icon={<QuestionAnswerIcon />}
 					value={"message"}
 					style={styles.tab}
 				/>
 				<Tab
-					icon={<NotificationNoneIcon />}
-					value={"notification"}
+					icon={<FaceIcon />}
+					value={"mypage"}
 					style={styles.tab}
 				/>
 				<Tab
-					icon={<FaceIcon />}
-					value={"mypage"}
+					icon={<VideoCallIcon />}
+					value={"videoCall"}
+					style={styles.tab}
+				/>
+				<Tab
+					icon={<VideoCamIcon />}
+					value={"videoCam"}
 					style={styles.tab}
 				/>
 			</Tabs>

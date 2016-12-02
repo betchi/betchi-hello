@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {Router, Route, IndexRoute, History, hashHistory} from 'react-router';
 import HeadRoom from 'react-headroom';
 
 import {List, ListItem} from 'material-ui/List';
@@ -40,7 +39,6 @@ export class OffersPage extends React.Component {
 		offerUserId = this.props.params.userId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
-		this.getMentoring(mentoringId);
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/api/offers/' + mentoringId);
 		xhr.onload = () => {
@@ -81,7 +79,8 @@ export class OffersPage extends React.Component {
 		this.context.router.goBack();
 	}
 
-	onItemTap(userId) {
+	onItemTap(userId, title) {
+		/*
 		this.context.router.push({
 			pathname: '/chat/' + mentoringId + '/' + userId + '/' + mentoringTitle,
 			query: {
@@ -89,29 +88,68 @@ export class OffersPage extends React.Component {
 				mentoringUserId: this.props.location.query.mentoringUserId,
 			},
 		});
+		*/
+		let targetUserIds = [];
+		let roomId = sessionStorage.user.rooms[this.props.location.state.mentoring.id][userId];
+		for (let searchUserId in sessionStorage.user.rooms[this.props.location.state.mentoring.id]) {
+			targetUserIds.push(userId);
+		}
+		let mentoring = this.getMentoring(this.props.location.state.mentoring.id);
+		let members = this.getRoomMember(roomId);
+
+		console.log(this.props.location.state.mentoring.id);
+		console.log(roomId);
+		console.log(userId);
+		console.log(targetUserIds);
+		console.log(title);
+		console.log(mentoring);
+		console.log(members);
+		this.context.router.push({
+			pathname: '/messages',
+			state: {
+				roomId: roomId,
+				userId: sessionStorage.user.swagchat_id,
+				targetUserIds: targetUserIds,
+				title: title,
+				mentoring: mentoring,
+				members: members,
+			},
+		});
 	}
 
 	getMentoring(id) {
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', '/api/mentoring/' + id, false);
-		xhr.onload = () => {
-			if (xhr.status !== 200) {
-				this.setState({
-					snack: {
-						open: true,
-						message: '通信に失敗しました。',
-					},
-					refreshStyle: {
-						display: 'none',
-					},
-				});
-				return;
-			}
-			let data = JSON.parse(xhr.responseText);
-			console.log(data.mentoring);
-			mentoring = data.mentoring;
-		}
 		xhr.send();
+		if (xhr.status !== 200) {
+			this.setState({
+				snack: {
+					open: true,
+					message: '通信に失敗しました。',
+				},
+				refreshStyle: {
+					display: 'none',
+				},
+			});
+			return;
+		}
+		let data = JSON.parse(xhr.responseText);
+		console.log(data.mentoring);
+		return data.mentoring;
+	}
+
+	getRoomMember(roomId) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/rooms/' + roomId + '/members', false);
+		xhr.send();
+		let data = JSON.parse(xhr.responseText);
+		if (data.members !== undefined) {
+			let members = {}
+			for (var i = 0; i < data.members.length; i++) {
+				members[data.members[i].userId] = data.members[i];
+			}
+			return members;
+		}
 	}
 
 	render() {
@@ -226,8 +264,8 @@ export class OffersPage extends React.Component {
 							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 							var message = decodeURI(this.state.contactList[i].last_message);
 							var determinationLabel = null;
-							if (mentoring.determinations !== null &&
-								mentoring.determinations.indexOf(this.state.contactList[i].user_id) >= 0) {
+							if (this.props.location.state.mentoring.determinations !== null &&
+								this.props.location.state.mentoring.determinations.indexOf(this.state.contactList[i].user_id) >= 0) {
 								determinationLabel = <div style={styles.label}>確定</div>;
 							}
 							contactList.push(<ListItem
@@ -236,7 +274,7 @@ export class OffersPage extends React.Component {
 								primaryText={this.state.contactList[i].username}
 								secondaryText={<span style={styles.secondoryText}>{message}</span>}
 								leftAvatar={<Avatar src={this.state.contactList[i].avatar} />}
-								onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id)}
+								onTouchTap={this.onItemTap.bind(this, this.state.contactList[i].user_id, this.state.contactList[i].username)}
 								secondaryTextLines={2}
 								rightIcon={<p style={styles.time}>{hhmm}{determinationLabel}</p>}
 							/>);
@@ -258,4 +296,5 @@ export class OffersPage extends React.Component {
 OffersPage.contextTypes = {
 	router: React.PropTypes.object.isRequired,
 	colors: React.PropTypes.object.isRequired,
+	swagchat: React.PropTypes.object.isRequired,
 }
