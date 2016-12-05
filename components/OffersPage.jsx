@@ -29,6 +29,7 @@ export class OffersPage extends React.Component {
 				open: false,
 				message: '',
 			},
+			mentoring: this.props.location.state.mentoring,
 		};
 		this.onItemTap = this.onItemTap.bind(this);
 		this.onBack = this.onBack.bind(this);
@@ -36,6 +37,10 @@ export class OffersPage extends React.Component {
 	}
 
 	componentWillMount() {
+		this.setState({
+			mentoring: this.getMentoring(this.props.params.mentoringId),
+		});
+
 		offerUserId = this.props.params.userId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
@@ -109,6 +114,7 @@ export class OffersPage extends React.Component {
 			state: {
 				roomId: roomId,
 				userId: sessionStorage.user.swagchat_id,
+				offerUserId: userId,
 				targetUserIds: targetUserIds,
 				title: title,
 				mentoring: mentoring,
@@ -259,13 +265,15 @@ export class OffersPage extends React.Component {
 				{(() => {
 					if (Array.isArray(this.state.contactList)) {
 						let contactList = [];
+							console.log(this.props.location.state.mentoring.determinations);
 						for (var i = 0; i < this.state.contactList.length; i++) {
 							var date = new Date( this.state.contactList[i].last_modified_at);
 							var hhmm = date.getHours() + ":" + ('0' + date.getMinutes()).slice( -2 );
 							var message = decodeURI(this.state.contactList[i].last_message);
 							var determinationLabel = null;
-							if (this.props.location.state.mentoring.determinations !== null &&
-								this.props.location.state.mentoring.determinations.indexOf(this.state.contactList[i].user_id) >= 0) {
+							console.log(this.state.contactList[i].user_id);
+							if (this.state.mentoring.count_determinations !== 0 &&
+								this.state.mentoring.determinations[this.state.contactList[i].user_id] !== undefined) {
 								determinationLabel = <div style={styles.label}>確定</div>;
 							}
 							contactList.push(<ListItem

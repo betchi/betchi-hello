@@ -66,7 +66,7 @@ export class Menu extends React.Component {
 					<FileUpload userId={this.props.userId} roomId={this.props.roomId} onTouchTap={this.onMenuClose.bind(this)} />
 					{(() => {
 						if (this.state.mentoring !== null && this.state.mentoring.user_id === sessionStorage.user.id) {
-							return <Offer userId={this.props.userId} roomId={this.props.roomId} onTouchTap={this.onMenuClose.bind(this)} mentoring={this.state.mentoring} />
+							return <Offer roomId={this.props.roomId} userId={this.props.userId} offerUserId={this.props.offerUserId} onTouchTap={this.onMenuClose.bind(this)} mentoring={this.state.mentoring} />
 						}
 					})()}
 				</div>

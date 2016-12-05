@@ -778,8 +778,9 @@ export class MessagePage extends React.Component {
 					/>
           <Menu
             isMenuDisplay={this.state.isMenuDisplay}
-            userId={this.props.location.state.userId}
             roomId={this.props.location.state.roomId}
+            userId={this.props.location.state.userId}
+            offerUserId={this.props.location.state.offerUserId}
 						mentoring={this.props.location.state.mentoring}
 						targetUserIds={this.props.location.state.targetUserIds}
             onTouchTap={this.fileuploadComplete}

@@ -23,6 +23,8 @@ import CardGiftcardIcon from 'material-ui/svg-icons/action/card-giftcard.js';
 import QuestionAnswerIcon from 'material-ui/svg-icons/action/question-answer.js';
 import EditorModeIcon from 'material-ui/svg-icons/editor/mode-edit.js';
 import ListIcon from 'material-ui/svg-icons/action/list.js';
+import VideoCallIcon from 'material-ui/svg-icons/av/video-call';
+import VideoCamIcon from 'material-ui/svg-icons/av/videocam';
 import AddCircle from 'material-ui/svg-icons/content/add-circle.js';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
@@ -218,6 +220,8 @@ export class MentoringPage extends React.Component {
 
 	postRoomMember(roomId, roomMemberInfo) {
 		console.log("postRoomMember");
+		console.log(roomId);
+		console.log(roomMemberInfo);
 		new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 			xhr.open('PUT', this.context.swagchat.config.apiBaseUrl + '/rooms/' + roomId + '/members', false);
@@ -242,6 +246,7 @@ export class MentoringPage extends React.Component {
 
 	postUserRoom(userRoomInfo) {
 		console.log("postUser");
+		console.log(userRoomInfo);
 		const p = new Promise((resolve, reject) => {
 			let xhr = new XMLHttpRequest();
 			xhr.open('POST', '/api/userRoom', false);
@@ -536,6 +541,14 @@ export class MentoringPage extends React.Component {
 		});
 	}
 
+	onMentoringStartForMentor() {
+		webkit.messageHandlers.startMentorVideoChat.postMessage(this.state.mentoring.id);
+	}
+
+	onMentoringStartForMentie() {
+		webkit.messageHandlers.startFollowerVideoChat.postMessage(this.state.mentoring.id);
+	}
+
 	render() {
 		const styles = {
 			contactListSection: {
@@ -806,45 +819,101 @@ export class MentoringPage extends React.Component {
 				{(() => {
 					if (this.state.mentoring.user_id == sessionStorage.user.id) {
 						if (this.state.mentoring.kind == 1) {
+							let mentoringStartButton = "";
+							if (this.state.mentoring.count_determinations > 0) {
+								mentoringStartButton = (
+									<FlatButton
+										style={styles.button}
+										icon={<VideoCallIcon style={styles.buttonIcon} />}
+										label="メンタリング開始"
+										labelStyle={styles.buttonLabel}
+										onTouchTap={this.onMentoringStartForMentor.bind(this)}
+									/>
+								)
+							}
 							if (this.state.mentoring.count_offers > 0) {
-								return <FlatButton
-									style={styles.button}
-									icon={<ListIcon style={styles.buttonIcon} />}
-									label="オファーを確認する"
-									labelStyle={styles.buttonLabel}
-									onTouchTap={this.onOfferList}
-								/>
+								return (
+									<div>
+										{mentoringStartButton}
+										<FlatButton
+											style={styles.button}
+											icon={<ListIcon style={styles.buttonIcon} />}
+											label="オファーを確認する"
+											labelStyle={styles.buttonLabel}
+											onTouchTap={this.onOfferList}
+										/>
+									</div>
+								)
 							}
 						} else {
 							if (this.state.mentoring.count_determinations > 0) {
-								return <FlatButton
-									style={styles.button}
-									icon={<ListIcon style={styles.buttonIcon} />}
-									label="参加リストを確認"
-									labelStyle={styles.buttonLabel}
-									onTouchTap={this.onParticipantsList}
-								/>
+								return (
+									<div>
+										<FlatButton
+											style={styles.button}
+											icon={<VideoCallIcon style={styles.buttonIcon} />}
+											label="メンタリング開始"
+											labelStyle={styles.buttonLabel}
+											onTouchTap={this.onMentoringStartForMentor.bind(this)}
+										/>
+										<FlatButton
+											style={styles.button}
+											icon={<ListIcon style={styles.buttonIcon} />}
+											label="参加リストを確認"
+											labelStyle={styles.buttonLabel}
+											onTouchTap={this.onParticipantsList}
+										/>
+									</div>
+								)
 							}
 						}
 					} else {
 						if (this.state.mentoring.kind == 1) {
-							return <FlatButton
-								style={styles.button}
-								icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
-								label="オファーする(メッセージ)"
-								labelStyle={styles.buttonLabel}
-								onTouchTap={this.onOffer}
-							/>
+							let mentoringStartButton = "";
+							if (this.state.mentoring.count_determinations > 0) {
+								mentoringStartButton = (
+									<FlatButton
+										style={styles.button}
+										icon={<VideoCamIcon style={styles.buttonIcon} />}
+										label="メンタリングを受ける"
+										labelStyle={styles.buttonLabel}
+										onTouchTap={this.onMentoringStartForMentie.bind(this)}
+									/>
+								)
+							}
+							return (
+								<div>
+									{mentoringStartButton}
+									<FlatButton
+										style={styles.button}
+										icon={<QuestionAnswerIcon style={styles.buttonIcon} />}
+										label="オファーする(メッセージ)"
+										labelStyle={styles.buttonLabel}
+										onTouchTap={this.onOffer}
+									/>
+								</div>
+							)
 						} else {
 							if (!isBlocked) { 
 								if (isNowDetermination) {
-									return <FlatButton
-										style={styles.button}
-										icon={<AddCircle style={styles.buttonIcon} />}
-										label="参加を取り消す"
-										labelStyle={styles.buttonLabel}
-										onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
-									/>
+									return (
+										<div>
+											<FlatButton
+												style={styles.button}
+												icon={<VideoCamIcon style={styles.buttonIcon} />}
+												label="メンタリングを受ける"
+												labelStyle={styles.buttonLabel}
+												onTouchTap={this.onMentoringStartForMentie.bind(this)}
+											/>
+											<FlatButton
+												style={styles.button}
+												icon={<AddCircle style={styles.buttonIcon} />}
+												label="参加を取り消す"
+												labelStyle={styles.buttonLabel}
+												onTouchTap={this.dialogHandleOpen.bind(this, "参加を取り消しますか？", "remove")}
+											/>
+										</div>
+									)
 								} else {
 									return <FlatButton
 										style={styles.button}
