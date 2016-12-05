@@ -204,9 +204,9 @@ export class SearchPage extends React.Component {
 	render() {
 		const styles = {
 			searchBoxStyle: {
-				position: 'fixed',
+				//	position: 'fixed',
 				top: 0,
-				width: '100%',
+				width: '97%',
 				height: '64px',
 				zIndex: 9999,
 			},
@@ -218,20 +218,19 @@ export class SearchPage extends React.Component {
 			},
 			searchText: {
 				boxSizing: 'border-box',
-				width: '96%',
-				margin: '8px 2% 0 2%',
-				padding: '0 40px',
+				width: '100%',
+				margin: '8px 5px 0 5px',
+				padding: '0 10px',
 				fontSize: '1rem',
 				lineHeight: '1.5rem',
 				backgroundColor: 'white',
-				boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.24), 0 -1px 2px rgba(0,0,0,0.12), 0 -1px 1px rgba(0,0,0,0.24)',
+				border: '1px solid #ececec',
 			},
 			topMargin: {
 				marginTop: '64px',
 			},
 			refreshBox: {
 				position: 'relative',
-				margin: '16px 0',
 				width: '100%',
 			},
 			refreshMargin: {
@@ -252,12 +251,6 @@ export class SearchPage extends React.Component {
 							ref='searchTextField'
 						/>
 						<IconButton
-							style={styles.backIcon}
-							onTouchTap={this.onBack}
-						>
-							<NavigationArrowBack />
-						</IconButton>
-						<IconButton
 							style={this.state.clearIconStyle}
 							onTouchTap={this.onClear}
 						>
@@ -265,7 +258,6 @@ export class SearchPage extends React.Component {
 						</IconButton>
 					</form>
 				</div>
-				<div style={styles.topMargin} />
 				<MentoringList
 					mentorings={this.state.mentorings}
 				/>

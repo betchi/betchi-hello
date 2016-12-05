@@ -70,6 +70,13 @@ export class Tabbar extends React.Component {
 			iconContentAdd: {
 			},
 		}
+		/*
+				<Tab
+					icon={<SearchIcon />}
+					value={"search"}
+					style={styles.tab}
+				/>
+		*/
 
 		return (
 			<Tabs
@@ -81,11 +88,6 @@ export class Tabbar extends React.Component {
 				<Tab
 					icon={<HomeIcon />}
 					value={"top"}
-					style={styles.tab}
-				/>
-				<Tab
-					icon={<SearchIcon />}
-					value={"search"}
 					style={styles.tab}
 				/>
 				<Tab

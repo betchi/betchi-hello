@@ -740,7 +740,6 @@ export class MentoringList extends React.Component {
 				flexFlow: 'row wrap',
 				justifyContent: 'space-between',
 				alignItems: 'flex-start',
-				marginBottom: '3rem',
 			},
 		};
 		/*

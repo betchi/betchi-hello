@@ -11,6 +11,8 @@ import RefreshIndicator from 'material-ui/RefreshIndicator';
 import {MentoringList} from './content.jsx';
 import {Tabbar} from './Tabbar.jsx';
 
+import {SearchPage} from './SearchPage.jsx';
+
 export class TopPage extends React.Component {
 	constructor(props, context) {
 		super(props, context);
@@ -261,6 +263,7 @@ export class TopPage extends React.Component {
 					<div style={styles.brandBar}>mentor</div>
 					<TopTab loadContents={this.loadContents} />
 				</HeadRoom>
+				<SearchPage />
 				<MentoringList
 					mentorings={this.state.mentorings}
 					category={this.state.category}
