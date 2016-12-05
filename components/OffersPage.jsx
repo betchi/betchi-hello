@@ -42,9 +42,7 @@ export class OffersPage extends React.Component {
 		});
 
 		this.updateUserSession();
-		async function asyncFunc(self) {
-			await self.getUserRoom()
-		}
+		this.getUserRoom()
 		asyncFunc(this);
 
 		offerUserId = this.props.params.userId;
@@ -99,6 +97,44 @@ export class OffersPage extends React.Component {
 			return
 		}
 		sessionStorage.user = data.user;
+	}
+
+	getUserRoom() {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', this.context.swagchat.config.apiBaseUrl + '/users/' + sessionStorage.user.swagchat_id + '/rooms');
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+		xhr.send();
+		if (xhr.status !== 200) {
+			this.setState({
+				snack: {
+					open: true,
+					message: 'オファーの読み込みに失敗しました。',
+				},
+			});
+			return;
+		}
+		let data = JSON.parse(xhr.responseText);
+		if (data.rooms.length === 0) {
+			this.setState({
+				snack: {
+					open: true,
+					message: '検索ヒット0件です。',
+				},
+			});
+			return;
+		}
+		let talkList = [];
+		let roomId;
+		for (let i = 0; i < data.rooms.length; i++) {
+			for (let userId in sessionStorage.user.rooms[this.props.location.query.mentoringId]) {
+				if (data.rooms[i].roomId == sessionStorage.user.rooms[this.props.location.query.mentoringId][userId]) {
+					talkList.push(data.rooms[i]);
+				}
+			}
+		}
+		this.setState({
+			talkList: talkList,
+		});
 	}
 
 	onBack(e) {

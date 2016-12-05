@@ -444,7 +444,7 @@ export class MentoringDigest extends React.Component {
 				margin: '0 0.5rem',
 				textOverflow: 'ellipsis',
 				overflow: 'hidden',
-				width: '30%',
+				width: '50%',
 				fontSize: '1.1rem',
 				height: '2rem',
 			},
