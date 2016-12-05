@@ -33,10 +33,8 @@ export class Offer extends React.Component {
 
 	postDeterminations() {
 		this.handleClose();
-
-		console.log(this.state.mentoring.offers);
-
 			/*
+
 		let userIds = [];
 		let determinationRoomIds = [];
 		let cancelRoomIds = [];
@@ -58,6 +56,10 @@ export class Offer extends React.Component {
 		for (let i = 0; i < sessionStorage.user.rooms[this.state.mentoring.id].length; i++) {
 			tmpRoomId = sessionStorage.user.rooms[this.state.mentoring.id][i];
 		}
+		console.log(userIds);
+		console.log(determinationRoomIds);
+		console.log(cancelRoomIds);
+		console.log(tmpRoomId);
 		*/
 
 		console.log(this.state.mentoring);

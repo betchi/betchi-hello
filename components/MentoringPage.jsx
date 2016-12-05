@@ -543,18 +543,22 @@ export class MentoringPage extends React.Component {
 
 	// 1 on 1
 	onMentoringStartForMentor() {
-		webkit.messageHandlers.startMentorVideoChat.postMessage(this.state.mentoring.id);
+		console.log("startMentorVideoChat");
+		webkit.messageHandlers.startMentorVideoChat.postMessage(String(this.state.mentoring.id));
 	}
 	onMentoringStartForMentie() {
-		webkit.messageHandlers.startFollowerVideoChat.postMessage(this.state.mentoring.id);
+		console.log("startFollowerVideoChat");
+		webkit.messageHandlers.startFollowerVideoChat.postMessage(String(this.state.mentoring.id));
 	}
 
 	// MultiParty
 	onMentoringStartForMentorMultiParty() {
-		webkit.messageHandlers.startMentorMultiParty.postMessage(this.state.mentoring.id);
+		console.log("startMentorMultiParty");
+		webkit.messageHandlers.startMentorMultiParty.postMessage(String(this.state.mentoring.id));
 	}
 	onMentoringStartForMentieMultiParty() {
-		webkit.messageHandlers.startFollowerMultiParty.postMessage(this.state.mentoring.id);
+		console.log("startFollowerMultiParty");
+		webkit.messageHandlers.startFollowerMultiParty.postMessage(String(this.state.mentoring.id));
 	}
 
 	render() {
@@ -957,7 +961,7 @@ export class MentoringPage extends React.Component {
 							return <FlatButton
 								style={styles.button}
 								icon={<BookmarkBorderIcon style={styles.buttonIcon} />}
-								label="ブックマークする"
+								label="気になる！"
 								labelStyle={styles.buttonLabel}
 								onTouchTap={this.onBookmark}
 							/>

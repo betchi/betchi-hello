@@ -76,6 +76,16 @@ export class Tabbar extends React.Component {
 					value={"search"}
 					style={styles.tab}
 				/>
+				<Tab
+					icon={<VideoCallIcon />}
+					value={"videoCall"}
+					style={styles.tab}
+				/>
+				<Tab
+					icon={<VideoCamIcon />}
+					value={"videoCam"}
+					style={styles.tab}
+				/>
 		*/
 
 		return (
@@ -103,16 +113,6 @@ export class Tabbar extends React.Component {
 				<Tab
 					icon={<FaceIcon />}
 					value={"mypage"}
-					style={styles.tab}
-				/>
-				<Tab
-					icon={<VideoCallIcon />}
-					value={"videoCall"}
-					style={styles.tab}
-				/>
-				<Tab
-					icon={<VideoCamIcon />}
-					value={"videoCam"}
 					style={styles.tab}
 				/>
 			</Tabs>

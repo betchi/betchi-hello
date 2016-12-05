@@ -41,6 +41,12 @@ export class OffersPage extends React.Component {
 			mentoring: this.getMentoring(this.props.params.mentoringId),
 		});
 
+		this.updateUserSession();
+		async function asyncFunc(self) {
+			await self.getUserRoom()
+		}
+		asyncFunc(this);
+
 		offerUserId = this.props.params.userId;
 		mentoringId = this.props.params.mentoringId;
 		mentoringTitle = this.props.params.mentoringTitle;
@@ -80,6 +86,21 @@ export class OffersPage extends React.Component {
 		xhr.send();;
 	}
 
+	updateUserSession() {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/user/' + sessionStorage.user.id, false); // synchronous
+		xhr.send();
+		if (xhr.status !== 200) {
+			return;
+		}
+		const data = JSON.parse(xhr.responseText);
+		if (!data.ok) {
+			goLogin();
+			return
+		}
+		sessionStorage.user = data.user;
+	}
+
 	onBack(e) {
 		this.context.router.goBack();
 	}
@@ -95,6 +116,9 @@ export class OffersPage extends React.Component {
 		});
 		*/
 		let targetUserIds = [];
+		console.log(this.props.location.state.mentoring.id);
+		console.log(userId);
+		console.log(sessionStorage.user.rooms);
 		let roomId = sessionStorage.user.rooms[this.props.location.state.mentoring.id][userId];
 		for (let searchUserId in sessionStorage.user.rooms[this.props.location.state.mentoring.id]) {
 			targetUserIds.push(userId);
