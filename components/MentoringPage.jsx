@@ -541,12 +541,20 @@ export class MentoringPage extends React.Component {
 		});
 	}
 
+	// 1 on 1
 	onMentoringStartForMentor() {
 		webkit.messageHandlers.startMentorVideoChat.postMessage(this.state.mentoring.id);
 	}
-
 	onMentoringStartForMentie() {
 		webkit.messageHandlers.startFollowerVideoChat.postMessage(this.state.mentoring.id);
+	}
+
+	// MultiParty
+	onMentoringStartForMentorMultiParty() {
+		webkit.messageHandlers.startMentorMultiParty.postMessage(this.state.mentoring.id);
+	}
+	onMentoringStartForMentieMultiParty() {
+		webkit.messageHandlers.startFollowerMultiParty.postMessage(this.state.mentoring.id);
 	}
 
 	render() {
@@ -854,7 +862,7 @@ export class MentoringPage extends React.Component {
 											icon={<VideoCallIcon style={styles.buttonIcon} />}
 											label="メンタリング開始"
 											labelStyle={styles.buttonLabel}
-											onTouchTap={this.onMentoringStartForMentor.bind(this)}
+											onTouchTap={this.onMentoringStartForMentorMultiParty.bind(this)}
 										/>
 										<FlatButton
 											style={styles.button}
@@ -903,7 +911,7 @@ export class MentoringPage extends React.Component {
 												icon={<VideoCamIcon style={styles.buttonIcon} />}
 												label="メンタリングを受ける"
 												labelStyle={styles.buttonLabel}
-												onTouchTap={this.onMentoringStartForMentie.bind(this)}
+												onTouchTap={this.onMentoringStartForMentieMultiParty.bind(this)}
 											/>
 											<FlatButton
 												style={styles.button}
