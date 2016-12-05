@@ -244,7 +244,7 @@ export class SearchPage extends React.Component {
 					<form onSubmit={this.onSearch}>
 						<TextField
 							style={styles.searchText}
-							hintText='検索ワード'
+							hintText='メンタリングを検索'
 							underlineShow={false}
 							value={this.state.q}
 							onChange={this.onSearchChange}
