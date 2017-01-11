@@ -1,0 +1,17 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "module": "es6",
+        "target": "es5",
+        "noImplicitAny": true,
+        "sourceMap": true,
+				"jsx": "react",
+		    "outDir": "./dist/"
+    },
+    "files": [
+        "./src/Index.tsx"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
