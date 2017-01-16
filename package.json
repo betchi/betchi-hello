@@ -1,6 +1,6 @@
 {
   "name": "betchi-hello",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "betchi-hello",
   "main": "lib/BetchiHello.js",
   "types": "lib/BetchiHello.d.ts",
