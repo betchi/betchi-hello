@@ -1,17 +1,19 @@
 {
-    "compileOnSave": false,
+    "compileOnSave": true,
     "compilerOptions": {
-        "module": "es6",
+        "module": "commonjs",
         "target": "es5",
         "noImplicitAny": true,
         "sourceMap": true,
 				"jsx": "react",
-		    "outDir": "./dist/"
+		    "outDir": "./lib/",
+				"declaration": true
     },
     "files": [
         "./src/Index.tsx"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "lib"
     ]
 }

@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 export interface Props {
-    content: string;
+  content: string;
 }
 
-export default class MyComponent extends React.Component<Props, {}> {
+export default class BetchiHello extends React.Component<Props, {}> {
     render() {
         return <div>{this.props.content}</div>
     }

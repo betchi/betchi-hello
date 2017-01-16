@@ -1,22 +1,23 @@
 {
-  "name": "mentor.fairway.ne.jp",
+  "name": "betchi-hello",
   "version": "1.0.0",
-  "description": "mentor.fairway.ne.jp",
-  "main": "index.js",
+  "description": "hey",
+  "main": "lib/BetchiHello.js",
+  "types": "lib/BetchiHello.d.ts",
   "scripts": {
     "build": "webpack --progress --colors --watch --config ./webpack.config.dev.js",
     "build:prod": "webpack --config ./webpack.config.prod.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fairway-corp/mentor.fairway.ne.jp.git"
+    "url": "git+https://github.com/fairway-corp/hey.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/fairway-corp/mentor.fairway.ne.jp/issues"
+    "url": "https://github.com/fairway-corp/hey/issues"
   },
-  "homepage": "https://github.com/fairway-corp/mentor.fairway.ne.jp#readme",
+  "homepage": "https://github.com/fairway-corp/hey#readme",
   "devDependencies": {
     "@types/react": "^0.14.55",
     "@types/react-dom": "^0.14.19",
